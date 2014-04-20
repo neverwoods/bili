@@ -2,7 +2,7 @@
     "name": "neverwoods/bili",
     "type": "library",
     "description": "The swiss army knife of PHP modules.",
-    "keywords": ["collection", "crypt", "includer", "language],
+    "keywords": ["collection", "crypt", "includer", "language"],
     "homepage": "https://neverwoods.beanstalkapp.com/bili/",
     "license": "Apache v2",
     "authors": [
