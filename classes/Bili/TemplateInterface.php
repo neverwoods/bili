@@ -321,6 +321,14 @@ class TemplateInterface
         return $arrReturn;
     }
 
+    /**
+     * Clear the CSS array.
+     */
+    protected static function clearCss()
+    {
+        self::$cssIncludes = array();
+    }
+
     private static function doAddScriptBlock($strBlock, $strPrefix, &$arrBlocks, $arrVars = array(), $blnReplace = true)
     {
         if (!empty($strBlock)) {

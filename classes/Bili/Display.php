@@ -84,6 +84,44 @@ class Display
     }
 
     /**
+     * Do a simple conversion from bytes to Kilobytes, Megabytes or Gigabytes.
+     *
+     * @param integer $intFrom
+     * @param string $strTargetUnit
+     * @return decimal
+     */
+    public static function renderBytes($intFrom, $strTargetUnit, $strSourceUnit = "B")
+    {
+        $decReturn = $intFrom;
+
+        switch ($strSourceUnit) {
+        	case "KB":
+        	    $decReturn = $decReturn * 1024;
+        	    break;
+        	case "MB":
+        	    $decReturn = $decReturn * 1024 * 1024;
+        	    break;
+        	case "GB":
+        	    $decReturn = $decReturn * 1024 * 1024 * 1024;
+        	    break;
+        }
+
+        switch ($strTargetUnit) {
+        	case "KB":
+        	    $decReturn = $decReturn / 1024;
+        	    break;
+        	case "MB":
+        	    $decReturn = $decReturn / 1024 / 1024;
+        	    break;
+        	case "GB":
+        	    $decReturn = $decReturn / 1024 / 1024 / 1024;
+        	    break;
+        }
+
+        return $decReturn;
+    }
+
+    /**
      * Format a numeric value according to the language settings for a form value.
      *
      * @return string string representation of a numeric value

@@ -38,6 +38,13 @@ class Sanitize
         return $strReturn;
     }
 
+    public static function toFilename($strOutput)
+    {
+    	$strOutput = preg_replace('/([^\w\s\d\-\.%_~,;:\[\]\|])/u', '', $strOutput);
+
+    	return $strOutput;
+    }
+
     /**
      * Convert any numeric input to a machine readable decimal.
      *

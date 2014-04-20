@@ -11,9 +11,28 @@ class Crypt
      * @param number $intMaxLength
      * @return string
      */
-    public static function generateToken($arrInput = [], $intMaxLength = 16)
+    public static function generateToken($arrInput = [], $intMaxLength = 40)
     {
-        return substr(sha1(implode("", $arrInput)), 0, $intMaxLength);
+        $strReturn = null;
+
+        if (count($arrInput) > 0) {
+            $intMaxLength = ($intMaxLength > 16) ? 16 : $intMaxLength;
+            $strReturn = substr(sha1(implode("", $arrInput)), 0, $intMaxLength);
+        } else {
+            $strChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            srand((double)microtime()*1000000);
+            $arrReturn = [];
+
+            for ($i = 1; $i <= $intMaxLength; $i++) {
+                $intNum = rand() % (strlen($strChars) - 1);
+                $strTmp = substr($strChars, $intNum, 1);
+                $arrReturn[] = $strTmp;
+            }
+
+            $strReturn = implode("", $arrReturn);
+        }
+
+        return $strReturn;
     }
 
     public static function doEncode($in)

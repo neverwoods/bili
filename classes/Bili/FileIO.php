@@ -39,6 +39,22 @@ class FileIO
 	    }
 	}
 
+	public static function createTempFolder($strBaseFolder)
+	{
+	    $strReturn = "";
+
+	    $strBaseFolder = (substr($strBaseFolder, -1) !== DIRECTORY_SEPARATOR)
+	        ? $strBaseFolder . DIRECTORY_SEPARATOR
+	        : $strBaseFolder;
+
+        $strFolderName = $strBaseFolder . Crypt::generateToken([], 16);
+        if (mkdir($strFolderName)) {
+            $strReturn = $strFolderName;
+        }
+
+        return $strReturn;
+	}
+
 	/**
 	 * Convert HTML markup to a binary PDF
 	 * @param  string      $strHtml The HTML input
@@ -79,7 +95,42 @@ class FileIO
 	    return $varReturn;
 	}
 
-	public static function handleUpload($targetDir)
+	/**
+	 * Merge 2 or more PDF files.
+	 *
+	 * @param string $strPathA The path to save to. If it's an exisiting file it will be added to the merge
+	 *                         and replaced after the successful merge.
+	 * @param string $varPathB The path(s) to the files that we want to merge.
+	 * @return boolean
+	 */
+	public static function mergePdfFiles($strPathA, $varPathB)
+	{
+	    $blnReturn = false;
+
+	    $strSaveFile = $strPathA;
+	    $blnMove = false;
+
+	    if (file_exists($strPathA)) {
+	        $blnMove = true;
+	        $varPathB .= " \"" . $strPathA . "\"";
+	        $strSaveFile = dirname($strPathA) . "/" . Crypt::generateToken([], 16);
+	    }
+
+        $strCommand = $GLOBALS["_CONF"]["app"]["gs"]
+        	. " -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=\"{$strSaveFile}\" -dBATCH {$varPathB}";
+
+        $blnReturn = exec($strCommand);
+
+        if (file_exists($strSaveFile) && $blnMove) {
+            //*** Move the temp file to the original.
+            @unlink($strPathA);
+            @rename($strSaveFile, $strPathA);
+        }
+
+	    return $blnReturn;
+	}
+
+	public static function handleUpload($targetDir, intMaxSize = null)
 	{
 		// HTTP headers for no cache etc
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -98,7 +149,10 @@ class FileIO
 		$fileId = isset($_REQUEST["id"]) ? $_REQUEST["id"] : '';
 
 		// Clean the fileName for security reasons
-		$fileName = preg_replace('/[^\w\._]+/', '-', $fileName);
+		$fileName = filter_var($fileName, FILTER_SANITIZE_STRING);
+		$fileName = str_replace(" ", "-", $fileName);
+		$fileName = str_replace("---", "-", $fileName);
+		$fileName = str_replace("--", "-", $fileName);
 		$originalName = $fileName;
 
 		// Make sure the fileName is unique but only if chunking is disabled
@@ -183,11 +237,27 @@ class FileIO
 			}
 		}
 
-		// Save the upload info.
-		$_SESSION["app-uploads"][$fileId] = array("file" => $fileName, "original" => $originalName);
+		//*** Check if the uploaded file is under the max. size limit.
+		if (!is_null($intMaxSize)) {
+		    try {
+		        $intSize = filesize($targetDir . DIRECTORY_SEPARATOR . $fileName);
+		        if ($intSize > $intMaxSize) {
+		            $fileName = "";
+		        }
+		    } catch (\Exception $ex) {
+		        //*** Fail silent.
+		    }
+		}
 
-		// Return JSON-RPC response
-		die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+		if (!empty($fileName)) {
+    		// Save the upload info.
+    		$_SESSION["app-uploads"][$fileId] = array("file" => $fileName, "original" => $originalName);
+
+    		// Return JSON-RPC response
+    		die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+		} else {
+			die('{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "File size over maximum allowed size."}, "id" : "id"}');
+		}
 	}
 
 	/**
@@ -233,6 +303,9 @@ class FileIO
 	public static function getWebFile($strUrl)
 	{
 	    $strReturn = null;
+
+	    //*** Make it browser save.
+	    $strUrl = str_replace(" ", "%20", $strUrl);
 
 	    $objCurl = curl_init();
 	    curl_setopt($objCurl, CURLOPT_URL, $strUrl);

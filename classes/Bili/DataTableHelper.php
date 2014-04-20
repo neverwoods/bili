@@ -4,6 +4,23 @@ namespace Bili;
 
 class DataTableHelper
 {
+    public static function getInitialServerResponse()
+    {
+        return [
+            "iTotalRecords" => 0,
+            "iTotalDisplayRecords" => 0,
+            "sEcho" => self::getEcho(),
+            "aaData" => []
+        ];
+    }
+
+    public static function getEcho()
+    {
+        $strReturn = Request::get("sEcho");
+
+        return $strReturn;
+    }
+
     public static function getOrderColumn($strDefaultColumn)
     {
         $strReturn = $strDefaultColumn;
@@ -29,6 +46,13 @@ class DataTableHelper
     public static function getSearchValue()
     {
         $strReturn = Request::get("sSearch");
+
+        return $strReturn;
+    }
+
+    public static function getSqlSearchValue()
+    {
+        $strReturn = "%" . self::getSearchValue() . "%";
 
         return $strReturn;
     }

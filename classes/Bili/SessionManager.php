@@ -15,10 +15,11 @@ class SessionManager
 {
     private static $instance = null;
     private $transferId = null;
+    private $timeout = 1440;
 
-    public static function singleton($transferId = null, $intTimeout = 900)
+    public static function singleton($transferId = null, $timeout = 1440)
     {
-        self::$instance = new SessionManager($transferId);
+        self::$instance = new SessionManager($transferId, $timeout);
 
         //*** Register this object as the session handler.
         session_set_save_handler(
@@ -30,8 +31,8 @@ class SessionManager
             array(&self::$instance, "gc")
         );
 
-        ini_set('session.gc_maxlifetime', $intTimeout);
-        if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $intTimeout)) {
+        ini_set('session.gc_maxlifetime', $timeout);
+        if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $timeout)) {
             session_unset();     // unset $_SESSION variable for the run-time
             session_destroy();   // destroy session data in storage
         }
@@ -43,11 +44,15 @@ class SessionManager
         return self::$instance;
     }
 
-    private function __construct($transferId = null)
+    private function __construct($transferId = null, $timeout = 1440)
     {
         if (!is_null($transferId) && !empty($transferId)) {
             $this->transferId = $transferId;
         }
+
+        $this->timeout = $timeout;
+
+        ini_set('session.gc_maxlifetime', $this->timeout);
     }
 
     public function open($strSavePath, $strSessionName)

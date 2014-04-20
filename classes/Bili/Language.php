@@ -60,7 +60,7 @@ class Language
         return self::$instance;
     }
 
-    public function setSanitize($strSanitizeType)
+    public static function setSanitize($strSanitizeType)
     {
         self::$sanitizeType = $strSanitizeType;
     }
@@ -70,10 +70,10 @@ class Language
         return $this->activeLang;
     }
 
-    public static function get($strName, $strCategory = "global")
+    public static function get($strName, $strCategory = "global", $blnReturnError = true)
     {
         //*** Get a translation from the language file.
-        $strReturn = sprintf(self::$error, $strName, $strCategory);
+        $strReturn = ($blnReturnError) ? sprintf(self::$error, $strName, $strCategory) : "";
 
         if (isset(self::$languages[$strCategory][$strName])) {
             $strReturn = self::$languages[$strCategory][$strName];
@@ -82,7 +82,7 @@ class Language
         //*** Output sanitisation?
         switch (self::$sanitizeType) {
             case "xhtml":
-                if (class_exists("Sanitize", true)) {
+                if (class_exists("Bili\\Sanitize", true)) {
                     $strReturn = Sanitize::toXhtml($strReturn);
                 }
 

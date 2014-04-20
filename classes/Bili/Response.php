@@ -106,6 +106,35 @@ class Response
         return Request::getRootURI() . $strLink;
     }
 
+    public static function pushDownloadHeadersToBrowser($mimeType, $strFilename, $intContentLength = 0)
+    {
+        header("HTTP/1.1 200 OK");
+        header("Pragma: public");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);
+        header("Content-type: " . $mimeType);
+        header("Content-Disposition: attachment; filename=\"" . $strFilename . "\"");
+        header("Content-Transfer-Encoding: binary");
+
+        if ($intContentLength > 0) {
+            header("Content-Length: " . $intContentLength);
+        }
+    }
+
+    public static function pushFileHeadersToBrowser($mimeType, $intContentLength = 0)
+    {
+        header("HTTP/1.1 200 OK");
+        header("Pragma: public");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);
+        header("Content-type: " . $mimeType);
+        header("Content-Transfer-Encoding: binary");
+
+        if ($intContentLength > 0) {
+            header("Content-Length: " . $intContentLength);
+        }
+    }
+
     public static function pushDownloadToBrowser($strFileData, $strFilename)
     {
         if ($strFileData !== false) {
@@ -120,16 +149,48 @@ class Response
                 //*** Skip detection.
             }
 
-            header("HTTP/1.1 200 OK");
-            header("Pragma: public");
-            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-            header("Cache-Control: private", false);
-            header("Content-type: " . $mimeType);
-            header("Content-Disposition: attachment; filename=\"" . $strFilename . "\"");
-            header("Content-Transfer-Encoding: binary");
-            header("Content-Length: " . strlen($strFileData));
+            self::pushDownloadHeadersToBrowser($mimeType, $strFilename, strlen($strFileData));
 
             echo $strFileData;
+        } else {
+            header("HTTP/1.1 404 Not found");
+            echo "No data.";
+        }
+
+        exit;
+    }
+
+    public static function pushFileToBrowser($varFileData)
+    {
+        if ($varFileData !== false) {
+            $blnBinary = true;
+
+            //*** Detect if the input is a file path or binary file.
+            try {
+                $blnBinary = is_file($varFileData) === false;
+            } catch (\Exception $ex) {
+                //*** Skip detection.
+            }
+
+            if (!$blnBinary) {
+                //*** Load the file contents.
+                $binFileData = file_get_contents($varFileData);
+            } else {
+                $binFileData = $varFileData;
+            }
+
+            $mimeType = "application/octet-stream";
+
+            try {
+                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mimeType = $finfo->buffer($binFileData);
+            } catch (\Exception $ex) {
+                //*** Skip detection.
+            }
+
+            self::pushFileHeadersToBrowser($mimeType, strlen($binFileData));
+
+            echo $binFileData;
         } else {
             header("HTTP/1.1 404 Not found");
             echo "No data.";

@@ -8,6 +8,8 @@ class FTP
 	private $strHost;
 	private $intPort;
 	private $intTimeout;
+	private $strUsername;
+	private $strPassword;
 
    	/* public Void __construct(): Constructor */
    	public function __construct($host, $port = 21, $timeout = 90, $blnSecure = false)
@@ -36,7 +38,11 @@ class FTP
    	/* public Void __destruct(): Destructor */
    	public function __destruct()
    	{
-   		@ftp_close($this->objFTP);
+   	    try {
+   		   @ftp_close($this->objFTP);
+   	    } catch (\Exception $ex) {
+   	        //*** Already disconnected. Continue.
+   	    }
    	}
 
    	/* public Mixed __call(): Re-route all function calls to the PHP-functions */
@@ -65,6 +71,14 @@ class FTP
        	}
 
        	return $varReturn;
+   	}
+
+   	public function login($strUsername, $strPassword)
+   	{
+   	    $this->strUsername = $strUsername;
+   	    $this->strPassword = $strPassword;
+
+   	    return ftp_login($this->objFTP, $strUsername, $strPassword);
    	}
 
    	public function delete($strPath)
@@ -106,6 +120,22 @@ class FTP
 		}
 	}
 
+	public function mksubdirs($ftpath, $ftpbasedir = null) {
+	    if (!is_null($ftpbasedir)) {
+	       @ftp_chdir($this->objFTP, $ftpbasedir);
+	    }
+
+	    $parts = explode('/', $ftpath);
+	    foreach ($parts as $part) {
+	        try {
+	            @ftp_chdir($this->objFTP, $part);
+	        } catch (\Exception $ex) {
+	            @ftp_mkdir($this->objFTP, $part);
+	            @ftp_chdir($this->objFTP, $part);
+	        }
+	    }
+	}
+
 	/**
 	 * Quick remove method for a single file.
 	 *
@@ -139,13 +169,12 @@ class FTP
 	 * @param array $ftpSettings (path.uploads, host, username, password)
 	 * @throws \RuntimeException
 	 */
-	public static function ftpUpload($sourceFile, $ftpSettings)
+	public static function ftpUpload($sourceFile, $ftpSettings, $targetFile = null, $blnSecure = false)
 	{
-	    $strFtpFileName = basename($sourceFile);
+	    $strFtpFileName = (is_null($targetFile)) ? basename($sourceFile) : $targetFile;
 	    $strFtpFileDir = $ftpSettings['path']['uploads'];
-	    $strFtpFilePath = $strFtpFileDir . "/" . $strFtpFileName;
 
-	    $objFtp = new FTP($ftpSettings['host']);
+	    $objFtp = new FTP($ftpSettings['host'], 21, 90, $blnSecure);
 	    $objRet = $objFtp->login($ftpSettings['username'], $ftpSettings['password']);
 	    if (!$objRet) {
 	        throw new \RuntimeException("Could not login to FTP server.", 404);
@@ -156,13 +185,13 @@ class FTP
 
 	    //*** Create dealer folder.
 	    try {
-	        $objFtp->mkdir($strFtpFileDir);
+	        $objFtp->mksubdirs($strFtpFileDir);
 	    } catch (\Exception $ex) {
 	        //*** Ignore. The folder probably already exists.
 	    }
 
 	    //*** Transfer file.
-	    $objRet = $objFtp->nb_put($strFtpFilePath, $sourceFile, FTP_BINARY);
+	    $objRet = $objFtp->nb_put($strFtpFileName, $sourceFile, FTP_BINARY);
 	    while ($objRet == FTP_MOREDATA) {
 	        // Continue uploading...
 	        $objRet = $objFtp->nb_continue();

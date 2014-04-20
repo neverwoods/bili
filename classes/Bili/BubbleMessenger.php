@@ -15,6 +15,11 @@ class BubbleMessenger
      *
      * @var string $message The message to display
      * @var array $options An array of options for the message
+     *                     "title" = Title of the message
+     *                     "type" = Message type (MSG_TYPE_INFO, MSG_TYPE_ERROR, MSG_TYPE_WARNING, MSG_TYPE_CONFIRM)
+     *                     "location" = Location on the page (MSG_LOC_PAGE, MSG_LOC_CONTAINER, MSG_LOC_SIDEBAR)
+     *                     "timeout" = Timeout in milliseconds (MSG_HIDE_TIME_INFO, MSG_HIDE_TIME_ERROR)
+     *                     "permanent" = Indicate if the message should be displayed on every page and not only once.
      */
     public static function add($message, $options = array())
     {
@@ -52,6 +57,24 @@ class BubbleMessenger
         }
 
         return $arrReturn;
+    }
+    
+    public static function remove($strKey)
+    {
+        $arrTemp = array();
+        
+    	if (isset($_SESSION["bubble-messages"])) {
+    		$objMessages = unserialize($_SESSION["bubble-messages"]);
+    		if (is_array($objMessages)) {
+    			foreach ($objMessages as $objMessage) {
+    				if ($objMessage->getKey() != $strKey) {
+    					array_push($arrTemp, $objMessage);
+    				}
+    			}
+    			
+    			$_SESSION["bubble-messages"] = serialize($arrTemp);
+    		}
+    	}
     }
 
     public static function clear()

@@ -67,7 +67,7 @@ class Date
 
     public static function getMonthName($intMonth)
     {
-        return date("F", mktime(0, 0, 0, $intMonth, 10));
+        return strftime("%B", mktime(0, 0, 0, $intMonth, 10));
     }
 
     public static function parseDate($strDate, $strFormat)
