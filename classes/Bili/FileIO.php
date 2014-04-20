@@ -130,7 +130,7 @@ class FileIO
 	    return $blnReturn;
 	}
 
-	public static function handleUpload($targetDir, intMaxSize = null)
+	public static function handleUpload($targetDir, $intMaxSize = null)
 	{
 		// HTTP headers for no cache etc
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");

@@ -39,7 +39,7 @@ class FTP
    	public function __destruct()
    	{
    	    try {
-   		   @ftp_close($this->objFTP);
+   		    @ftp_close($this->objFTP);
    	    } catch (\Exception $ex) {
    	        //*** Already disconnected. Continue.
    	    }
@@ -120,9 +120,10 @@ class FTP
 		}
 	}
 
-	public function mksubdirs($ftpath, $ftpbasedir = null) {
+	public function mksubdirs($ftpath, $ftpbasedir = null)
+	{
 	    if (!is_null($ftpbasedir)) {
-	       @ftp_chdir($this->objFTP, $ftpbasedir);
+	        @ftp_chdir($this->objFTP, $ftpbasedir);
 	    }
 
 	    $parts = explode('/', $ftpath);
