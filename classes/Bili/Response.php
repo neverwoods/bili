@@ -84,7 +84,7 @@ class Response
      * @param  string $strFilename File name
      * @return string The generated download link
      */
-    public static function generateDownloadLink($binData, $strFilename)
+    public static function generateDownloadLink($binData, $strFilename, $strDownloadUrl = null)
     {
         $strUniqueName 	= mt_rand(1000000, 9999999);
         $objRewrite 	= Rewrite::getInstance();
@@ -94,16 +94,20 @@ class Response
         // Save in session
         $_SESSION["documents"][$strUniqueName] = $strFilename;
 
-        $strLink = $objRewrite->getUrl(
-        	SECTION_DOCUMENT,
-        	CMD_DOWNLOAD,
-        	null,
-        	null,
-        	SUB_SECTION_EMPTY,
-        	array("t" => $strUniqueName)
-        );
+        if (is_null($strDownloadUrl)) {
+            $strDownloadUrl = $objRewrite->getUrl(
+            	SECTION_DOCUMENT,
+            	CMD_DOWNLOAD,
+            	null,
+            	null,
+            	SUB_SECTION_EMPTY,
+            	array("t" => $strUniqueName)
+            );
+        } else {
+            $strDownloadUrl .= "/t/" . Rewrite::encode($strUniqueName);
+        }
 
-        return Request::getRootURI() . $strLink;
+        return Request::getRootURI() . $strDownloadUrl;
     }
 
     public static function pushDownloadHeadersToBrowser($mimeType, $strFilename, $intContentLength = 0)
