@@ -151,6 +151,24 @@ class Sanitize
         return $varReturn;
     }
 
+    /**
+     * Sanitize a string to a pure ascii string. No special characters or any other fancy UTF-8 stuff.
+     *
+     * @param string $strInput
+     * @return string
+     */
+    public static function toAscii($strInput)
+    {
+        $strReturn = $strInput;
+
+        $strNew = iconv("utf-8", "ascii//TRANSLIT", $strInput);
+        if ($strNew !== false) {
+            $strReturn = $strNew;
+        }
+
+        return $strReturn;
+    }
+
     private static function filterAmpersandEntity(&$text)
     {
         $text = preg_replace('/&(?!#?[xX]?(?:[0-9a-fA-F]+|\w{1,8});)/i', "&amp;", $text);
