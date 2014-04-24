@@ -187,7 +187,8 @@ class Display
     {
         $text = trim($text);
         $text = strip_tags($text, $strAllowedTags);
+        $text = json_encode($text);
 
-        return addslashes($text);
+        return $text;
     }
 }
