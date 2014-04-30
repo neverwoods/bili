@@ -46,7 +46,7 @@ class Response
      */
     public static function sendRSS($strBody)
     {
-        self::send($strBody, "application/rss+xml");
+        self::send($strBody, "application/rss+xml; charset=utf-8");
     }
 
     /**
@@ -55,7 +55,7 @@ class Response
      */
     public static function sendAtom($strBody)
     {
-        self::send($strBody, "application/atom+xml");
+        self::send($strBody, "application/atom+xml; charset=utf-8");
     }
 
     /**
