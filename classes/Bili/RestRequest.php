@@ -170,6 +170,7 @@ class RestRequest
         curl_setopt($curlHandle, CURLOPT_TIMEOUT, 30);
         curl_setopt($curlHandle, CURLOPT_URL, $this->url);
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $this->buildHeaders());
     }
 
