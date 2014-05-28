@@ -60,7 +60,7 @@ class FileIO
 	 * @param  string      $strHtml The HTML input
 	 * @return binary|null The binary PDF output or null if something went wrong.
 	 */
-	public static function html2pdf($strHtml, $strFilePrefix = "document")
+	public static function html2pdf($strHtml, $strFilePrefix = "document", $arrParameters = null)
 	{
 	    $varReturn = null;
 
@@ -76,8 +76,12 @@ class FileIO
 	    $strInput = $strHtmlFile;
 	    $strOutput = $strPdfFile;
 
+	    //*** Extra parameters.
+	    $strParameters = (is_array($arrParameters)) ? implode(" ", $arrParameters) : "";
+
 	    $arrExec = array();
 	    $arrExec[] = $GLOBALS["_CONF"]["app"]["wkhtmltopdf"]; // TODO: Check if global exists.
+		$arrExec[] = $strParameters;
 	    $arrExec[] = $strInput;
 	    $arrExec[] = $strOutput;
 	    $strExec = implode(" ", $arrExec);
@@ -88,9 +92,11 @@ class FileIO
 	        $varReturn = file_get_contents($strPdfFile);
 
 	        // Clean up
-	        @unlink($strHtmlFile);
 	        @unlink($strPdfFile);
 	    }
+
+        // Clean up
+        @unlink($strHtmlFile);
 
 	    return $varReturn;
 	}
