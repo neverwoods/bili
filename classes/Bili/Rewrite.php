@@ -226,7 +226,7 @@ class Rewrite
         $strReturn = "/";
 
         //*** Department.
-        if (!is_null($intDepartment) && is_numeric($intDepartment)) {
+        if (!is_null($intDepartment) && ctype_digit(strval($intDepartment))) {
             $strReturn .= $this::encode($intDepartment) . "/";
         }
 
@@ -260,7 +260,7 @@ class Rewrite
 
         //*** Element.
         if (!is_null($intElement)) {
-            if (is_numeric($intElement)) {
+            if (ctype_digit(strval($intElement))) {
                 $intElement = $this::encode($intElement);
             }
             $strReturn .= "/" . $intElement;
@@ -271,7 +271,7 @@ class Rewrite
             foreach ($arrParameters as $key => $value) {
                 //*** Prevent setting of reserved parameters
                 if (!in_array($key, $this->reservedParameters)) {
-                    if (is_numeric($value)) {
+                    if (ctype_digit(strval($value))) {
                         $value = $this::encode($value);
                     }
 
@@ -306,7 +306,7 @@ class Rewrite
 
             $blnHasDepartment = false;
             if (count($arrUrl) > 0) {
-                if (is_numeric($arrUrl[0])) {
+                if (ctype_digit(strval($arrUrl[0]))) {
                     $this->department = $this::decode($arrUrl[0]);
                     $blnHasDepartment = true;
                 }
@@ -350,7 +350,7 @@ class Rewrite
                                 $this->command = self::$commands[$value];
                             }
                         } else {
-                            if (is_numeric($value)) {
+                            if (ctype_digit(strval($value))) {
                                 $this->element = $this::decode($value);
                             } else {
                                 $this->parameters = $this->arrayToAssociated(
@@ -364,7 +364,7 @@ class Rewrite
                     case 3:
                         //*** Element or parameters.
                         if ($blnHasSubsection) {
-                            if (is_numeric($value)) {
+                            if (ctype_digit(strval($value))) {
                                 $this->element = $this::decode($value);
                             } else {
                                 $this->parameters = $this->arrayToAssociated(
@@ -445,7 +445,7 @@ class Rewrite
         if (!(count($arrInput) & 1)) {
             for ($count = 0; $count < count($arrInput); $count++) {
                 $value = $arrInput[$count + 1];
-                if (is_numeric($value)) {
+                if (ctype_digit(strval($value))) {
                     $value = $this::decode($value);
                 }
 
