@@ -48,12 +48,17 @@ class Request
     {
         if (!empty($strQuery)) {
             if (is_numeric($strQuery)) {
-                $strLocation = "?eid=" . $strQuery;
+                $strLocation = self::getURI() . "?eid=" . $strQuery;
             } else {
-                $strLocation = $strQuery;
+                $arrLocation = parse_url($strQuery);
+                if ($arrLocation !== false && isset($arrLocation["scheme"]) && !empty($arrLocation["scheme"])) {
+                    $strLocation = $strQuery;
+                } else {
+                    $strLocation = self::getURI() . $strQuery;
+                }
             }
 
-            header("Location: " . self::getURI() . $strLocation);
+            header("Location: " . $strLocation);
 
             exit();
         }
