@@ -37,6 +37,8 @@ class SessionManager
             session_destroy();   // destroy session data in storage
         }
         $_SESSION['LAST_ACTIVITY'] = time(); // update last activity time stamp
+
+        return self::$instance;
     }
 
     public static function getInstance()
