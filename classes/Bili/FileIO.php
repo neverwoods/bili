@@ -6,8 +6,9 @@ namespace Bili;
  * File IO operations.
  *
  * @package Bili
- * @author felix
- * @version 1.0
+ * @author Felix Langfeldt <felix@neverwoods.com>
+ * @author Robin van Baalen <robin@neverwoods.com>
+ * @version 1.1
  */
 class FileIO
 {
