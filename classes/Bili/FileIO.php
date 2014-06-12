@@ -269,10 +269,33 @@ class FileIO
 	/**
 	 * Check if a remote file on a webserver exists.
 	 *
-	 * @param string $strUrl
-	 * @return boolean
+	 * This can be used like:
+	 * <code>
+	 * $blnFileExsits = \Bili\FileIO::webFileExists('http://neverwoods.com/css/default.css');
+	 * </code>
+	 * Returns true since neverwoods.com automatically forwards to the main page and returns a 200 header
+	 *
+	 * But to verify it's actually a CSS file that exists remotely, we can add a validation array:
+	 * <code>
+	 * $blnFileExists = \Bili\FileIO::webFileExists(
+	 *     'http://neverwoods.com/css/default.css',
+	 *     array(
+	 *         CURLINFO_CONTENT_TYPE => "text/css"
+	 *     )
+	 * );
+	 * </code>
+	 * In this case, `$blnFileExists` is false. The remote file is an HTML page instead of a CSS file.
+	 * You can add all `CURLINFO_` constants as a key and add their desired value as the value.
+	 *
+	 * Note:
+	 * Be aware that when you validate for HTML pages, CURLINFO_CONTENT_TYPE returns 'text/html; charset=UTF-8'
+	 * or something similar instead of the possibly expected 'text/html'.
+	 *
+	 * @param string $strUrl The fully qualified path to the remote file
+	 * @param array $validations The array of validation rules
+	 * @return boolean True if the remote file exists and matches the validation rules, false if not
 	 */
-	public static function webFileExists($strUrl)
+	public static function webFileExists($strUrl, $validations = array())
 	{
 	    $blnReturn = false;
 
@@ -290,8 +313,24 @@ class FileIO
 
 	    $strData = curl_exec($objCurl);
 
-        $intStatusCode = curl_getinfo($objCurl, CURLINFO_HTTP_CODE);
-	    if ($intStatusCode == 200) {
+	    $intValidationCounter = 0;
+	    $intHttpResponseCode = curl_getinfo($objCurl, CURLINFO_HTTP_CODE);
+	    if ($intHttpResponseCode == 200) {
+    	    foreach ($validations as $intCurlType => $varDesiredValue) {
+    	        $varReturnValue = curl_getinfo($objCurl, $intCurlType);
+
+    	        if ($varReturnValue === $varDesiredValue) {
+                    //*** Validate all validations and keep track of the amount of valid ones
+                    $intValidationCounter++;
+    	        }
+    	    }
+	    }
+
+	    /**
+	     * When we have to validate all validations, compare the validations array length
+	     * against the amount of valid validations we've encountered.
+	     */
+	    if (count($validations) === $intValidationCounter) {
 	        $blnReturn = true;
 	    }
 
