@@ -64,11 +64,11 @@ class DataTableHelper
 
     public static function getPageStart()
     {
-        return Request::get("iDisplayStart", 0);
+        return (int)Request::get("iDisplayStart", 0);
     }
 
     public static function getPageLength()
     {
-        return Request::get("iDisplayLength", 10);
+        return (int)Request::get("iDisplayLength", 10);
     }
 }
