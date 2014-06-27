@@ -144,9 +144,9 @@ class FTP
 	 * @param array $ftpSettings (host, username, password)
 	 * @throws \RuntimeException
 	 */
-	public static function ftpRemove($strFile, $ftpSettings)
+	public static function ftpRemove($strFile, $ftpSettings, $blnSecure = false)
 	{
-	    $objFtp = new FTP($ftpSettings['host']);
+	    $objFtp = new FTP($ftpSettings['host'], 21, 90, $blnSecure);
 	    $objRet = $objFtp->login($ftpSettings['username'], $ftpSettings['password']);
 	    if (!$objRet) {
 	        throw new \RuntimeException("Could not login to FTP server.", 404);
@@ -158,6 +158,38 @@ class FTP
 	    //*** Remove the file.
 	    try {
 	        @$objFtp->delete($strFile);
+	    } catch (\Exception $ex) {
+	        //*** Ignore. Probably already removed.
+	    }
+	}
+
+	/**
+	 * Quick remove method for a single folder.
+	 *
+	 * @param string $strFolder
+	 * @param array $ftpSettings (host, username, password)
+	 * @param boolean $blnSecure
+	 * @throws \RuntimeException
+	 */
+	public static function ftpRemoveDir($strFolder, $ftpSettings, $blnSecure = false)
+	{
+	    $objFtp = new FTP($ftpSettings['host'], 21, 90, $blnSecure);
+	    $objRet = $objFtp->login($ftpSettings['username'], $ftpSettings['password']);
+	    if (!$objRet) {
+	        throw new \RuntimeException("Could not login to FTP server.", 404);
+	    }
+
+	    //*** Passive mode.
+	    $objFtp->pasv(true);
+
+	    //*** Remove the file.
+	    try {
+	        //*** Check if the folder is empty.
+	        $arrFiles = $objFtp->nlist($strFolder);
+
+	        if ($arrFiles !== false && count($arrFiles) == 0) {
+	            @$objFtp->rmdir($strFolder);
+	        }
 	    } catch (\Exception $ex) {
 	        //*** Ignore. Probably already removed.
 	    }
