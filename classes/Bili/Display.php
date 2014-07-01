@@ -191,4 +191,26 @@ class Display
 
         return $text;
     }
+
+    /**
+     * Get the first paragraph from an HTML string
+     *
+     * For example when you have a string like this:
+     * ```php
+     * $strHtml = "<strong>hello</strong><p>Cool</p><p>Awesome longer text!</p>";
+     * ```
+     *
+     * This method would return `<p>Cool</p>` since that's the first paragraph.
+     * This way, you could have both a summary and a full length text in one string without having to chop off text.
+     *
+     * @param string $strHtml The HTML string to look for the first paragraph element
+     * @return string
+     */
+    public static function getFirstParagraph($strHtml)
+    {
+        $arrResults = array();
+        preg_match('%(<p[^>]*>.*?</p>)%i', $strHtml, $arrResults);
+
+        return $arrResults[0];
+    }
 }
