@@ -9,7 +9,7 @@ class Geocoder
     public static function addressToLatLng($strAddress)
     {
         if (empty($strAddress)) {
-            throw new \InvalidArgumentException("Invalid address supplied in Geocoder::addressToLatLng()", E_ERROR);
+            throw new \InvalidArgumentException("Empty address supplied in Geocoder::addressToLatLng(). Cannot proceed.", E_ERROR);
         }
 
         $objCurlRequest = curl_init();
