@@ -21,16 +21,28 @@ class Geocoder
             true
         );
 
-        if ($arrResponse['status'] !== 'OK') {
+        if (is_null($arrResponse) 
+            || !isset($arrResponse['status']) 
+            || $arrResponse['status'] !== 'OK'
+        ) {
             throw new \RuntimeException("No valid response received from Google Maps API.", E_ERROR);
         }
 
-        $arrGeometry = $arrResponse['results'][0]['geometry'];
+        // Fetch geometry data from response
+        if (!isset($arrResponse['results']) 
+            || !is_array($arrResponse['results'][0]) 
+            || !isset($arrResponse['results'][0]['geometry'])
+            || !isset($arrResponse['results'][0]['geometry']['location'])
+            || !isset($arrResponse['results'][0]['geometry']['location']['lat'])
+            || !isset($arrResponse['results'][0]['geometry']['location']['lng'])
+        ) {
+            throw new \UnexpectedValueException("Could not read geometry data from Google Maps API response data.", E_ERROR);
+        }
 
+        $arrGeometry = $arrResponse['results'][0]['geometry'];
         return array(
         	'latitude' => $arrGeometry['location']['lat'],
-        	'longitude' => $arrGeometry['location']['lng'],
-        	'locationType' => $arrGeometry['location']['location_type']
+        	'longitude' => $arrGeometry['location']['lng']
         );
     }
 }
