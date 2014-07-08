@@ -13,7 +13,7 @@ class Geocoder
         }
 
         $objCurlRequest = curl_init();
-        curl_setopt($objCurlRequest, CURLOPT_URL, self::$googleMapsApi);
+        curl_setopt($objCurlRequest, CURLOPT_URL, sprintf(self::$googleMapsApi, $strAddress));
         curl_setopt($objCurlRequest, CURLOPT_RETURNTRANSFER, 1);
 
         $arrResponse = json_decode(
