@@ -17,8 +17,9 @@ class RestRequest
     protected $acceptType;
     protected $responseBody;
     protected $responseInfo;
+    protected $multipart;
 
-    public function __construct ($url = null, $verb = "GET", $requestBody = null, $headers = null)
+    public function __construct ($url = null, $verb = "GET", $requestBody = null, $headers = null, $blnMultipart = false)
     {
         $this->url				= $url;
         $this->verb				= $verb;
@@ -30,6 +31,7 @@ class RestRequest
         $this->acceptType		= "application/json";
         $this->responseBody		= null;
         $this->responseInfo		= null;
+        $this->multipart        = $blnMultipart;
 
         if ($this->requestBody !== null) {
             $this->buildPostBody();
@@ -84,11 +86,14 @@ class RestRequest
     {
         $data = ($data !== null) ? $data : $this->requestBody;
 
-        if (!is_array($data)) {
+        if (!is_array($data) && !is_object($data)) {
             throw new \InvalidArgumentException("Invalid data input for postBody. Array expected.");
         }
 
-        $data = http_build_query($data, "", "&");
+        if (!$this->multipart) {
+        	$data = http_build_query($data, "", "&");
+        }
+        
         $this->requestBody = $data;
     }
 
@@ -118,12 +123,12 @@ class RestRequest
 
     protected function executePost ($ch)
     {
-        if (!is_string($this->requestBody)) {
+        if (!is_string($this->requestBody) && !$this->multipart) {
             $this->buildPostBody();
         }
 
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $this->requestBody);
         curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $this->requestBody);
 
         $this->doExecute($ch);
     }
@@ -170,7 +175,6 @@ class RestRequest
         curl_setopt($curlHandle, CURLOPT_TIMEOUT, 30);
         curl_setopt($curlHandle, CURLOPT_URL, $this->url);
         curl_setopt($curlHandle, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curlHandle, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $this->buildHeaders());
     }
 
