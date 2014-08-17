@@ -26,18 +26,19 @@ class FileIO
 
 	public static function unlinkDir($dir)
 	{
-	    $files = glob($dir . '*', GLOB_MARK);
-	    foreach ($files as $file) {
-	        if (substr($file, -1) == '/') {
-	            self::unlinkDir($file);
-	        } else {
-	            unlink($file);
-	        }
-	    }
+        if (is_dir($dir) === true) {
+    	    $files = array_diff(scandir($dir), array('.', '..'));
 
-	    if (is_dir($dir)) {
-	        rmdir($dir);
-	    }
+    	    foreach ($files as $file) {
+                self::unlinkDir(realpath($dir) . '/' . $file);
+    	    }
+
+            return rmdir($dir);
+        } else if (is_file($dir) === true) {
+            return unlink($dir);
+        }
+
+        return false;
 	}
 
 	public static function createTempFolder($strBaseFolder)
