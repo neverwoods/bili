@@ -118,10 +118,10 @@ class Language
 
         //*** Really load the file.
         if (!empty($this->activeLang)) {
-            require_once($this->langPath . "/" . $this->activeLang . ".php");
+            require($this->langPath . "/" . $this->activeLang . ".php");
 
             if (file_exists($this->langOverwritePath . "/" . $this->activeLang . ".php")) {
-                require_once($this->langOverwritePath . "/" . $this->activeLang . ".php");
+                require($this->langOverwritePath . "/" . $this->activeLang . ".php");
             }
 
             //*** Check if the expected variable exists.
@@ -132,6 +132,8 @@ class Language
 
             $arrTemp = explode("-", $this->activeLang);
             $this->language = str_replace("_", " ", $arrTemp[0]);
+
+            $this->setLocale();
 
             $blnReturn = true;
         }
@@ -145,7 +147,9 @@ class Language
         $blnReturn = false;
 
         //*** Check if the language file exists and is different from the current language.
-        if (file_exists($this->langPath . "/" . $strLang . ".php") && $strLang !== $this->activeLang) {
+        if (file_exists($this->langPath . "/" . $strLang . ".php")
+                && ($strLang !== $this->activeLang
+                    || count(self::$languages) === 0)) {
             //*** Write to cookie.
             setcookie('language', $strLang, time()+60*60*24*30, '/');
 
