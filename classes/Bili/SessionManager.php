@@ -2,8 +2,6 @@
 
 namespace Bili;
 
-use App\Models\Session;
-
 /**
  * Class to hold Session logic.
  *
@@ -16,10 +14,11 @@ class SessionManager
     private static $instance = null;
     private $transferId = null;
     private $timeout = 1440;
+    private $session = null;
 
-    public static function singleton($transferId = null, $timeout = 1440)
+    public static function singleton($transferId = null, $timeout = 1440, $diSession = null)
     {
-        self::$instance = new SessionManager($transferId, $timeout);
+        self::$instance = new SessionManager($transferId, $timeout, $diSession);
 
         //*** Register this object as the session handler.
         session_set_save_handler(
@@ -46,13 +45,14 @@ class SessionManager
         return self::$instance;
     }
 
-    private function __construct($transferId = null, $timeout = 1440)
+    private function __construct($transferId = null, $timeout = 1440, $diSession = null)
     {
         if (!is_null($transferId) && !empty($transferId)) {
             $this->transferId = $transferId;
         }
 
         $this->timeout = $timeout;
+        $this->session = $diSession;
 
         ini_set('session.gc_maxlifetime', $this->timeout);
     }
@@ -71,30 +71,36 @@ class SessionManager
 
     public function read($strId)
     {
+        $session = $this->session;
+
         $strId = (!is_null($this->transferId)) ? $this->transferId : $strId;
-        $strReturn = Session::getSessionData($strId);
+        $strReturn = $session::getSessionData($strId);
 
         return $strReturn;
     }
 
     public function write($strId, $strData)
     {
+        $session = $this->session;
+
         $strId = (!is_null($this->transferId)) ? $this->transferId : $strId;
-        Session::setSessionData($strId, $strData);
+        $session::setSessionData($strId, $strData);
 
         return true;
     }
 
     public function destroy($strId)
     {
-        Session::destroy($strId);
+        $session = $this->session;
+        $session::destroy($strId);
 
         return true;
     }
 
     public function gc()
     {
-        Session::clean();
+        $session = $this->session;
+        $session::clean();
 
         return true;
     }
