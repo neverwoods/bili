@@ -151,6 +151,13 @@ class Sanitize
         return $varReturn;
     }
 
+    public static function toFilename($strOutput)
+    {
+    	$strOutput = preg_replace('/([^\w\s\d\-\.%_~,;:\[\]\|])/u', '', $strOutput);
+
+    	return $strOutput;
+    }
+
     /**
      * Sanitize a string to a pure ascii string. No special characters or any other fancy UTF-8 stuff.
      *

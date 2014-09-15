@@ -15,6 +15,46 @@ namespace Bili;
  */
 class Display
 {
+    /**
+     * Convert HTML markup to a binary PDF
+     * @param  string      $strHtml The HTML input
+     * @return binary|null The binary PDF output or null if something went wrong.
+     */
+    public static function html2pdf ($strHtml, $strFilePrefix = "document")
+    {
+        $varReturn = null;
+
+        srand((double) microtime()*1000000);
+        $random_number = rand();
+        $sid = md5($random_number);
+
+        $strHash 		= $strFilePrefix . "-" . $sid;
+        $strPdfFile 	= $GLOBALS["_PATHS"]["cache"] . $strHash . ".pdf"; // TODO: Check if global exists.
+        $strHtmlFile 	= $GLOBALS["_PATHS"]["cache"] . $strHash . ".html";
+
+        file_put_contents($strHtmlFile, $strHtml);
+        $strInput = $strHtmlFile;
+        $strOutput = $strPdfFile;
+
+        $arrExec = array();
+        $arrExec[] = $GLOBALS["_CONF"]["app"]["wkhtmltopdf"]; // TODO: Check if global exists.
+        $arrExec[] = $strInput;
+        $arrExec[] = $strOutput;
+        $strExec = implode(" ", $arrExec);
+
+        $blnCreated = exec($strExec);
+
+        if (file_exists($strPdfFile)) {
+            $varReturn = file_get_contents($strPdfFile);
+
+            // Clean up
+            @unlink($strHtmlFile);
+            @unlink($strPdfFile);
+        }
+
+        return $varReturn;
+    }
+
     public static function renderLink($strLabel, $strLink, $blnExternal = false, $strClass = "")
     {
         $strExternal = ($blnExternal) ? " rel=\"external\"" : "";
