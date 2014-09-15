@@ -18,16 +18,16 @@ namespace Bili;
 
 class Language
 {
-    private static $instance 		= null;
-    private static $sanitizeType	= null;
-    private static $languages 		= array();
-    private static $error			= "TRANSLATION '%s' NOT FOUND IN '%s'.";
-    public $name 			= "";
-    public $language 		= "";
-    private $defaultLang 	= "";
-    private $langPath 		= "";
-    private $langOverwritePath 	= null;
-    private $activeLang 	= "";
+    private static $instance         = null;
+    private static $sanitizeType    = null;
+    private static $languages         = array();
+    private static $error            = "TRANSLATION '%s' NOT FOUND IN '%s'.";
+    public $name             = "";
+    public $language         = "";
+    private $defaultLang     = "";
+    private $langPath         = "";
+    private $langOverwritePath     = null;
+    private $activeLang     = "";
 
     private function __construct($strLang, $langPath, $overwritePath)
     {
@@ -194,11 +194,11 @@ class Language
 
     public function setLocale()
     {
-	    $varReturn = false;
+        $varReturn = false;
 
-		$strLocale = $this->get("locale");
-		$varReturn = setlocale(LC_ALL, $strLocale);
+        $strLocale = $this->get("locale");
+        $varReturn = setlocale(LC_ALL, $strLocale);
 
-		return $varReturn;
+        return $varReturn;
     }
 }
