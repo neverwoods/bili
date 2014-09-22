@@ -28,6 +28,7 @@ class Language
     private $langPath         = "";
     private $langOverwritePath     = null;
     private $activeLang     = "";
+    private $forceReload     = false;
 
     private function __construct($strLang, $langPath, $overwritePath)
     {
@@ -146,10 +147,13 @@ class Language
         //*** Set a specific language and write it to the session and cockie.
         $blnReturn = false;
 
+        if ($strLang !== $this->activeLang) {
+            $this->forceReload = true;
+        }
+
         //*** Check if the language file exists and is different from the current language.
         if (file_exists($this->langPath . "/" . $strLang . ".php")
-                && ($strLang !== $this->activeLang
-                    || count(self::$languages) === 0)) {
+                && (count(self::$languages) === 0 || $this->forceReload)) {
             //*** Write to cookie.
             setcookie('language', $strLang, time()+60*60*24*30, '/');
 
@@ -200,5 +204,14 @@ class Language
         $varReturn = setlocale(LC_ALL, $strLocale);
 
         return $varReturn;
+    }
+
+    public function setOverwritePath($strPath)
+    {
+        if (file_exists($strPath) && $strPath !== $this->langOverwritePath) {
+            $this->langOverwritePath = $strPath;
+
+            $this->forceReload = true;
+        }
     }
 }
