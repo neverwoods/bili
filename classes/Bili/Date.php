@@ -3,10 +3,12 @@
 namespace Bili;
 
 /**
- * Date Class v0.2.6
+ * Date Class v0.2.7
  * Holds methods for misc. date calls.
  *
  * CHANGELOG
+ * version 0.2.7, 24 Sep 2014
+ *   ADD: Added the getOrdinalSuffix method.
  * version 0.2.6, 04 Apr 2013
  *   ADD: Added the getMonthName method.
  * version 0.2.5, 29 Sep 2009
@@ -101,6 +103,22 @@ class Date
         */
 
         return strftime($strOutFormat, self::parseDate($strDate, $strInFormat));
+    }
+
+    /**
+     * Determine the ordinal suffixes using the day and an array of suffixes.
+     *
+     * @param integer $intDay
+     * @param array $arrSuffixes An array like ['th','st','nd','rd','th','th','th','th','th','th']
+     * @return string The day with the suffix
+     */
+    public function getOrdinalSuffix($intDay, $arrSuffixes)
+    {
+        $intDay = abs($intDay);
+        $intMod100 = $intDay % 100;
+        $strReturn =  $intDay . ($intMod100 >= 11 && $intMod100 <= 13 ? $arrSuffixes[9] :  $arrSuffixes[$intDay % 10]);
+
+        return $strReturn;
     }
 
     public static function dateDifference(
