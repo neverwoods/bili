@@ -48,12 +48,12 @@ class BubbleMessage extends ClassDynamic implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-	        "type" => $this->type,
-	        "title" => $this->title,
-        	"body" => $this->message,
-        	"location" => $this->location,
-        	"timeout" => $this->timeout,
-        	"key" => $this->key
+            "type" => $this->type,
+            "title" => $this->title,
+            "body" => $this->message,
+            "location" => $this->location,
+            "timeout" => $this->timeout,
+            "key" => $this->key
         ];
     }
 }

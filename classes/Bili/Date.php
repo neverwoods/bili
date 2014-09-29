@@ -80,7 +80,7 @@ class Date
 
         $arrDate = (function_exists("strptime")) ?
             strptime($strDate, $strFormat) : self::strptime($strDate, $strFormat);
-        $hour 	= ($arrDate['tm_hour'] > 23 || $arrDate['tm_hour'] < 0) ? 0 : $arrDate['tm_hour'];
+        $hour     = ($arrDate['tm_hour'] > 23 || $arrDate['tm_hour'] < 0) ? 0 : $arrDate['tm_hour'];
         $minute = ($arrDate['tm_min'] > 59 || $arrDate['tm_min'] < 0) ? 0 : $arrDate['tm_min'];
         $second = ($arrDate['tm_sec'] > 61 || $arrDate['tm_sec'] < 0) ? 0 : $arrDate['tm_sec'];
 

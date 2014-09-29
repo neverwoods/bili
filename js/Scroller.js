@@ -8,7 +8,7 @@
  *  - This is created and tested with the latest jQuery but will possibly work on older jQuery versions.
  *  
  * VERSION
- * 	- v1.0
+ *     - v1.0
  * 
  * AUTHOR
  *  - Robin van Baalen <robin@neverwoods.com>

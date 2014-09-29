@@ -9,10 +9,10 @@ namespace Bili;
  * @version 1.2.1
  *
  * CHANGELOG
- * 	version 1.2.1
- * 		[Felix] Added internal template handling methods and properties.
- * 	version 1.0.1
- * 		[Robin] Updated parseDynamic method
+ *     version 1.2.1
+ *         [Felix] Added internal template handling methods and properties.
+ *     version 1.0.1
+ *         [Robin] Updated parseDynamic method
  */
 class TemplateInterface
 {
@@ -51,9 +51,9 @@ class TemplateInterface
      */
     protected function parseDynamic($method, $args = array(), $strPrefix = "parse")
     {
-        $varReturn 	= null;
-        $method 	= $strPrefix . $method;
-        $arrMethod 	= array($this, $method);
+        $varReturn     = null;
+        $method     = $strPrefix . $method;
+        $arrMethod     = array($this, $method);
 
         if (is_callable($arrMethod)) {
             $varReturn = call_user_func_array($arrMethod, $args);
@@ -184,7 +184,7 @@ class TemplateInterface
      */
     protected function resolveAction($args = array())
     {
-    	return $this->parseDynamic($this->command, $args, "action");
+        return $this->parseDynamic($this->command, $args, "action");
     }
 
     /**

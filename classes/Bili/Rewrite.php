@@ -4,22 +4,22 @@ namespace Bili;
 
 class Rewrite
 {
-    public static $instance 			= null;
-    public static $sections 			= [];
-    public static $subsections 		    = [];
-    public static $commands			    = [];
-    public static $parseTypes		    = [];
+    public static $instance             = null;
+    public static $sections             = [];
+    public static $subsections             = [];
+    public static $commands                = [];
+    public static $parseTypes            = [];
     public static $defaultSection       = null;
     public static $defaultSubSection    = null;
-    public static $defaultCommand 	    = null;
-    public static $defaultParser		= null;
-    private $department		            = null;
-    private $section			        = null;
-    private $subsection		            = null;
-    private $command			        = null;
-    private $element			        = null;
-    private $parser			            = null;
-    private $parameters		            = null;
+    public static $defaultCommand         = null;
+    public static $defaultParser        = null;
+    private $department                    = null;
+    private $section                    = null;
+    private $subsection                    = null;
+    private $command                    = null;
+    private $element                    = null;
+    private $parser                        = null;
+    private $parameters                    = null;
     private $reservedParameters         = array("view");
 
     private function __construct()
@@ -296,7 +296,7 @@ class Rewrite
     private function getRewrite()
     {
         //*** Extract the logic from the URL.
-        $strRewrite	= Request::get('rewrite');
+        $strRewrite    = Request::get('rewrite');
 
         if (!empty($strRewrite)) {
             $strRewrite = rtrim($strRewrite, " \/");

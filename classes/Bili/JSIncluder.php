@@ -73,10 +73,10 @@ class JSIncluder
 
         //*** Gzip the Javascript.
         $objEncoder = new \HTTP_Encoder(
-        	array(
-            	"content" => $strOutput,
-            	"type" => "text/javascript"
-       	 	)
+            array(
+                "content" => $strOutput,
+                "type" => "text/javascript"
+                )
         );
 
         $objEncoder->encode();

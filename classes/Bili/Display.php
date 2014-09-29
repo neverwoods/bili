@@ -20,7 +20,7 @@ class Display
      * @param  string      $strHtml The HTML input
      * @return binary|null The binary PDF output or null if something went wrong.
      */
-    public static function html2pdf ($strHtml, $strFilePrefix = "document")
+    public static function html2pdf($strHtml, $strFilePrefix = "document")
     {
         $varReturn = null;
 
@@ -28,9 +28,9 @@ class Display
         $random_number = rand();
         $sid = md5($random_number);
 
-        $strHash 		= $strFilePrefix . "-" . $sid;
-        $strPdfFile 	= $GLOBALS["_PATHS"]["cache"] . $strHash . ".pdf"; // TODO: Check if global exists.
-        $strHtmlFile 	= $GLOBALS["_PATHS"]["cache"] . $strHash . ".html";
+        $strHash         = $strFilePrefix . "-" . $sid;
+        $strPdfFile     = $GLOBALS["_PATHS"]["cache"] . $strHash . ".pdf"; // TODO: Check if global exists.
+        $strHtmlFile     = $GLOBALS["_PATHS"]["cache"] . $strHash . ".html";
 
         file_put_contents($strHtmlFile, $strHtml);
         $strInput = $strHtmlFile;
@@ -135,27 +135,27 @@ class Display
         $decReturn = $intFrom;
 
         switch ($strSourceUnit) {
-        	case "KB":
-        	    $decReturn = $decReturn * 1024;
-        	    break;
-        	case "MB":
-        	    $decReturn = $decReturn * 1024 * 1024;
-        	    break;
-        	case "GB":
-        	    $decReturn = $decReturn * 1024 * 1024 * 1024;
-        	    break;
+            case "KB":
+                $decReturn = $decReturn * 1024;
+                break;
+            case "MB":
+                $decReturn = $decReturn * 1024 * 1024;
+                break;
+            case "GB":
+                $decReturn = $decReturn * 1024 * 1024 * 1024;
+                break;
         }
 
         switch ($strTargetUnit) {
-        	case "KB":
-        	    $decReturn = $decReturn / 1024;
-        	    break;
-        	case "MB":
-        	    $decReturn = $decReturn / 1024 / 1024;
-        	    break;
-        	case "GB":
-        	    $decReturn = $decReturn / 1024 / 1024 / 1024;
-        	    break;
+            case "KB":
+                $decReturn = $decReturn / 1024;
+                break;
+            case "MB":
+                $decReturn = $decReturn / 1024 / 1024;
+                break;
+            case "GB":
+                $decReturn = $decReturn / 1024 / 1024 / 1024;
+                break;
         }
 
         return $decReturn;

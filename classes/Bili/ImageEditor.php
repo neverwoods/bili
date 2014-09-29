@@ -219,23 +219,23 @@ class ImageEditor {
     if(!$this->error)
     {
       $tmpimage = imagecreate($this->x, $this->y);
-	  for ($c=0; $c<256; $c++)
-	  {
-	    $palette[$c] = imagecolorallocate($tmpimage, $c, $c, $c);
-	  }
+      for ($c=0; $c<256; $c++)
+      {
+        $palette[$c] = imagecolorallocate($tmpimage, $c, $c, $c);
+      }
 
-	  for ($y = 0; $y < $this->y; $y++)
-	  {
-	    for ($x = 0; $x < $this->x; $x++)
-	    {
-	      $rgb = imagecolorat($this->img, $x, $y);
-	      $r = ($rgb >> 16) & 0xFF;
-	      $g = ($rgb >> 8) & 0xFF;
-	      $b = $rgb & 0xFF;
-	      $gs = $this->yiq($r, $g, $b);
-	      imagesetpixel($tmpimage, $x, $y, $palette[$gs]);
-	    }
-	  }
+      for ($y = 0; $y < $this->y; $y++)
+      {
+        for ($x = 0; $x < $this->x; $x++)
+        {
+          $rgb = imagecolorat($this->img, $x, $y);
+          $r = ($rgb >> 16) & 0xFF;
+          $g = ($rgb >> 8) & 0xFF;
+          $b = $rgb & 0xFF;
+          $gs = $this->yiq($r, $g, $b);
+          imagesetpixel($tmpimage, $x, $y, $palette[$gs]);
+        }
+      }
 
       imagedestroy($this->img);
       $this->img = $tmpimage;

@@ -63,7 +63,7 @@ class CSSIncluder
         if (count($this->arrFiles[$strMedia]) > 0) {
             $strFilter = implode(",", $this->arrFiles[$strMedia]);
             $strReturn = '<link rel="stylesheet" type="text/css" href="/css?'
-            		   . $strFilter . '" media="' . $strMedia . '" />';
+                       . $strFilter . '" media="' . $strMedia . '" />';
         }
 
         return $strReturn;
@@ -96,10 +96,10 @@ class CSSIncluder
 
         //*** Gzip the CSS.
         $objEncoder = new \HTTP_Encoder(
-        	array(
-            	"content" => $strOutput,
-            	"type" => "text/css"
-        	)
+            array(
+                "content" => $strOutput,
+                "type" => "text/css"
+            )
         );
 
         $objEncoder->encode();
@@ -158,10 +158,10 @@ class CSSIncluder
         } else {
             if ($GLOBALS["_CONF"]["cache"]["caching"]) {
                 $strOutput = \Minify_CSS::minify(
-                	$strOutput,
-                	array(
-                   		"preserveComments" => false
-                	)
+                    $strOutput,
+                    array(
+                           "preserveComments" => false
+                    )
                 );
             }
             $objCache->save($strOutput, $strHash, "css");

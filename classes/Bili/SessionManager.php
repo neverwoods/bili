@@ -5,8 +5,8 @@ namespace Bili;
 /**
  * Class to hold Session logic.
  *
- * @package	Bili
- * @author	felix
+ * @package    Bili
+ * @author    felix
  * @version 1.1
  */
 class SessionManager

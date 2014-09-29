@@ -15,7 +15,7 @@ class Geocoder
         }
         $arrReturn = array();
 
-        $strAddress = str_replace (" ", "+", urlencode($strAddress));
+        $strAddress = str_replace(" ", "+", urlencode($strAddress));
 
         $objCurlRequest = curl_init();
         curl_setopt($objCurlRequest, CURLOPT_URL, sprintf(self::$googleMapsApi, $strAddress));
@@ -52,8 +52,8 @@ class Geocoder
 
             $arrGeometry = $arrResponse['results'][0]['geometry'];
             $arrReturn = array(
-            	'latitude' => $arrGeometry['location']['lat'],
-            	'longitude' => $arrGeometry['location']['lng']
+                'latitude' => $arrGeometry['location']['lat'],
+                'longitude' => $arrGeometry['location']['lng']
             );
         }
 

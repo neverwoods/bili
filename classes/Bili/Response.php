@@ -66,10 +66,10 @@ class Response
     public static function send($strBody, $strContentType = "text/html")
     {
         $objEncoder = new \HTTP_Encoder(
-        	array(
+            array(
                 "content" => $strBody,
                 "type" => $strContentType
-       		)
+               )
         );
 
         $objEncoder->encode();
@@ -86,8 +86,8 @@ class Response
      */
     public static function generateDownloadLink($binData, $strFilename, $strDownloadUrl = null)
     {
-        $strUniqueName 	= mt_rand(1000000, 9999999);
-        $objRewrite 	= Rewrite::getInstance();
+        $strUniqueName     = mt_rand(1000000, 9999999);
+        $objRewrite     = Rewrite::getInstance();
 
         // Store in the cache.
         file_put_contents($GLOBALS["_PATHS"]["cache"] . $strUniqueName, $binData);
@@ -96,12 +96,12 @@ class Response
 
         if (is_null($strDownloadUrl)) {
             $strDownloadUrl = $objRewrite->getUrl(
-            	SECTION_DOCUMENT,
-            	CMD_DOWNLOAD,
-            	null,
-            	null,
-            	SUB_SECTION_EMPTY,
-            	array("t" => $strUniqueName)
+                SECTION_DOCUMENT,
+                CMD_DOWNLOAD,
+                null,
+                null,
+                SUB_SECTION_EMPTY,
+                array("t" => $strUniqueName)
             );
         } else {
             $strDownloadUrl .= "/t/" . Rewrite::encode($strUniqueName);

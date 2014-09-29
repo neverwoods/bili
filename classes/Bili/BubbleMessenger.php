@@ -24,7 +24,7 @@ class BubbleMessenger
     public static function add($message, $options = array())
     {
         if (!isset($_SESSION["bubble-messages"]) || (isset($_SESSION["bubble-messages"])
-        		&& !is_array(unserialize($_SESSION["bubble-messages"])))) {
+                && !is_array(unserialize($_SESSION["bubble-messages"])))) {
             $_SESSION["bubble-messages"] = serialize(array());
         }
 
@@ -63,18 +63,18 @@ class BubbleMessenger
     {
         $arrTemp = array();
         
-    	if (isset($_SESSION["bubble-messages"])) {
-    		$objMessages = unserialize($_SESSION["bubble-messages"]);
-    		if (is_array($objMessages)) {
-    			foreach ($objMessages as $objMessage) {
-    				if ($objMessage->getKey() != $strKey) {
-    					array_push($arrTemp, $objMessage);
-    				}
-    			}
-    			
-    			$_SESSION["bubble-messages"] = serialize($arrTemp);
-    		}
-    	}
+        if (isset($_SESSION["bubble-messages"])) {
+            $objMessages = unserialize($_SESSION["bubble-messages"]);
+            if (is_array($objMessages)) {
+                foreach ($objMessages as $objMessage) {
+                    if ($objMessage->getKey() != $strKey) {
+                        array_push($arrTemp, $objMessage);
+                    }
+                }
+                
+                $_SESSION["bubble-messages"] = serialize($arrTemp);
+            }
+        }
     }
 
     public static function clear()

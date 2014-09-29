@@ -19,18 +19,18 @@ class RestRequest
     protected $responseInfo;
     protected $multipart;
 
-    public function __construct ($url = null, $verb = "GET", $requestBody = null, $headers = null, $blnMultipart = false)
+    public function __construct($url = null, $verb = "GET", $requestBody = null, $headers = null, $blnMultipart = false)
     {
-        $this->url				= $url;
-        $this->verb				= $verb;
-        $this->requestBody		= $requestBody;
-        $this->requestHeaders	= $headers;
-        $this->requestLength	= 0;
-        $this->username			= null;
-        $this->password			= null;
-        $this->acceptType		= "application/json";
-        $this->responseBody		= null;
-        $this->responseInfo		= null;
+        $this->url                = $url;
+        $this->verb                = $verb;
+        $this->requestBody        = $requestBody;
+        $this->requestHeaders    = $headers;
+        $this->requestLength    = 0;
+        $this->username            = null;
+        $this->password            = null;
+        $this->acceptType        = "application/json";
+        $this->responseBody        = null;
+        $this->responseInfo        = null;
         $this->multipart        = $blnMultipart;
 
         if ($this->requestBody !== null) {
@@ -38,16 +38,16 @@ class RestRequest
         }
     }
 
-    public function flush ()
+    public function flush()
     {
-        $this->requestBody		= null;
-        $this->requestLength	= 0;
-        $this->verb				= "GET";
-        $this->responseBody		= null;
-        $this->responseInfo		= null;
+        $this->requestBody        = null;
+        $this->requestLength    = 0;
+        $this->verb                = "GET";
+        $this->responseBody        = null;
+        $this->responseInfo        = null;
     }
 
-    public function execute ()
+    public function execute()
     {
         $ch = curl_init();
 
@@ -82,7 +82,7 @@ class RestRequest
         }
     }
 
-    public function buildPostBody ($data = null)
+    public function buildPostBody($data = null)
     {
         $data = ($data !== null) ? $data : $this->requestBody;
 
@@ -91,9 +91,9 @@ class RestRequest
         }
 
         if (!$this->multipart) {
-        	$data = http_build_query($data, "", "&");
+            $data = http_build_query($data, "", "&");
         }
-        
+
         $this->requestBody = $data;
     }
 
@@ -112,7 +112,7 @@ class RestRequest
         return $arrReturn;
     }
 
-    protected function executeGet ($ch)
+    protected function executeGet($ch)
     {
         if (is_string($this->requestBody)) {
             $this->url .= "?" . $this->requestBody;
@@ -121,7 +121,7 @@ class RestRequest
         $this->doExecute($ch);
     }
 
-    protected function executePost ($ch)
+    protected function executePost($ch)
     {
         if (!is_string($this->requestBody) && !$this->multipart) {
             $this->buildPostBody();
@@ -133,7 +133,7 @@ class RestRequest
         $this->doExecute($ch);
     }
 
-    protected function executePut ($ch)
+    protected function executePut($ch)
     {
         if (!is_string($this->requestBody)) {
             $this->buildPostBody();
@@ -154,23 +154,23 @@ class RestRequest
         fclose($fh);
     }
 
-    protected function executeDelete ($ch)
+    protected function executeDelete($ch)
     {
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
 
         $this->doExecute($ch);
     }
 
-    protected function doExecute (&$curlHandle)
+    protected function doExecute(&$curlHandle)
     {
         $this->setCurlOpts($curlHandle);
-        $this->responseBody 	= curl_exec($curlHandle);
-        $this->responseInfo  	= curl_getinfo($curlHandle);
+        $this->responseBody     = curl_exec($curlHandle);
+        $this->responseInfo      = curl_getinfo($curlHandle);
 
         curl_close($curlHandle);
     }
 
-    protected function setCurlOpts (&$curlHandle)
+    protected function setCurlOpts(&$curlHandle)
     {
         curl_setopt($curlHandle, CURLOPT_TIMEOUT, 30);
         curl_setopt($curlHandle, CURLOPT_URL, $this->url);
@@ -178,7 +178,7 @@ class RestRequest
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $this->buildHeaders());
     }
 
-    protected function setAuth (&$curlHandle)
+    protected function setAuth(&$curlHandle)
     {
         if ($this->username !== null && $this->password !== null) {
             curl_setopt($curlHandle, CURLOPT_HTTPAUTH, CURLAUTH_DIGEST);
@@ -186,62 +186,62 @@ class RestRequest
         }
     }
 
-    public function getAcceptType ()
+    public function getAcceptType()
     {
         return $this->acceptType;
     }
 
-    public function setAcceptType ($acceptType)
+    public function setAcceptType($acceptType)
     {
         $this->acceptType = $acceptType;
     }
 
-    public function getPassword ()
+    public function getPassword()
     {
         return $this->password;
     }
 
-    public function setPassword ($password)
+    public function setPassword($password)
     {
         $this->password = $password;
     }
 
-    public function getResponseBody ()
+    public function getResponseBody()
     {
         return $this->responseBody;
     }
 
-    public function getResponseInfo ()
+    public function getResponseInfo()
     {
         return $this->responseInfo;
     }
 
-    public function getUrl ()
+    public function getUrl()
     {
         return $this->url;
     }
 
-    public function setUrl ($url)
+    public function setUrl($url)
     {
         $this->url = $url;
     }
 
-    public function getUsername ()
+    public function getUsername()
     {
         return $this->username;
     }
 
-    public function setUsername ($username)
+    public function setUsername($username)
     {
         $this->username = $username;
     }
 
-    public function getVerb ()
+    public function getVerb()
     {
         return $this->verb;
     }
 
-    public function setVerb ($verb)
+    public function setVerb($verb)
     {
         $this->verb = $verb;
     }

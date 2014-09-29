@@ -37,7 +37,7 @@ class ClassDynamic
         }
 
         if (!$blnExists) {
-        	$strErrorMessage = "Property Error in " . get_class($this) . "::set({$property}) on line " . __LINE__ . ".";
+            $strErrorMessage = "Property Error in " . get_class($this) . "::set({$property}) on line " . __LINE__ . ".";
             throw new \BadMethodCallException($strErrorMessage, 1);
         }
     }
