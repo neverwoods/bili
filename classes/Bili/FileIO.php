@@ -62,17 +62,25 @@ class FileIO
      * @param  string      $strHtml The HTML input
      * @return binary|null The binary PDF output or null if something went wrong.
      */
-    public static function html2pdf($strHtml, $strFilePrefix = "document", $arrParameters = null)
+    public static function html2pdf($strHtml, $strFilePrefix = "document", $arrParameters = null, $arrSettings = [])
     {
         $varReturn = null;
+
+	    if (!isset($arrSettings["tempPath"]) && isset($GLOBALS["_PATHS"]["cache"])) {
+	       $arrSettings["tempPath"] = $GLOBALS["_PATHS"]["cache"];
+	    }
+
+	    if (!isset($arrSettings["wkhtmltopdfPath"]) && isset($GLOBALS["_CONF"]["app"]["wkhtmltopdf"])) {
+	       $arrSettings["wkhtmltopdfPath"] = $GLOBALS["_CONF"]["app"]["wkhtmltopdf"];
+	    }
 
         srand((double) microtime()*1000000);
         $random_number = rand();
         $sid = md5($random_number);
 
         $strHash         = $strFilePrefix . "-" . $sid;
-        $strPdfFile     = $GLOBALS["_PATHS"]["cache"] . $strHash . ".pdf"; // TODO: Check if global exists.
-        $strHtmlFile     = $GLOBALS["_PATHS"]["cache"] . $strHash . ".html";
+	    $strPdfFile 	= $arrSettings["tempPath"] . $strHash . ".pdf";
+	    $strHtmlFile 	= $arrSettings["tempPath"] . $strHash . ".html";
 
         file_put_contents($strHtmlFile, $strHtml);
         $strInput = $strHtmlFile;
@@ -82,7 +90,7 @@ class FileIO
         $strParameters = (is_array($arrParameters)) ? implode(" ", $arrParameters) : "";
 
         $arrExec = array();
-        $arrExec[] = $GLOBALS["_CONF"]["app"]["wkhtmltopdf"]; // TODO: Check if global exists.
+        $arrExec[] = $arrSettings["wkhtmltopdfPath"];
         $arrExec[] = $strParameters;
         $arrExec[] = $strInput;
         $arrExec[] = $strOutput;
@@ -111,9 +119,13 @@ class FileIO
      * @param string $varPathB The path(s) to the files that we want to merge.
      * @return boolean
      */
-    public static function mergePdfFiles($strPathA, $varPathB)
+    public static function mergePdfFiles($strPathA, $varPathB, $arrSettings = [])
     {
         $blnReturn = false;
+
+        if (!isset($arrSettings["ghostscriptPath"]) && isset($GLOBALS["_CONF"]["app"]["gs"])) {
+	       $arrSettings["ghostscriptPath"] = $GLOBALS["_CONF"]["app"]["gs"];
+	    }
 
         $strSaveFile = $strPathA;
         $blnMove = false;
@@ -124,7 +136,7 @@ class FileIO
             $strSaveFile = dirname($strPathA) . "/" . Crypt::generateToken([], 16);
         }
 
-        $strCommand = $GLOBALS["_CONF"]["app"]["gs"]
+        $strCommand = $arrSettings["ghostscriptPath"]
             . " -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=\"{$strSaveFile}\" -dBATCH {$varPathB}";
 
         $blnReturn = exec($strCommand);
