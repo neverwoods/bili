@@ -130,6 +130,12 @@ class FTP
         foreach ($parts as $part) {
             try {
                 @ftp_chdir($this->objFTP, $part);
+
+	            //*** Extra check for the case that error reporting is disabled.
+	            if (stripos(ftp_pwd($this->objFTP), $part) === false) {
+    	            @ftp_mkdir($this->objFTP, $part);
+    	            @ftp_chdir($this->objFTP, $part);
+	            }
             } catch (\Exception $ex) {
                 @ftp_mkdir($this->objFTP, $part);
                 @ftp_chdir($this->objFTP, $part);
