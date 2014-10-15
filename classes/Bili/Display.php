@@ -117,8 +117,22 @@ class Display
             $intMaxDecimal = $intMinDecimal;
         }
 
-        $strTousandSeparator = ($blnShowThousandSeparator) ? Language::get("thousands_separator") : "";
-        $strReturn = number_format($fltValue, $intMaxDecimal, Language::get("decimal_separator"), $strTousandSeparator);
+        $strDecimalPoint = Language::get("decimal_separator", "global", false);
+        $strThousandSeparator = Language::get("thousands_separator", "global", false);
+        if (empty($strDecimalPoint) || empty($strThousandSeparator)) {
+            $arrLocaleInfo = localeconv();
+
+            if (empty($strDecimalPoint) && isset($arrLocaleInfo["decimal_point"])) {
+                $strDecimalPoint = $arrLocaleInfo["decimal_point"];
+            }
+
+            if (empty($strThousandSeparator) && isset($arrLocaleInfo["thousands_sep"])) {
+                $strThousandSeparator = $arrLocaleInfo["thousands_sep"];
+            }
+        }
+
+        $strThousandSeparator = ($blnShowThousandSeparator) ? $strThousandSeparator : "";
+        $strReturn = number_format($fltValue, $intMaxDecimal, $strDecimalPoint, $strThousandSeparator);
 
         return Sanitize::toXhtml($strReturn);
     }
