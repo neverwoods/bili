@@ -319,7 +319,6 @@ class FileIO
             curl_setopt($objCurl, CURLOPT_HEADER, true);
             curl_setopt($objCurl, CURLOPT_NOBODY, true);
             curl_setopt($objCurl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-            curl_setopt($objCurl, CURLOPT_SSLVERSION, 3);
             curl_setopt($objCurl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($objCurl, CURLOPT_RETURNTRANSFER, true);
@@ -373,7 +372,6 @@ class FileIO
             curl_setopt($objCurl, CURLOPT_URL, $strUrl);
             curl_setopt($objCurl, CURLOPT_HEADER, false);
             curl_setopt($objCurl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-            curl_setopt($objCurl, CURLOPT_SSLVERSION, 3);
             curl_setopt($objCurl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, false);
             curl_setopt($objCurl, CURLOPT_RETURNTRANSFER, true);
