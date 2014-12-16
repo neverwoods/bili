@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "mrclay/minify": "2.*"
+        "mrclay/minify": "2.*",
+        "pear/cache_lite": "1.*"
     },
     "autoload": {
         "psr-0": {"Bili": "classes/"}
