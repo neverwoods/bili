@@ -130,6 +130,10 @@ class FileIO
         $strSaveFile = $strPathA;
         $blnMove = false;
 
+        if (is_array($varPathB)) {
+            $varPathB = "\"" . implode("\" \"", $varPathB) . "\"";
+        }
+
         if (file_exists($strPathA)) {
             $blnMove = true;
             $varPathB .= " \"" . $strPathA . "\"";
