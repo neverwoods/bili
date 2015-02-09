@@ -86,28 +86,47 @@ class Response
      */
     public static function generateDownloadLink($binData, $strFilename, $strDownloadUrl = null)
     {
-        $strUniqueName     = mt_rand(1000000, 9999999);
-        $objRewrite     = Rewrite::getInstance();
+        // Generate a unique number.
+        $strUniqueName = mt_rand(1000000, 9999999);
 
         // Store in the cache.
         file_put_contents($GLOBALS["_PATHS"]["cache"] . $strUniqueName, $binData);
+
+        $strReturn = static::generateDownloadLinkForExisting($strUniqueName, $strFilename, $strDownloadUrl);
+
+        return $strReturn;
+    }
+
+    /**
+     * Generate a download link for an exisiting file in the cache.
+     *
+     * @param  string $strCachedName The name of the file in the cache
+     * @param  string $strFilename File name
+     * @return string The generated download link
+     */
+    public static function generateDownloadLinkForExisting($strCachedName, $strFilename, $strDownloadUrl = null)
+    {
         // Save in session
-        $_SESSION["documents"][$strUniqueName] = $strFilename;
+        $_SESSION["documents"][$strCachedName] = $strFilename;
 
         if (is_null($strDownloadUrl)) {
+            $objRewrite = Rewrite::getInstance();
+
             $strDownloadUrl = $objRewrite->getUrl(
                 SECTION_DOCUMENT,
                 CMD_DOWNLOAD,
                 null,
                 null,
                 SUB_SECTION_EMPTY,
-                array("t" => $strUniqueName)
+                array("t" => $strCachedName)
             );
         } else {
-            $strDownloadUrl .= "/t/" . Rewrite::encode($strUniqueName);
+            $strDownloadUrl .= "/t/" . Rewrite::encode($strCachedName);
         }
 
-        return Request::getRootURI() . $strDownloadUrl;
+        $strReturn = Request::getRootURI() . $strDownloadUrl;
+
+        return $strReturn;
     }
 
     public static function pushDownloadHeadersToBrowser($mimeType, $strFilename, $intContentLength = 0)
