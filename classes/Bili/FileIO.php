@@ -66,21 +66,21 @@ class FileIO
     {
         $varReturn = null;
 
-	    if (!isset($arrSettings["tempPath"]) && isset($GLOBALS["_PATHS"]["cache"])) {
-	       $arrSettings["tempPath"] = $GLOBALS["_PATHS"]["cache"];
-	    }
+        if (!isset($arrSettings["tempPath"]) && isset($GLOBALS["_PATHS"]["cache"])) {
+            $arrSettings["tempPath"] = $GLOBALS["_PATHS"]["cache"];
+        }
 
-	    if (!isset($arrSettings["wkhtmltopdfPath"]) && isset($GLOBALS["_CONF"]["app"]["wkhtmltopdf"])) {
-	       $arrSettings["wkhtmltopdfPath"] = $GLOBALS["_CONF"]["app"]["wkhtmltopdf"];
-	    }
+        if (!isset($arrSettings["wkhtmltopdfPath"]) && isset($GLOBALS["_CONF"]["app"]["wkhtmltopdf"])) {
+            $arrSettings["wkhtmltopdfPath"] = $GLOBALS["_CONF"]["app"]["wkhtmltopdf"];
+        }
 
         srand((double) microtime()*1000000);
         $random_number = rand();
         $sid = md5($random_number);
 
-        $strHash         = $strFilePrefix . "-" . $sid;
-	    $strPdfFile 	= $arrSettings["tempPath"] . $strHash . ".pdf";
-	    $strHtmlFile 	= $arrSettings["tempPath"] . $strHash . ".html";
+        $strHash = $strFilePrefix . "-" . $sid;
+        $strPdfFile = $arrSettings["tempPath"] . $strHash . ".pdf";
+        $strHtmlFile = $arrSettings["tempPath"] . $strHash . ".html";
 
         file_put_contents($strHtmlFile, $strHtml);
         $strInput = $strHtmlFile;
@@ -124,8 +124,8 @@ class FileIO
         $blnReturn = false;
 
         if (!isset($arrSettings["ghostscriptPath"]) && isset($GLOBALS["_CONF"]["app"]["gs"])) {
-	       $arrSettings["ghostscriptPath"] = $GLOBALS["_CONF"]["app"]["gs"];
-	    }
+            $arrSettings["ghostscriptPath"] = $GLOBALS["_CONF"]["app"]["gs"];
+        }
 
         $strSaveFile = $strPathA;
         $blnMove = false;
@@ -388,5 +388,30 @@ class FileIO
         }
 
         return $strReturn;
+    }
+
+    /**
+     * Get the amount of lines in a file.
+     *
+     * @param string $strFilePath
+     * @return number
+     */
+    public static function getLineCount($strFilePath)
+    {
+        $intReturn = 0;
+
+        if (file_exists($strFilePath)) {
+            $intReturn = 1;
+
+            $resFile = fopen($strFilePath, 'rb');
+
+            while (!feof($resFile)) {
+                $intReturn += substr_count(fread($resFile, 8192), PHP_EOL);
+            }
+
+            fclose($resFile);
+        }
+
+        return $intReturn;
     }
 }
