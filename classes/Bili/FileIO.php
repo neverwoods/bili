@@ -154,8 +154,10 @@ class FileIO
         return $blnReturn;
     }
 
-    public static function handleUpload($targetDir, $intMaxSize = null)
+    public static function handleUpload($targetDir, $intMaxSize = null, $blnReturnInfo = false)
     {
+        $arrReturn = null;
+
         // HTTP headers for no cache etc
         header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
         header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -275,13 +277,19 @@ class FileIO
 
         if (!empty($fileName)) {
             // Save the upload info.
-            $_SESSION["app-uploads"][$fileId] = array("file" => $fileName, "original" => $originalName);
+            if ($blnReturnInfo) {
+                $arrReturn = ["id" => $fileId, "file" => $fileName, "original" => $originalName];
+            } else {
+                $_SESSION["app-uploads"][$fileId] = array("file" => $fileName, "original" => $originalName);
 
-            // Return JSON-RPC response
-            die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+                // Return JSON-RPC response
+                die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
+            }
         } else {
             die('{"jsonrpc" : "2.0", "error" : {"code": 104, "message": "File size over maximum allowed size."}, "id" : "id"}');
         }
+
+        return $arrReturn;
     }
 
     /**
