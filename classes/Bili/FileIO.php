@@ -8,7 +8,7 @@ namespace Bili;
  * @package Bili
  * @author Felix Langfeldt <felix@neverwoods.com>
  * @author Robin van Baalen <robin@neverwoods.com>
- * @version 1.1
+ * @version 1.2
  */
 class FileIO
 {
@@ -20,8 +20,21 @@ class FileIO
 
     public static function add2Base($filename, $addition)
     {
+        $strReturn = "";
+
         $strBase = basename($filename, self::extension($filename));
-        return substr($strBase, 0, -1) . $addition . "." . self::extension($filename);
+        if (substr($strBase, -1) == ".") {
+            $strBase = substr($strBase, 0, -1);
+        }
+
+        $strReturn = $strBase . $addition;
+
+        $strExtension = self::extension($filename);
+        if (!is_null($strExtension)) {
+            $strReturn .= "." . $strExtension;
+        }
+
+        return $strReturn;
     }
 
     public static function unlinkDir($dir)
