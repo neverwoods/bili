@@ -18,10 +18,11 @@ namespace Bili;
 
 class Language
 {
-    private static $instance         = null;
+    private static $instance		= null;
     private static $sanitizeType    = null;
-    private static $languages         = array();
-    private static $error            = "TRANSLATION '%s' NOT FOUND IN '%s'.";
+    private static $secureCookie    = false;
+    private static $languages       = array();
+    private static $error           = "TRANSLATION '%s' NOT FOUND IN '%s'.";
     public $name             = "";
     public $language         = "";
     private $defaultLang     = "";
@@ -63,7 +64,12 @@ class Language
 
     public static function setSanitize($strSanitizeType)
     {
-        self::$sanitizeType = $strSanitizeType;
+        static::$sanitizeType = $strSanitizeType;
+    }
+
+    public static function setUseSecureCookie($blnValue)
+    {
+        static::$secureCookie = $blnValue;
     }
 
     public function getActiveLang()
@@ -155,7 +161,15 @@ class Language
         if (file_exists($this->langPath . "/" . $strLang . ".php")
                 && (count(self::$languages) === 0 || $this->forceReload)) {
             //*** Write to cookie.
-            setcookie('language', $strLang, time()+60*60*24*30, '/');
+            setcookie(
+                'language',
+                $strLang,
+                time() + 60*60*24*30,
+                '/',
+                '',
+                static::$secureCookie,
+                true
+            );
 
             //*** Write to session.
             $_SESSION['language'] = $strLang;

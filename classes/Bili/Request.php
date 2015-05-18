@@ -23,6 +23,13 @@ namespace Bili;
 
 class Request
 {
+    const METHOD_GET = "GET";
+    const METHOD_POST = "POST";
+    const METHOD_PUT = "PUT";
+    const METHOD_OPTIONS = "OPTIONS";
+    const METHOD_HEAD = "HEAD";
+    const METHOD_DELETE = "DELETE";
+
     public static function redirectInternal($intId)
     {
         /***
@@ -62,6 +69,22 @@ class Request
 
             exit();
         }
+    }
+
+    /**
+     * Get the current HTTP request method.
+     *
+     * @return string One of the Request::METHOD_ constants
+     */
+    public static function getMethod()
+    {
+        $strReturn = "";
+
+        if (isset($_SERVER['REQUEST_METHOD'])) {
+            $strReturn = strtoupper($_SERVER['REQUEST_METHOD']);
+        }
+
+        return $strReturn;
     }
 
     public static function getURI()
