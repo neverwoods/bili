@@ -233,7 +233,7 @@ class Rewrite
         //*** Section.
         foreach (self::$sections as $key => $value) {
             if ($value == $intSection) {
-                $strReturn .= $key;
+                $strReturn .= urlencode($key);
                 break;
             }
         }
@@ -242,7 +242,7 @@ class Rewrite
         if ($intSubSection != SUB_SECTION_EMPTY) {
             foreach (self::$subsections as $key => $value) {
                 if ($value == $intSubSection) {
-                    $strReturn .= "/" . $key;
+                    $strReturn .= "/" . urlencode($key);
                     break;
                 }
             }
@@ -252,7 +252,7 @@ class Rewrite
         if (!is_null($intCommand)) {
             foreach (self::$commands as $key => $value) {
                 if ($value == $intCommand) {
-                    $strReturn .= "/" . $key;
+                    $strReturn .= "/" . urlencode($key);
                     break;
                 }
             }
@@ -263,7 +263,7 @@ class Rewrite
             if (ctype_digit(strval($intElement))) {
                 $intElement = $this::encode($intElement);
             }
-            $strReturn .= "/" . $intElement;
+            $strReturn .= "/" . urlencode($intElement);
         }
 
         //*** Parameters.
@@ -275,7 +275,7 @@ class Rewrite
                         $value = $this::encode($value);
                     }
 
-                    $strReturn .= "/{$key}/{$value}";
+                    $strReturn .= "/" . urlencode($key) . "/" . urlencode($value);
                 }
             }
         }
@@ -284,7 +284,7 @@ class Rewrite
         if (!is_null($strParseType)) {
             foreach (self::$parseTypes as $key => $value) {
                 if ($value == $strParseType && !empty($key)) {
-                    $strReturn .= "/view/" . $key;
+                    $strReturn .= "/view/" . urlencode($key);
                     break;
                 }
             }
