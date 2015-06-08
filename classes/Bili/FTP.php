@@ -241,7 +241,9 @@ class FTP
         }
 
         //*** Remove local file.
-        @unlink($sourceFile);
+        if (file_exists($sourceFile)) {
+            @unlink($sourceFile);
+        }
     }
 
     private function hasWildcard($strWildcard, $strName)
