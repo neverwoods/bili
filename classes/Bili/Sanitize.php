@@ -25,18 +25,44 @@ class Sanitize
         return $strReturn;
     }
 
-    public static function toEntities($strValue)
+    /**
+     * Convert all special characters in a string or array to HTML Entities.
+     *
+     * @param string|array $varValue
+     * @return string|array
+     */
+    public static function toEntities($varValue)
     {
-        $strReturn = htmlentities($strValue, ENT_QUOTES | ENT_IGNORE, 'UTF-8', false);
+        if (is_array($varValue)) {
+            $varReturn = [];
+            foreach ($varValue as $key => $value) {
+                $varReturn[$key] = htmlentities($value, ENT_QUOTES | ENT_IGNORE, 'UTF-8', false);
+            }
+        } else {
+            $varReturn = htmlentities($varValue, ENT_QUOTES | ENT_IGNORE, 'UTF-8', false);
+        }
 
-        return $strReturn;
+        return $varReturn;
     }
 
-    public static function fromEntities($strValue)
+    /**
+     * Convert all HTML Entities in a string to special characters.
+     *
+     * @param string|array $varValue
+     * @return string|array
+     */
+    public static function fromEntities($varValue)
     {
-        $strReturn = html_entity_decode($strValue, ENT_QUOTES, 'UTF-8');
+        if (is_array($varValue)) {
+            $varReturn = [];
+            foreach ($varValue as $key => $value) {
+                $varReturn[$key] = html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+            }
+        } else {
+            $varReturn = html_entity_decode($varValue, ENT_QUOTES, 'UTF-8');
+        }
 
-        return $strReturn;
+        return $varReturn;
     }
 
     public static function toXml($strOutput)
