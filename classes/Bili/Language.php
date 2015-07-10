@@ -94,6 +94,12 @@ class Language
                 }
 
                 break;
+            case "entities":
+                if (class_exists("Bili\\Sanitize", true)) {
+                    $strReturn = Sanitize::toEntities($strReturn);
+                }
+
+                break;
         }
 
         return $strReturn;

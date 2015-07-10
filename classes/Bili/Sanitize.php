@@ -25,6 +25,20 @@ class Sanitize
         return $strReturn;
     }
 
+    public static function toEntities($strValue)
+    {
+        $strReturn = htmlentities($strValue, ENT_QUOTES | ENT_IGNORE, 'UTF-8', false);
+
+        return $strReturn;
+    }
+
+    public static function fromEntities($strValue)
+    {
+        $strReturn = html_entity_decode($strValue, ENT_QUOTES, 'UTF-8');
+
+        return $strReturn;
+    }
+
     public static function toXml($strOutput)
     {
         $strReturn = $strOutput;
