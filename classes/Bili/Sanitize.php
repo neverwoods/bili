@@ -115,9 +115,17 @@ class Sanitize
 
         $varReturn = (float) $varInput;
 
-        // If the return value is 0 and the input was longer and conversion isn't forced we return the original value.
-        if (!$blnForceConversion && $varReturn === 0.0 && strlen($varInput) > 1) {
-            $varReturn = $varInput;
+        // If the conversion isn't forced we check for specific cases.
+        if (!$blnForceConversion) {
+            //*** If the return value is 0 and the input was longer we return the input value.
+            if ($varReturn === 0.0 && strlen($varInput) > 1) {
+                $varReturn = $varInput;
+            }
+
+            //*** If the return value has an exponent in it we return the input value.
+            if (stristr((string) $varReturn, "e+") !== false) {
+                $varReturn = $varInput;
+            }
         }
 
         return $varReturn;
