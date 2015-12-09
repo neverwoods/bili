@@ -21,7 +21,7 @@ class DataTableHelper
         return $strReturn;
     }
 
-    public static function getOrderColumn($strDefaultColumn)
+    public static function getOrderColumn($strDefaultColumn, $arrWhiteList = null)
     {
         $strReturn = $strDefaultColumn;
 
@@ -29,7 +29,10 @@ class DataTableHelper
         if (is_numeric($intOrderColumn)) {
             $strColumn = Request::get("mDataProp_" . $intOrderColumn);
             if (!empty($strColumn)) {
-                $strReturn = $strColumn;
+                if (is_null($arrWhiteList)
+                        || (!is_null($arrWhiteList) && in_array($strColumn, $arrWhiteList))) {
+                    $strReturn = $strColumn;
+                }
             }
         }
 
