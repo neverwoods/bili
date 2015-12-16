@@ -3,11 +3,13 @@
 namespace Bili;
 
 /**
- * Language Selection Class v0.1.2
+ * Language Selection Class v0.2.0
  * Used to get the default language, set a specific language and list
  * available languages.
  *
  * CHANGELOG
+ * version 0.2.0, 16 Dec 2015
+ *   NEW: Improve the overwrite logic with multiple paths
  * version 0.1.2, 26 Mar 2013
  *   NEW: Show translation key and category
  * version 0.1.1, 19 Mar 2013
@@ -23,26 +25,29 @@ class Language
     private static $secureCookie    = false;
     private static $languages       = array();
     private static $error           = "TRANSLATION '%s' NOT FOUND IN '%s'.";
-    public $name             = "";
-    public $language         = "";
-    private $defaultLang     = "";
-    private $langPath         = "";
-    private $langOverwritePath     = null;
-    private $activeLang     = "";
-    private $forceReload     = false;
+    public $name                    = "";
+    public $language                = "";
+    private $defaultLang            = "";
+    private $langPath               = "";
+    private $langOverwritePaths     = null;
+    private $activeLang             = "";
+    private $forceReload            = false;
 
-    private function __construct($strLang, $langPath, $overwritePath)
+    private function __construct($strLang, $langPath, $overwritePaths)
     {
         $this->defaultLang = $strLang;
         $this->langPath = $langPath;
-        $this->langOverwritePath = $overwritePath;
+
+        if (!is_null($overwritePaths)) {
+            $this->setOverwritePath($overwritePaths);
+        }
 
         $this->getLang();
     }
 
-    public static function singleton($strLang = "english-utf-8", $langPath = "./lng/", $strOverwritePath = null)
+    public static function singleton($strLang = "english-utf-8", $langPath = "./lng/", $varOverwritePaths = null)
     {
-        self::$instance = new Language($strLang, $langPath, $strOverwritePath);
+        self::$instance = new Language($strLang, $langPath, $varOverwritePaths);
 
         return self::$instance;
     }
@@ -133,8 +138,12 @@ class Language
         if (!empty($this->activeLang)) {
             require($this->langPath . "/" . $this->activeLang . ".php");
 
-            if (file_exists($this->langOverwritePath . "/" . $this->activeLang . ".php")) {
-                require($this->langOverwritePath . "/" . $this->activeLang . ".php");
+            if (is_array($this->langOverwritePaths)) {
+                foreach ($this->langOverwritePaths as $strPath) {
+                    if (file_exists($strPath . "/" . $this->activeLang . ".php")) {
+                        require($strPath . "/" . $this->activeLang . ".php");
+                    }
+                }
             }
 
             //*** Check if the expected variable exists.
@@ -226,10 +235,27 @@ class Language
         return $varReturn;
     }
 
-    public function setOverwritePath($strPath)
+    /**
+     * Set a path or array of paths that shoud be included in order after the initial language file.
+     * This will override specific items in the language array.
+     *
+     * @param string|string[] $varPath
+     */
+    public function setOverwritePath($varPath)
     {
-        if (file_exists($strPath) && $strPath !== $this->langOverwritePath) {
-            $this->langOverwritePath = $strPath;
+        //*** Sanitize the input value.
+        $arrPaths = (!is_array($varPath)) ? [$varPath] : $varPath;
+
+        //*** Check the paths for existence and add to temp. array.
+        $arrNewPaths = [];
+        foreach ($arrPaths as $strPath) {
+            if (file_exists($strPath)) {
+                $arrNewPaths[] = $strPath;
+            }
+        }
+
+        if ($arrNewPaths !== $this->langOverwritePaths) {
+            $this->langOverwritePaths = $arrNewPaths;
 
             $this->forceReload = true;
         }
