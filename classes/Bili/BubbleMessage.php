@@ -53,7 +53,13 @@ class BubbleMessage extends ClassDynamic implements \JsonSerializable
 
     public function setId()
     {
-        $this->id = "message-" . mt_rand(10000, 100000);
+        $this->id = "message-";
+
+        if (empty($this->key)) {
+            $this->id .= mt_rand(10000, 100000);
+        } else {
+            $this->id .= $this->key;
+        }
     }
 
     /*
