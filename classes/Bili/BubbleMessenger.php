@@ -10,7 +10,7 @@ namespace Bili;
 
 class BubbleMessenger
 {
-    /*
+    /**
      * Add a new message to the message stack.
      *
      * @var string $message The message to display
@@ -33,6 +33,12 @@ class BubbleMessenger
         $_SESSION["bubble-messages"] = serialize($objMessages);
     }
 
+    /**
+     * Get an array of BubbleMessages for a specific location.
+     *
+     * @param string $messageLocation
+     * @return BubbleMessage[]
+     */
     public static function get($messageLocation)
     {
         $arrReturn = array();
@@ -58,11 +64,16 @@ class BubbleMessenger
 
         return $arrReturn;
     }
-    
+
+    /**
+     * Remove a message from the Messenger by it's key.
+     *
+     * @param string $strKey
+     */
     public static function remove($strKey)
     {
         $arrTemp = array();
-        
+
         if (isset($_SESSION["bubble-messages"])) {
             $objMessages = unserialize($_SESSION["bubble-messages"]);
             if (is_array($objMessages)) {
@@ -71,12 +82,47 @@ class BubbleMessenger
                         array_push($arrTemp, $objMessage);
                     }
                 }
-                
+
                 $_SESSION["bubble-messages"] = serialize($arrTemp);
             }
         }
     }
 
+    /**
+     * Check if a message with a specific key exists in the Messenger.
+     *
+     * @param string[] $arrKey
+     * @return boolean
+     */
+    public static function hasMessage($arrKey)
+    {
+        $blnReturn = false;
+
+        if (!is_array($arrKey)) {
+            $arrKey = [$arrKey];
+        }
+
+        if (isset($_SESSION["bubble-messages"])) {
+            $objMessages = unserialize($_SESSION["bubble-messages"]);
+            if (is_array($objMessages)) {
+                foreach ($objMessages as $objMessage) {
+                    foreach ($arrKey as $strKey) {
+                        if ($objMessage->getKey() == $strKey) {
+                            $blnReturn = true;
+
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $blnReturn;
+    }
+
+    /**
+     * Clear all messages from the Messenger.
+     */
     public static function clear()
     {
         $_SESSION["bubble-messages"] = serialize(array());
