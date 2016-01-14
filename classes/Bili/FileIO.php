@@ -156,13 +156,22 @@ class FileIO
         $strCommand = $arrSettings["ghostscriptPath"]
             . " -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=\"{$strSaveFile}\" -dBATCH {$varPathB}";
 
-        $blnReturn = exec($strCommand);
+        //*** Save the command to a temporary bash file to circumvent the max. argument problem of the exec method.
+        $strCommandFile = sys_get_temp_dir() . "/" . Crypt::generateToken([], 16) . ".sh";
+        file_put_contents($strCommandFile, $strCommand);
+        chmod($strCommandFile, 0777);
+
+        //*** Execute the bash script.
+        $blnReturn = exec($strCommandFile);
 
         if (file_exists($strSaveFile) && $blnMove) {
             //*** Move the temp file to the original.
             @unlink($strPathA);
             @rename($strSaveFile, $strPathA);
         }
+
+        //*** Remove the bash script.
+        @unlink($strCommandFile);
 
         return $blnReturn;
     }
