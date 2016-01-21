@@ -4,14 +4,31 @@ namespace Bili;
 
 class FTP
 {
+    /** @var resource */
     private $objFTP;
+    
+    /** @var string */
     private $strHost;
+    
+    /** @var int */
     private $intPort;
+    
+    /** @var int */
     private $intTimeout;
+    
+    /** @var string */
     private $strUsername;
+    
+    /** @var string */
     private $strPassword;
 
-    /* public Void __construct(): Constructor */
+    /**
+     * FTP constructor.
+     * @param $host
+     * @param int $port
+     * @param int $timeout
+     * @param bool $blnSecure
+     */
     public function __construct($host, $port = 21, $timeout = 90, $blnSecure = false)
     {
         if (is_null($port)) {
@@ -35,7 +52,9 @@ class FTP
         }
     }
 
-    /* public Void __destruct(): Destructor */
+    /**
+     * Destructor
+     */
     public function __destruct()
     {
         try {
@@ -45,7 +64,13 @@ class FTP
         }
     }
 
-    /* public Mixed __call(): Re-route all function calls to the PHP-functions */
+    /**
+     * Re-route all function calls to the PHP-functions
+     * 
+     * @param $function
+     * @param $arguments
+     * @return bool|mixed
+     */
     public function __call($function, $arguments)
     {
         $varReturn = false;
@@ -73,6 +98,11 @@ class FTP
         return $varReturn;
     }
 
+    /**
+     * @param $strUsername
+     * @param $strPassword
+     * @return bool
+     */
     public function login($strUsername, $strPassword)
     {
         $this->strUsername = $strUsername;
@@ -81,6 +111,9 @@ class FTP
         return ftp_login($this->objFTP, $strUsername, $strPassword);
     }
 
+    /**
+     * @param string $strPath
+     */
     public function delete($strPath)
     {
         if (stristr($strPath, "*") === false) {
@@ -108,6 +141,10 @@ class FTP
         }
     }
 
+    /**
+     * @param string $strPath
+     * @return bool
+     */
     public function isDir($strPath)
     {
         $origin = @ftp_pwd($this->objFTP);
@@ -120,6 +157,10 @@ class FTP
         }
     }
 
+    /**
+     * @param $ftpath
+     * @param string|null $ftpbasedir
+     */
     public function mksubdirs($ftpath, $ftpbasedir = null)
     {
         if (!is_null($ftpbasedir)) {
@@ -148,6 +189,7 @@ class FTP
      *
      * @param string $strFile
      * @param array $ftpSettings (host, username, password)
+     * @param boolean $blnSecure
      * @throws \RuntimeException
      */
     public static function ftpRemove($strFile, $ftpSettings, $blnSecure = false)
@@ -203,10 +245,11 @@ class FTP
 
     /**
      * Quick upload mthod for a single file.
-     *
+     * 
      * @param string $sourceFile local file name
      * @param array $ftpSettings (path.uploads, host, username, password)
-     * @throws \RuntimeException
+     * @param null $targetFile
+     * @param bool $blnSecure
      */
     public static function ftpUpload($sourceFile, $ftpSettings, $targetFile = null, $blnSecure = false)
     {
