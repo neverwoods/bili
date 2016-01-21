@@ -237,7 +237,7 @@ class FTP
         }
         if ($objRet != FTP_FINISHED) {
             //*** Something went wrong.
-            throw new \RuntimeException("FTP transfer of {$strFtpFileName} interruppted.", 500);
+            throw new \RuntimeException("FTP transfer of {$strFtpFileName} interrupted.", 500);
         }
 
         //*** Remove local file.
