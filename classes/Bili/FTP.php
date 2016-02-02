@@ -28,6 +28,7 @@ class FTP
      * @param int $port
      * @param int $timeout
      * @param bool $blnSecure
+     * @throws \Exception when the ftp connection failed
      */
     public function __construct($host, $port = 21, $timeout = 90, $blnSecure = false)
     {
@@ -49,6 +50,11 @@ class FTP
 
         if (!$this->objFTP) {
             $this->objFTP = ftp_connect($host, $port, $timeout);
+        }
+        
+        //*** Throw exception if there still isn't a valid FTP resource.
+        if (!$this->objFTP) {
+            throw new \Exception("FTP connection has failed.", E_ERROR);
         }
     }
 
