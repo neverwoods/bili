@@ -5,9 +5,9 @@ namespace Bili;
 /**
  * Class to hold Session logic.
  *
- * @package    Bili
- * @author    felix
- * @version 1.1
+ * @package     Bili
+ * @author      Felix Langfeldt
+ * @version     1.2
  */
 class SessionManager
 {
@@ -16,7 +16,7 @@ class SessionManager
     private $timeout = 1440;
     private $session = null;
 
-    public static function singleton($transferId = null, $timeout = 1440, $diSession = null)
+    public static function singleton($transferId = null, $timeout = 1440, $diSession = null, $blnStart = true)
     {
         self::$instance = new SessionManager($transferId, $timeout, $diSession);
 
@@ -30,12 +30,9 @@ class SessionManager
             array(&self::$instance, "gc")
         );
 
-        ini_set('session.gc_maxlifetime', $timeout);
-        if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $timeout)) {
-            session_unset();     // unset $_SESSION variable for the run-time
-            session_destroy();   // destroy session data in storage
+        if ($blnStart) {
+            session_start();
         }
-        $_SESSION['LAST_ACTIVITY'] = time(); // update last activity time stamp
 
         return self::$instance;
     }
@@ -67,6 +64,24 @@ class SessionManager
         $this->gc();
 
         return true;
+    }
+
+    /**
+     * Validate a session. If not valid the session will be reset via the "reset" method.
+     *
+     * @return boolean
+     */
+    public function validate()
+    {
+        $blnReturn = true;
+
+        if (!$this->isValid($this->timeout)) {
+            $this->reset();
+
+            $blnReturn = false;
+        }
+
+        return $blnReturn;
     }
 
     public function read($strId)
@@ -112,6 +127,7 @@ class SessionManager
 
     public function reset()
     {
+        session_regenerate_id(true);
         session_unset();
         session_destroy();
     }
@@ -134,6 +150,46 @@ class SessionManager
         if (isset($_SESSION[$strKey])) {
             return $_SESSION[$strKey];
         }
+    }
+
+    protected function isExpired($timeout = 1800)
+    {
+        $blnReturn = false;
+
+        if (isset($_SESSION['_last_activity']) && (time() - $_SESSION['_last_activity'] > $timeout)) {
+            $blnReturn = true;
+        }
+
+        $_SESSION['_last_activity'] = time();
+
+        return $blnReturn;
+    }
+
+    protected function isFingerprint()
+    {
+        $blnReturn = true;
+
+        $hash = md5($_SERVER['HTTP_USER_AGENT'] . (ip2long($_SERVER['REMOTE_ADDR']) & ip2long('255.255.0.0')));
+
+        if (isset($_SESSION['_fingerprint'])) {
+            $blnReturn = $_SESSION['_fingerprint'] === $hash;
+        }
+
+        $_SESSION['_fingerprint'] = $hash;
+
+        return $blnReturn;
+    }
+
+    /**
+     * Execute the validation methods. At this time the fingerprint (user agent and IP address) and expiration timeout
+     * are checked.
+     *
+     * @param integer $timeout
+     * @return boolean
+     */
+    protected function isValid($timeout = 1800)
+    {
+        return (!$this->isExpired($timeout) && $this->isFingerprint());
     }
 
     /**
