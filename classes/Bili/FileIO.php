@@ -176,8 +176,12 @@ class FileIO
         return $blnReturn;
     }
 
-    public static function handleUpload($targetDir, $intMaxSize = null, $blnReturnInfo = false)
-    {
+    public static function handleUpload(
+        $targetDir,
+        $intMaxSize = null,
+        $blnReturnInfo = false,
+        $arrAllowedExtensions = null
+    ) {
         $arrReturn = null;
 
         // HTTP headers for no cache etc
@@ -282,6 +286,13 @@ class FileIO
                 }
             } catch (\Exception $ex) {
                 die('{"jsonrpc" : "2.0", "error" : {"code": 102, "message": "Failed to open output stream."}, "id" : "id"}');
+            }
+        }
+
+        //*** Check if the file extension is allowed.
+        if (!is_null($arrAllowedExtensions)) {
+            if (!in_array(FileIO::extension($originalName), $arrAllowedExtensions)) {
+                die('{"jsonrpc" : "2.0", "error" : {"code": 105, "message": "File extension not allowed."}, "id" : "id"}');
             }
         }
 
