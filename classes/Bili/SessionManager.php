@@ -169,13 +169,15 @@ class SessionManager
     {
         $blnReturn = true;
 
-        $hash = md5($_SERVER['HTTP_USER_AGENT'] . (ip2long($_SERVER['REMOTE_ADDR']) & ip2long('255.255.0.0')));
+        if (isset($_SERVER['HTTP_USER_AGENT']) && isset($_SERVER['REMOTE_ADDR'])) {
+            $hash = md5($_SERVER['HTTP_USER_AGENT'] . (ip2long($_SERVER['REMOTE_ADDR']) & ip2long('255.255.0.0')));
 
-        if (isset($_SESSION['_fingerprint'])) {
-            $blnReturn = $_SESSION['_fingerprint'] === $hash;
+            if (isset($_SESSION['_fingerprint'])) {
+                $blnReturn = $_SESSION['_fingerprint'] === $hash;
+            }
+
+            $_SESSION['_fingerprint'] = $hash;
         }
-
-        $_SESSION['_fingerprint'] = $hash;
 
         return $blnReturn;
     }
