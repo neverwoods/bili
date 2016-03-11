@@ -176,15 +176,19 @@ class Language
         if (file_exists($this->langPath . "/" . $strLang . ".php")
                 && (count(self::$languages) === 0 || $this->forceReload)) {
             //*** Write to cookie.
-            setcookie(
-                'language',
-                $strLang,
-                time() + 60*60*24*30,
-                '/',
-                '',
-                static::$secureCookie,
-                true
-            );
+            try {
+                setcookie(
+                    'language',
+                    $strLang,
+                    time() + 60*60*24*30,
+                    '/',
+                    '',
+                    static::$secureCookie,
+                    true
+                );
+            } catch (\Exception $ex) {
+                //*** Probably "headers already sent" error. Never mind. The cookie is not that important.
+            }
 
             //*** Write to session.
             $_SESSION['language'] = $strLang;
