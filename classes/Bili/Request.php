@@ -105,7 +105,13 @@ class Request
 
     public static function getRootURI()
     {
-        return self::getProtocol() . "://" . $_SERVER["HTTP_HOST"];
+        $strReturn = "";
+
+        if (isset($_SERVER["HTTP_HOST"])) {
+            $strReturn = self::getProtocol() . "://" . $_SERVER["HTTP_HOST"];
+        }
+
+        return $strReturn;
     }
 
     public static function getSubURI()
