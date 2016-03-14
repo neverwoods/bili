@@ -205,6 +205,7 @@ class FileIO
         $fileName = str_replace(" ", "-", $fileName);
         $fileName = str_replace("---", "-", $fileName);
         $fileName = str_replace("--", "-", $fileName);
+        $fileName = str_replace(FileIO::extension($fileName), strtolower(FileIO::extension($fileName)), $fileName);
         $originalName = $fileName;
 
         // Make sure the fileName is unique but only if chunking is disabled
@@ -290,7 +291,7 @@ class FileIO
         }
 
         //*** Check if the file extension is allowed.
-        if (!is_null($arrAllowedExtensions)) {
+        if (is_array($arrAllowedExtensions)) {
             if (!in_array(FileIO::extension($originalName), $arrAllowedExtensions)) {
                 die('{"jsonrpc" : "2.0", "error" : {"code": 105, "message": "File extension not allowed."}, "id" : "id"}');
             }
