@@ -72,6 +72,13 @@ class Date
         return strftime("%B", mktime(0, 0, 0, $intMonth, 10));
     }
 
+    public static function getQuarter($intMonth)
+    {
+        $intReturn = ceil($intMonth / 3);
+
+        return $intReturn;
+    }
+
     public static function parseDate($strDate, $strFormat)
     {
         /* This method parses a date/time value using a defined format.
