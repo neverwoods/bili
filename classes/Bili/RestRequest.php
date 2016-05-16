@@ -158,6 +158,10 @@ class RestRequest
     {
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
 
+        if (is_string($this->requestBody)) {
+            $this->url .= "?" . $this->requestBody;
+        }
+
         $this->doExecute($ch);
     }
 
