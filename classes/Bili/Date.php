@@ -3,10 +3,13 @@
 namespace Bili;
 
 /**
- * Date Class v0.2.7
+ * Date Class v0.3.0
  * Holds methods for misc. date calls.
  *
  * CHANGELOG
+ * version 0.3.0, 14 Jun 2016
+ *   ADD: Added the minDate method.
+ *   ADD: Added the maxDate method.
  * version 0.2.7, 24 Sep 2014
  *   ADD: Added the getOrdinalSuffix method.
  * version 0.2.6, 04 Apr 2013
@@ -65,6 +68,20 @@ class Date
         }
 
         return $strReturn;
+    }
+
+    public static function minDate()
+    {
+        $dtReturn = new \DateTime("1901-12-13");
+
+        return $dtReturn;
+    }
+
+    public static function maxDate()
+    {
+        $dtReturn = new \DateTime("2038-01-18");
+
+        return $dtReturn;
     }
 
     public static function getMonthName($intMonth)
