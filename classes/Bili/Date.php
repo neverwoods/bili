@@ -136,7 +136,7 @@ class Date
      * @param array $arrSuffixes An array like ['th','st','nd','rd','th','th','th','th','th','th']
      * @return string The day with the suffix
      */
-    public function getOrdinalSuffix($intDay, $arrSuffixes)
+    public static function getOrdinalSuffix($intDay, $arrSuffixes)
     {
         $intDay = abs($intDay);
         $intMod100 = $intDay % 100;
