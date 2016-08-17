@@ -267,4 +267,23 @@ class Display
 
         return $arrResults[0];
     }
+
+    /**
+     * Parse a number with either the singular or plural version of a description.
+     *
+     * @param integer $intAmount
+     * @param string $strSingular
+     * @param string $strPlural
+     * @return string
+     */
+    public static function singularOrPlural($intAmount, $strSingular, $strPlural)
+    {
+        if (round($intAmount) == 1) {
+            $strReturn = $intAmount . " " . $strSingular;
+        } else {
+            $strReturn = $intAmount . " " . $strPlural;
+        }
+
+        return $strReturn;
+    }
 }
