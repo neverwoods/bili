@@ -170,6 +170,33 @@ class Sanitize
     }
 
     /**
+     * Convert an input string to a save URL, which means no special characters, spaces or uppercase.
+     * Spaces get converted to hyphens.
+     *
+     * @param $strInput
+     * @return string
+     */
+    public static function toUrl($strInput)
+    {
+        //*** Convert HTML entities to utf-8 characters.
+        $strReturn = html_entity_decode($strInput, ENT_QUOTES | ENT_XML1, 'UTF-8');
+
+        //*** Convert utf-8 to ascii characters.
+        $strReturn = iconv('UTF-8', 'ASCII//TRANSLIT', $strReturn);
+
+        //*** Convert to lower case, trim and replace spaces with dashes.
+        $strReturn = str_replace(' ', '-', trim(strtolower($strReturn)));
+
+        //*** Remove anything that isn't a regular character or number.
+        $strReturn = preg_replace('/[^\w\s\d\-]/', '', $strReturn);
+
+        //*** Make sure the is only 1 hyphen. Could be more due to space replacement and special character removal.
+        $strReturn = preg_replace('/-{2,}/', '-', $strReturn);
+
+        return $strReturn;
+    }
+
+    /**
      * Sanitize input to be a numeric value. Works on single values and arrays.
      * This will retain leading zeros.
      *
