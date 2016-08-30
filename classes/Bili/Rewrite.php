@@ -220,7 +220,8 @@ class Rewrite
         $strParseType = null,
         $intSubSection = SUB_SECTION_EMPTY,
         $arrParameters = null,
-        $intDepartment = null
+        $intDepartment = null,
+        $strFragment = null
     ) {
         //*** Convert navigational elements to an URL.
         $strReturn = "/";
@@ -288,6 +289,11 @@ class Rewrite
                     break;
                 }
             }
+        }
+
+        //*** Fragment.
+        if (!is_null($strFragment)) {
+            $strReturn .= $strFragment;
         }
 
         return $strReturn;
