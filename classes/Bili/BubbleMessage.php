@@ -34,6 +34,7 @@ class BubbleMessage extends ClassDynamic implements \JsonSerializable
     protected $location;
     protected $timeout;
     protected $permanent;
+    protected $dismiss;
     protected $key;
     protected $id;
 
@@ -46,6 +47,7 @@ class BubbleMessage extends ClassDynamic implements \JsonSerializable
         $this->location = (isset($options["location"])) ? $options["location"] : static::MSG_LOC_CONTAINER;
         $this->timeout = (isset($options["timeout"])) ? $options["timeout"] : 0;
         $this->permanent = (isset($options["permanent"])) ? $options["permanent"] : false;
+        $this->dismiss = (isset($options["dismiss"])) ? $options["dismiss"] : false;
         $this->key = (isset($options["key"])) ? $options["key"] : "";
 
         $this->setId();
