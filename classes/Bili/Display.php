@@ -278,7 +278,7 @@ class Display
      */
     public static function singularOrPlural($intAmount, $strSingular, $strPlural)
     {
-        if (round($intAmount) == 1) {
+        if (round(Sanitize::toDecimal($intAmount)) == 1) {
             $strReturn = $intAmount . " " . $strSingular;
         } else {
             $strReturn = $intAmount . " " . $strPlural;
