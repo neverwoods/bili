@@ -106,7 +106,10 @@ class Display
         $intMinDecimal = 2,
         $blnShowThousandSeparator = true
     ) {
-        $fltValue = floatval($fltValue);
+        if (!is_numeric($fltValue)) {
+            $fltValue = floatval($fltValue);
+        }
+
         $intValue = floor($fltValue);
 
         for ($intDecimals = 0; $fltValue != round($fltValue, $intDecimals); $intDecimals++) {
