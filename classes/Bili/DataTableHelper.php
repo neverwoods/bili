@@ -41,7 +41,12 @@ class DataTableHelper
 
     public static function getOrderDirection($strDefaultDirection)
     {
+        $arrWhiteList = ["Asc", "Desc"];
+
         $strReturn = ucfirst(Request::get("sSortDir_0", $strDefaultDirection));
+        if (!in_array($strReturn, $arrWhiteList)) {
+            $strReturn = $strDefaultDirection;
+        }
 
         return $strReturn;
     }
