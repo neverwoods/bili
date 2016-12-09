@@ -62,7 +62,13 @@ class DataTableHelper
 
     public static function getPage()
     {
-        return floor(self::getPageStart() / self::getPageLength()) + 1;
+        $intReturn = 1;
+
+        if (self::getPageLength() > 0) {
+            $intReturn = floor(self::getPageStart() / self::getPageLength()) + 1;
+        }
+
+        return $intReturn;
     }
 
     public static function getPageStart()
