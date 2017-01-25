@@ -107,6 +107,11 @@ class FileIO
         $arrExec[] = $strParameters;
         $arrExec[] = $strInput;
         $arrExec[] = $strOutput;
+
+        if (isset($arrSettings['suppressOutput'])) {
+            $arrExec[] = '> /dev/null 2>&1';
+        }
+
         $strExec = implode(" ", $arrExec);
 
         $blnCreated = exec($strExec);
