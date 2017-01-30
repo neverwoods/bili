@@ -109,7 +109,7 @@ class FileIO
         $arrExec[] = $strOutput;
         $strExec = implode(" ", $arrExec);
 
-        $blnCreated = exec($strExec);
+        exec($strExec);
 
         if (file_exists($strPdfFile)) {
             $varReturn = file_get_contents($strPdfFile);
@@ -162,7 +162,7 @@ class FileIO
         chmod($strCommandFile, 0777);
 
         //*** Execute the bash script.
-        $blnReturn = exec($strCommandFile);
+        exec($strCommandFile);
 
         if (file_exists($strSaveFile) && $blnMove) {
             //*** Move the temp file to the original.
