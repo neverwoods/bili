@@ -8,7 +8,7 @@ class Crypt
      * Generate a token using a dynamic array of parameters.
      *
      * @param array $arrInput
-     * @param number $intMaxLength
+     * @param int|number $intMaxLength
      * @return string
      */
     public static function generateToken($arrInput = [], $intMaxLength = 40)
@@ -20,16 +20,19 @@ class Crypt
             $strReturn = substr(sha1(implode("", $arrInput)), 0, $intMaxLength);
         } else {
             $strChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            srand((double)microtime()*1000000);
-            $arrReturn = [];
 
-            for ($i = 1; $i <= $intMaxLength; $i++) {
-                $intNum = rand() % (strlen($strChars) - 1);
-                $strTmp = substr($strChars, $intNum, 1);
-                $arrReturn[] = $strTmp;
+            if ($intMaxLength < 1) {
+                throw new \InvalidArgumentException('Length must be a positive integer');
             }
 
-            $strReturn = implode("", $arrReturn);
+            $alphaMax = strlen($strChars) - 1;
+            if ($alphaMax < 1) {
+                throw new \InvalidArgumentException('Invalid alphabet');
+            }
+
+            for ($i = 0; $i < $intMaxLength; ++$i) {
+                $strReturn .= substr($strChars, random_int(0, $alphaMax), 1);
+            }
         }
 
         return $strReturn;
