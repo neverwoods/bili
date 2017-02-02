@@ -42,7 +42,7 @@ class Display
         $arrExec[] = $strOutput;
         $strExec = implode(" ", $arrExec);
 
-        $blnCreated = exec($strExec);
+        exec($strExec);
 
         if (file_exists($strPdfFile)) {
             $varReturn = file_get_contents($strPdfFile);
