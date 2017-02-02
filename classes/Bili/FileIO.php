@@ -72,7 +72,10 @@ class FileIO
 
     /**
      * Convert HTML markup to a binary PDF
-     * @param  string      $strHtml The HTML input
+     * @param string $strHtml The HTML input
+     * @param string $strFilePrefix
+     * @param array|null $arrParameters
+     * @param array $arrSettings
      * @return binary|null The binary PDF output or null if something went wrong.
      */
     public static function html2pdf($strHtml, $strFilePrefix = "document", $arrParameters = null, $arrSettings = [])
@@ -87,7 +90,7 @@ class FileIO
             $arrSettings["wkhtmltopdfPath"] = $GLOBALS["_CONF"]["app"]["wkhtmltopdf"];
         }
 
-        srand((double) microtime()*1000000);
+        srand((double) microtime() * 1000000);
         $random_number = rand();
         $sid = md5($random_number);
 
@@ -99,14 +102,22 @@ class FileIO
         $strInput = $strHtmlFile;
         $strOutput = $strPdfFile;
 
-        //*** Extra parameters.
-        $strParameters = (is_array($arrParameters)) ? implode(" ", $arrParameters) : "";
+        //*** Prepend extra parameters.
+        $strParameters = (is_array($arrParameters))
+            ? implode(" ", $arrParameters)
+            : "";
+
+        //*** Append extra parameters or define stdout and stderr
+        $strAppendParameters = (is_array($arrSettings['appendParameters']))
+            ? implode(" ", $arrSettings['appendParameters'])
+            : "";
 
         $arrExec = array();
         $arrExec[] = $arrSettings["wkhtmltopdfPath"];
         $arrExec[] = $strParameters;
         $arrExec[] = $strInput;
         $arrExec[] = $strOutput;
+        $arrExec[] = $strAppendParameters;
         $strExec = implode(" ", $arrExec);
 
         exec($strExec);
