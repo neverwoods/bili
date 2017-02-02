@@ -102,11 +102,22 @@ class FileIO
         //*** Extra parameters.
         $strParameters = (is_array($arrParameters)) ? implode(" ", $arrParameters) : "";
 
+        //*** Append parameters.
+        $strAppendParameters = '';
+        if (isset($arrSettings['appendParameters'])) {
+            if (is_array($arrSettings['appendParameters'])) {
+                $strAppendParameters = implode(' ', $arrSettings['appendParameters']);
+            } else if (is_string($arrSettings['appendParameters'])) {
+                $strAppendParameters = $arrSettings['appendParameters'];
+            }
+        }
+
         $arrExec = array();
         $arrExec[] = $arrSettings["wkhtmltopdfPath"];
         $arrExec[] = $strParameters;
         $arrExec[] = $strInput;
         $arrExec[] = $strOutput;
+        $arrExec[] = $strAppendParameters;
         $strExec = implode(" ", $arrExec);
 
         exec($strExec);
