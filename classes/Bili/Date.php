@@ -89,6 +89,11 @@ class Date
         return strftime("%B", mktime(0, 0, 0, $intMonth, 10));
     }
 
+    public static function getShortMonthName($intMonth)
+    {
+        return strftime("%b", mktime(0, 0, 0, $intMonth, 10));
+    }
+
     public static function getQuarter($intMonth)
     {
         $intReturn = ceil($intMonth / 3);
