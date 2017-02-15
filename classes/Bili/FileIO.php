@@ -164,10 +164,14 @@ class FileIO
         //*** Execute the bash script.
         exec($strCommandFile);
 
-        if (file_exists($strSaveFile) && $blnMove) {
-            //*** Move the temp file to the original.
-            @unlink($strPathA);
-            @rename($strSaveFile, $strPathA);
+        if (file_exists($strSaveFile)) {
+            if ($blnMove) {
+                //*** Move the temp file to the original.
+                @unlink($strPathA);
+                @rename($strSaveFile, $strPathA);
+            }
+
+            $blnReturn = true;
         }
 
         //*** Remove the bash script.
