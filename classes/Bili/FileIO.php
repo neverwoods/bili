@@ -107,7 +107,7 @@ class FileIO
         if (isset($arrSettings['appendParameters'])) {
             if (is_array($arrSettings['appendParameters'])) {
                 $strAppendParameters = implode(' ', $arrSettings['appendParameters']);
-            } else if (is_string($arrSettings['appendParameters'])) {
+            } elseif (is_string($arrSettings['appendParameters'])) {
                 $strAppendParameters = $arrSettings['appendParameters'];
             }
         }
