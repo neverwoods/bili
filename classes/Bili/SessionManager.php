@@ -15,6 +15,7 @@ class SessionManager
     private $transferId = null;
     private $timeout = 1440;
     private $session = null;
+    private $validateFingerprint = true;
 
     public static function singleton($transferId = null, $timeout = 1440, $diSession = null, $blnStart = true)
     {
@@ -132,6 +133,16 @@ class SessionManager
         session_destroy();
     }
 
+    /**
+     * Override the default action (true) to validate using the fingerprint method (IP and browser).
+     *
+     * @param $blnValue
+     */
+    public function useFingerprint($blnValue)
+    {
+        $this->validateFingerprint = $blnValue;
+    }
+
     public static function setData($strKey, $varData = null)
     {
         if (isset($_SESSION)) {
@@ -169,14 +180,16 @@ class SessionManager
     {
         $blnReturn = true;
 
-        if (isset($_SERVER['HTTP_USER_AGENT']) && isset($_SERVER['REMOTE_ADDR'])) {
-            $hash = md5($_SERVER['HTTP_USER_AGENT'] . (ip2long($_SERVER['REMOTE_ADDR']) & ip2long('255.255.0.0')));
+        if ($this->validateFingerprint) {
+            if (isset($_SERVER['HTTP_USER_AGENT']) && isset($_SERVER['REMOTE_ADDR'])) {
+                $hash = md5($_SERVER['HTTP_USER_AGENT'] . (ip2long($_SERVER['REMOTE_ADDR']) & ip2long('255.255.0.0')));
 
-            if (isset($_SESSION['_fingerprint'])) {
-                $blnReturn = $_SESSION['_fingerprint'] === $hash;
+                if (isset($_SESSION['_fingerprint'])) {
+                    $blnReturn = $_SESSION['_fingerprint'] === $hash;
+                }
+
+                $_SESSION['_fingerprint'] = $hash;
             }
-
-            $_SESSION['_fingerprint'] = $hash;
         }
 
         return $blnReturn;
