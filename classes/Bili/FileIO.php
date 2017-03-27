@@ -367,14 +367,18 @@ class FileIO
      * or something similar instead of the possibly expected 'text/html'.
      *
      * @param string $strUrl The fully qualified path to the remote file
-     * @param array $validations The array of validation rules
+     * @param array $arrValidations The array of validation rules
+     * @param array|null $arrHeaders The array of HTTP request headers
      * @return boolean True if the remote file exists and matches the validation rules, false if not
      */
-    public static function webFileExists($strUrl, $validations = array())
+    public static function webFileExists($strUrl, $arrValidations = [], $arrHeaders = null)
     {
         $blnReturn = false;
 
         if (!empty($strUrl)) {
+            //*** Make it browser save.
+            $strUrl = str_replace(" ", "%20", $strUrl);
+
             $objCurl = curl_init();
             curl_setopt($objCurl, CURLOPT_URL, $strUrl);
             curl_setopt($objCurl, CURLOPT_HEADER, true);
@@ -386,12 +390,16 @@ class FileIO
             curl_setopt($objCurl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($objCurl, CURLOPT_MAXREDIRS, 10); //follow up to 10 redirections - avoids loops
 
-            $strData = curl_exec($objCurl);
+            if (is_array($arrHeaders)) {
+                curl_setopt($objCurl, CURLOPT_HTTPHEADER, $arrHeaders);
+            }
+
+            curl_exec($objCurl);
 
             $intValidationCounter = 0;
             $intHttpResponseCode = curl_getinfo($objCurl, CURLINFO_HTTP_CODE);
             if ($intHttpResponseCode == 200) {
-                foreach ($validations as $intCurlType => $varDesiredValue) {
+                foreach ($arrValidations as $intCurlType => $varDesiredValue) {
                     $varReturnValue = curl_getinfo($objCurl, $intCurlType);
 
                     if ($varReturnValue === $varDesiredValue) {
@@ -405,7 +413,7 @@ class FileIO
              * When we have to validate all validations, compare the validations array length
              * against the amount of valid validations we've encountered.
              */
-            if (count($validations) === $intValidationCounter) {
+            if (count($arrValidations) === $intValidationCounter) {
                 $blnReturn = true;
             }
 
@@ -418,10 +426,11 @@ class FileIO
     /**
      * Download a file from a webserver.
      *
-     * @param string $strUrl
+     * @param string $strUrl The fully qualified path to the remote file
+     * @param null|array $arrHeaders The array of HTTP request headers
      * @return mixed
      */
-    public static function getWebFile($strUrl)
+    public static function getWebFile($strUrl, $arrHeaders = null)
     {
         $strReturn = null;
 
@@ -438,6 +447,10 @@ class FileIO
             curl_setopt($objCurl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($objCurl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($objCurl, CURLOPT_MAXREDIRS, 10); //follow up to 10 redirections - avoids loops
+
+            if (is_array($arrHeaders)) {
+                curl_setopt($objCurl, CURLOPT_HTTPHEADER, $arrHeaders);
+            }
 
             $strReturn = curl_exec($objCurl);
 
