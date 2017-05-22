@@ -140,17 +140,18 @@ class TemplateInterface
     /**
      * Initiate the internal HTML_Template_IT object that will be used for parsing.
      *
-     * @param  string           $strTemplateFile Name of the template file
-     * @param  string           $strTemplatePath Path to the template files
+     * @param  string $strTemplateFile Name of the template file
+     * @param  string $strTemplatePath Path to the template files
+     * @param null $arrOptions
      * @return \HTML_Template_IT The template object that was initiated
      */
-    public function setTemplate($strTemplateFile, $strTemplatePath = null)
+    public function setTemplate($strTemplateFile, $strTemplatePath = null, $arrOptions = null)
     {
         if (!is_null($strTemplatePath)) {
             $this->templatePath = $strTemplatePath;
         }
 
-        $this->template = new \HTML_Template_IT($this->templatePath);
+        $this->template = new \HTML_Template_IT($this->templatePath, $arrOptions);
         $this->template->loadTemplatefile($strTemplateFile);
 
         return $this->template;
