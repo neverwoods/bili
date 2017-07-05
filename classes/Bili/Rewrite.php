@@ -213,6 +213,29 @@ class Rewrite
         return $strReturn;
     }
 
+    /**
+     * Get the current active URL.
+     *
+     * @param bool $blnIncludeDepartment
+     * @return string
+     */
+    public function getCurrentUrl($blnIncludeDepartment = true)
+    {
+        $varDepartment = ($blnIncludeDepartment) ? $this->getDepartment() : null;
+
+        $strReturn = $this->getUrl(
+            $this->getSection(),
+            $this->getCommand(),
+            $this->getElement(),
+            $this->getParseType(),
+            $this->getSubSection(),
+            $this->getParameters(),
+            $varDepartment
+        );
+
+        return $strReturn;
+    }
+
     public function getUrl(
         $intSection,
         $intCommand = null,
