@@ -94,7 +94,8 @@ class Request
 
     public static function getProtocol()
     {
-        if (array_key_exists("HTTPS", $_SERVER) && $_SERVER["HTTPS"] == "on") {
+        if ((isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") || (isset($_SERVER["HTTP_X_FORWARDED_PROTO"]) &&
+                $_SERVER["HTTP_X_FORWARDED_PROTO"] == "https")) {
             $strReturn = "https";
         } else {
             $strReturn = "http";
