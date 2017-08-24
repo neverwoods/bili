@@ -140,7 +140,7 @@ class FileIO
      *
      * @param string $strPathA The path to save to. If it's an exisiting file it will be added to the merge
      *                         and replaced after the successful merge.
-     * @param string $varPathB The path(s) to the files that we want to merge.
+     * @param string|array $varPathB The path(s) to the files that we want to merge.
      * @return boolean
      */
     public static function mergePdfFiles($strPathA, $varPathB, $arrSettings = [])
