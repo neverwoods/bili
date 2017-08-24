@@ -106,7 +106,19 @@ class Date
         /* This method parses a date/time value using a defined format.
          * It returns a timestamp that can be used with strftime.
         */
+        
+        //*** Prepare possible special strftime formats.
+        $arrSpecialFormat = [
+            "%-e" => "%e",
+            "%-k" => "%k",
+            "%-l" => "%l"
+        ];
 
+        foreach ($arrSpecialFormat as $key => $value) {
+            $strFormat = str_replace($key, $value, $strFormat);
+        }
+
+        //*** Parse the format.
         $arrDate = (function_exists("strptime")) ?
             strptime($strDate, $strFormat) : self::strptime($strDate, $strFormat);
         $hour     = ($arrDate['tm_hour'] > 23 || $arrDate['tm_hour'] < 0) ? 0 : $arrDate['tm_hour'];
