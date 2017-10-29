@@ -216,12 +216,12 @@ class FileIO
         $fileId = isset($_REQUEST["id"]) ? $_REQUEST["id"] : '';
 
         // Clean the fileName for security reasons
+        $originalName = $fileName;
         $fileName = filter_var($fileName, FILTER_SANITIZE_STRING);
         $fileName = str_replace(" ", "-", $fileName);
         $fileName = str_replace("---", "-", $fileName);
         $fileName = str_replace("--", "-", $fileName);
         $fileName = str_replace(FileIO::extension($fileName), strtolower(FileIO::extension($fileName)), $fileName);
-        $originalName = $fileName;
 
         // Make sure the fileName is unique but only if chunking is disabled
         if ($chunks < 2 && file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
