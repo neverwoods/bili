@@ -484,4 +484,27 @@ class FileIO
 
         return $intReturn;
     }
+
+    /**
+     * Get the file encoding from a file.
+     *
+     * @param $strFilePath
+     * @return null|string
+     */
+    public static function detectFileEncoding($strFilePath) {
+        $strReturn = null;
+
+        if (file_exists($strFilePath)) {
+            $arrOutput = array();
+
+            exec('file -i "' . $strFilePath . '"', $arrOutput);
+
+            if (isset($arrOutput[0])){
+                $arrEncoding = explode('charset=', $arrOutput[0]);
+                $strReturn = isset($arrEncoding[1]) ? $arrEncoding[1] : null;
+            }
+        }
+
+        return $strReturn;
+    }
 }
