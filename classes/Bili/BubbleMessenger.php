@@ -23,13 +23,23 @@ class BubbleMessenger
      */
     public static function add($message, $options = array())
     {
+        static::addMessage(new BubbleMessage($message, $options));
+    }
+
+    /**
+     * Add a new message object to the message stack.
+     *
+     * @var BubbleMessage $objMessage The message object to display
+     */
+    public static function addMessage(BubbleMessage $objMessage)
+    {
         if (!isset($_SESSION["bubble-messages"]) || (isset($_SESSION["bubble-messages"])
                 && !is_array(unserialize($_SESSION["bubble-messages"])))) {
             $_SESSION["bubble-messages"] = serialize(array());
         }
 
         $objMessages = unserialize($_SESSION["bubble-messages"]);
-        array_push($objMessages, new BubbleMessage($message, $options));
+        array_push($objMessages, $objMessage);
         $_SESSION["bubble-messages"] = serialize($objMessages);
     }
 
