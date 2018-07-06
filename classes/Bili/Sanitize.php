@@ -227,6 +227,19 @@ class Sanitize
     }
 
     /**
+     * Sanitize a value to string using the filter_var method and constants.
+     *
+     * @param string $varInput
+     * @return string|bool
+     */
+    public static function toString($varInput)
+    {
+        $strReturn = filter_var(trim($varInput), FILTER_SANITIZE_STRING);
+
+        return $strReturn;
+    }
+
+    /**
      * Sanitize a string to a pure ascii string. No special characters or any other fancy UTF-8 stuff.
      *
      * @param string $strInput
