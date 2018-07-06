@@ -217,11 +217,30 @@ class Rewrite
      * Get the current active URL.
      *
      * @param bool $blnIncludeDepartment
+     * @param null|string|array $varExcludeParameters
      * @return string
      */
-    public function getCurrentUrl($blnIncludeDepartment = true)
+    public function getCurrentUrl($blnIncludeDepartment = true, $varExcludeParameters = null)
     {
+        //*** Exclude the department if provided.
         $varDepartment = ($blnIncludeDepartment) ? $this->getDepartment() : null;
+
+        //*** Filter excluded parameters if provided.
+        $arrParameters = $this->getParameters();
+        if (!is_null($varExcludeParameters)) {
+            if (!is_array($varExcludeParameters)) {
+                $varExcludeParameters = [$varExcludeParameters];
+            }
+
+            $arrFilteredParameters = [];
+            foreach ($arrParameters as $key => $value) {
+                if (!in_array($key, $varExcludeParameters)) {
+                    $arrFilteredParameters[$key] = $value;
+                }
+            }
+
+            $arrParameters = $arrFilteredParameters;
+        }
 
         $strReturn = $this->getUrl(
             $this->getSection(),
@@ -229,7 +248,7 @@ class Rewrite
             $this->getElement(),
             $this->getParseType(),
             $this->getSubSection(),
-            $this->getParameters(),
+            $arrParameters,
             $varDepartment
         );
 
