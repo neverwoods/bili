@@ -227,7 +227,7 @@ class Rewrite
 
         //*** Filter excluded parameters if provided.
         $arrParameters = $this->getParameters();
-        if (!is_null($varExcludeParameters)) {
+        if (is_array($arrParameters) && !is_null($varExcludeParameters)) {
             if (!is_array($varExcludeParameters)) {
                 $varExcludeParameters = [$varExcludeParameters];
             }
