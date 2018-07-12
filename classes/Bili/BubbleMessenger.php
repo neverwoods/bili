@@ -143,14 +143,17 @@ class BubbleMessenger
         $strReturn = "";
 
         switch ($location) {
-            case MSG_LOC_CONTAINER:
+            case BubbleMessage::MSG_LOC_CONTAINER:
                 $strReturn = "container";
+                
                 break;
-            case MSG_LOC_PAGE:
+            case BubbleMessage::MSG_LOC_PAGE:
                 $strReturn = "page";
+
                 break;
-            case MSG_LOC_SIDEBAR:
+            case BubbleMessage::MSG_LOC_SIDEBAR:
                 $strReturn = "side";
+
                 break;
         }
 
