@@ -128,9 +128,11 @@ class SessionManager
 
     public function reset()
     {
-        session_regenerate_id(true);
-        session_unset();
-        session_destroy();
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
+            session_unset();
+            session_destroy();
+        }
     }
 
     /**
