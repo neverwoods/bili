@@ -47,7 +47,7 @@ class DataTableHelper
     {
         $strReturn = $strDefaultColumn;
 
-        $arrColumns = static::getOrderColumns($strDefaultColumn, $arrWhiteList = null);
+        $arrColumns = static::getOrderColumns($strDefaultColumn, $arrWhiteList);
         if (count($arrColumns) > 0) {
             $strReturn = array_shift($arrColumns);
         }
