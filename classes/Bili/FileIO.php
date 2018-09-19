@@ -20,8 +20,6 @@ class FileIO
 
     public static function add2Base($filename, $addition)
     {
-        $strReturn = "";
-
         $strBase = basename($filename, self::extension($filename));
         if (substr($strBase, -1) == ".") {
             $strBase = substr($strBase, 0, -1);
@@ -72,8 +70,12 @@ class FileIO
 
     /**
      * Convert HTML markup to a binary PDF
-     * @param  string      $strHtml The HTML input
-     * @return binary|null The binary PDF output or null if something went wrong.
+     *
+     * @param string $strHtml               The HTML input
+     * @param string $strFilePrefix         Optional file prefix
+     * @param null|array $arrParameters     Optional wkhtmltopdf parameters
+     * @param array $arrSettings            Optional path settings
+     * @return string|null                  The binary PDF output or null if something went wrong.
      */
     public static function html2pdf($strHtml, $strFilePrefix = "document", $arrParameters = null, $arrSettings = [])
     {
@@ -138,9 +140,10 @@ class FileIO
     /**
      * Merge 2 or more PDF files.
      *
-     * @param string $strPathA The path to save to. If it's an exisiting file it will be added to the merge
-     *                         and replaced after the successful merge.
-     * @param string|array $varPathB The path(s) to the files that we want to merge.
+     * @param string $strPathA          The path to save to. If it's an exisiting file it will be added to the merge
+     *                                  and replaced after the successful merge.
+     * @param string|array $varPathB    The path(s) to the files that we want to merge.
+     * @param array $arrSettings        Optional path settings for ghostscript
      * @return boolean
      */
     public static function mergePdfFiles($strPathA, $varPathB, $arrSettings = [])
@@ -242,6 +245,8 @@ class FileIO
             @mkdir($targetDir);
         }
 
+        $contentType = "";
+
         // Look for the content type header
         if (isset($_SERVER["HTTP_CONTENT_TYPE"])) {
             $contentType = $_SERVER["HTTP_CONTENT_TYPE"];
@@ -307,7 +312,7 @@ class FileIO
 
         //*** Check if the file extension is allowed.
         if (is_array($arrAllowedExtensions)) {
-            if (!in_array(FileIO::extension($originalName), $arrAllowedExtensions)) {
+            if (!in_array(strtolower(FileIO::extension($originalName)), $arrAllowedExtensions)) {
                 die('{"jsonrpc" : "2.0", "error" : {"code": 105, "message": "File extension not allowed."}, "id" : "id"}');
             }
         }
