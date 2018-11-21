@@ -38,6 +38,9 @@ class SessionManager
         return self::$instance;
     }
 
+    /**
+     * @return SessionManager
+     */
     public static function getInstance()
     {
         return self::$instance;
@@ -65,6 +68,16 @@ class SessionManager
         $this->gc();
 
         return true;
+    }
+
+    /**
+     * Override the timeout setting from the singleton call.
+     *
+     * @param int $intTimeout
+     */
+    public function setTimeout(int $intTimeout)
+    {
+        self::$instance->timeout = $intTimeout;
     }
 
     /**
