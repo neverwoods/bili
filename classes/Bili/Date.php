@@ -137,12 +137,56 @@ class Date
         return $timestamp;
     }
 
+    /**
+     * Parse and test a date string using a specific format.
+     *
+     * @param string $strDate
+     * @param string $strFormat
+     * @param int $intMinYear
+     * @param int|null $intMaxYear
+     * @return \DateTime|null
+     */
+    public static function testParsedDate($strDate, $strFormat, $intMinYear, $intMaxYear = null)
+    {
+        $objReturn = null;
+
+        if (is_object($strDate)) {
+            $intTimestamp = true;
+            $objTestDate = $strDate;
+        } else {
+            $intTimestamp = Date::parseDate($strDate, $strFormat);
+            $objTestDate = \DateTime::createFromFormat('U', $intTimestamp);
+        }
+
+        if ($intTimestamp !== false) {
+            //*** An invalid date returns 1899 as year.
+            if ($objTestDate->format("Y") < $intMinYear) {
+                $intTimestamp = false;
+            }
+
+            if (!is_null($intMaxYear) && $objTestDate->format("Y") > $intMaxYear) {
+                $intTimestamp = false;
+            }
+
+            if ($intTimestamp !== false) {
+                $objReturn = $objTestDate;
+            }
+        }
+
+        return $objReturn;
+    }
+
+    /**
+     * This method takes a date/time value and converts it from one format to the other.
+     * It returns the converted value.
+     *
+     * @param string $strDate
+     * @param string $strInFormat
+     * @param string $strOutFormat
+     * @return string
+     */
     public static function convertDate($strDate, $strInFormat, $strOutFormat)
     {
-        /* This method takes a date/time value and converts it from one format to the other.
-         * It returns the converted value.
-        */
-
         return strftime($strOutFormat, self::parseDate($strDate, $strInFormat));
     }
 
