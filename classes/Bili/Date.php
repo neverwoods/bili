@@ -177,6 +177,78 @@ class Date
     }
 
     /**
+     * Get the delimiter from a string formatted date.
+     *
+     * @param string $strDate
+     * @return string|null
+     */
+    public static function getDateDelimiter($strDate)
+    {
+        $strReturn = null;
+
+        if (strpos($strDate, "/") !== false) {
+            $strReturn = "/";
+        }
+
+        if (strpos($strDate, "-") !== false) {
+            $strReturn = "-";
+        }
+
+        if (strpos($strDate, ".") !== false) {
+            $strReturn = ".";
+        }
+
+        return $strReturn;
+    }
+
+    /**
+     * Convert a 2 digit year in a date string to a 4 digit year.
+     *
+     * @param $strDate
+     * @return string
+     */
+    public static function fixShortYearInDate($strDate)
+    {
+        $strReturn = $strDate;
+
+        $strDelimiter = static::getDateDelimiter($strDate);
+
+        if (is_null($strDelimiter)) {
+            if (strlen($strDate) < 8) {
+                $strNewDate = "";
+                $arrDate = str_split($strDate, 2);
+
+                foreach ($arrDate as $strPart) {
+                    if ((int) $strPart > 31) {
+                        $strPart = (int) $strPart + 1900;
+                    }
+
+                    $strNewDate .= $strPart;
+                }
+
+                $strReturn = $strNewDate;
+            }
+        } else {
+            if (strlen($strDate) < 10) {
+                $arrNewDate = [];
+                $arrDate = explode($strDelimiter, $strDate);
+
+                foreach ($arrDate as $strPart) {
+                    if ((int) $strPart > 31) {
+                        $strPart = (int) $strPart + 1900;
+                    }
+
+                    $arrNewDate[] = $strPart;
+                }
+
+                $strReturn = implode($strDelimiter, $arrNewDate);
+            }
+        }
+
+        return $strReturn;
+    }
+
+    /**
      * This method takes a date/time value and converts it from one format to the other.
      * It returns the converted value.
      *
