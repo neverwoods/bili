@@ -211,37 +211,39 @@ class Date
     {
         $strReturn = $strDate;
 
-        $strDelimiter = static::getDateDelimiter($strDate);
+        if (!is_object($strDate)) {
+            $strDelimiter = static::getDateDelimiter($strDate);
 
-        if (is_null($strDelimiter)) {
-            if (strlen($strDate) < 8) {
-                $strNewDate = "";
-                $arrDate = str_split($strDate, 2);
+            if (is_null($strDelimiter)) {
+                if (strlen($strDate) < 8) {
+                    $strNewDate = "";
+                    $arrDate = str_split($strDate, 2);
 
-                foreach ($arrDate as $strPart) {
-                    if ((int) $strPart > 31) {
-                        $strPart = (int) $strPart + 1900;
+                    foreach ($arrDate as $strPart) {
+                        if ((int)$strPart > 31) {
+                            $strPart = (int)$strPart + 1900;
+                        }
+
+                        $strNewDate .= $strPart;
                     }
 
-                    $strNewDate .= $strPart;
+                    $strReturn = $strNewDate;
                 }
+            } else {
+                if (strlen($strDate) < 10) {
+                    $arrNewDate = [];
+                    $arrDate = explode($strDelimiter, $strDate);
 
-                $strReturn = $strNewDate;
-            }
-        } else {
-            if (strlen($strDate) < 10) {
-                $arrNewDate = [];
-                $arrDate = explode($strDelimiter, $strDate);
+                    foreach ($arrDate as $strPart) {
+                        if ((int)$strPart > 31) {
+                            $strPart = (int)$strPart + 1900;
+                        }
 
-                foreach ($arrDate as $strPart) {
-                    if ((int) $strPart > 31) {
-                        $strPart = (int) $strPart + 1900;
+                        $arrNewDate[] = $strPart;
                     }
 
-                    $arrNewDate[] = $strPart;
+                    $strReturn = implode($strDelimiter, $arrNewDate);
                 }
-
-                $strReturn = implode($strDelimiter, $arrNewDate);
             }
         }
 
