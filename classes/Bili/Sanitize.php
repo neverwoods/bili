@@ -145,7 +145,7 @@ class Sanitize
      *
      * @param  string|decimal|array $varInput
      * @param  boolean $blnDiscardInvalid Indicate if the input array should be compacted, leaving out invalid values.
-     * @return Ambigous <NULL, number, multitype:number >
+     * @return null|integer
      */
     public static function toInteger($varInput, $blnDiscardInvalid = true)
     {
@@ -202,7 +202,7 @@ class Sanitize
      *
      * @param  string|decimal|array $varInput
      * @param  boolean $blnDiscardInvalid Indicate if the input array should be compacted, leaving out invalid values.
-     * @return Ambigous <NULL, number, multitype:number >
+     * @return null|float|integer
      */
     public static function toNumeric($varInput, $blnDiscardInvalid = true)
     {
