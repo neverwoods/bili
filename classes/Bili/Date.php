@@ -234,15 +234,19 @@ class Date
                     $arrNewDate = [];
                     $arrDate = explode($strDelimiter, $strDate);
 
-                    foreach ($arrDate as $strPart) {
-                        if ((int)$strPart > 31) {
-                            $strPart = (int)$strPart + 1900;
+                    $arrLengths = array_map('strlen', $arrDate);
+
+                    if (max($arrLengths) < 4) {
+                        foreach ($arrDate as $strPart) {
+                            if ((int)$strPart > 31) {
+                                $strPart = (int)$strPart + 1900;
+                            }
+
+                            $arrNewDate[] = $strPart;
                         }
 
-                        $arrNewDate[] = $strPart;
+                        $strReturn = implode($strDelimiter, $arrNewDate);
                     }
-
-                    $strReturn = implode($strDelimiter, $arrNewDate);
                 }
             }
         }
