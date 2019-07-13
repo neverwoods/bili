@@ -512,8 +512,8 @@ class Rewrite
 
         if (is_array($varInput)) {
             $varReturn = array();
-            foreach ($varInput as $value) {
-                array_push($varReturn, Crypt::doEncode($value));
+            foreach ($varInput as $key => $value) {
+                $varReturn[$key] = Crypt::doEncode($value);
             }
         } else {
             $varReturn = Crypt::doEncode($varInput);
@@ -528,8 +528,8 @@ class Rewrite
 
         if (is_array($varInput)) {
             $varReturn = array();
-            foreach ($varInput as $value) {
-                array_push($varReturn, Crypt::doDecode($value));
+            foreach ($varInput as $key => $value) {
+                $varReturn[$key] = Crypt::doDecode($value);
             }
         } else {
             $varReturn = Crypt::doDecode($varInput);
