@@ -86,6 +86,25 @@ class Sanitize
     }
 
     /**
+     * Make sure a float is not longer than a specific length. Very handy for database fields.
+     *
+     * @param float|int $fltValue
+     * @param int $intMaxLength
+     * @param int $intRoundMode
+     * @return float
+     */
+    public static function floatToMaxLength($fltValue, $intMaxLength = 8, $intRoundMode = PHP_ROUND_HALF_UP)
+    {
+        $fltReturn = $fltValue;
+
+        if (strlen($fltValue) > $intMaxLength) {
+            $fltReturn = round($fltValue / pow(10, strlen($fltValue) - $intMaxLength), $intRoundMode);
+        }
+
+        return $fltReturn;
+    }
+
+    /**
      * Convert any numeric input to a machine readable decimal.
      *
      * Possible input:
