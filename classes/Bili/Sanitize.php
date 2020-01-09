@@ -87,18 +87,24 @@ class Sanitize
 
     /**
      * Make sure a float is not longer than a specific length. Very handy for database fields.
+     * If the value is longer than the maximum possible number is returned.
+     *
+     * Example:
+     * A value of 234234234.23234234 with a max. length of 8 will return 99999999.
+     * A value of 99348871.3434344 with a max. length of 8 will return 99348871.3434344.
      *
      * @param float|int $fltValue
      * @param int $intMaxLength
-     * @param int $intRoundMode
      * @return float
      */
-    public static function floatToMaxLength($fltValue, $intMaxLength = 8, $intRoundMode = PHP_ROUND_HALF_UP)
+    public static function floatToMaxLength($fltValue, $intMaxLength = 8)
     {
-        $fltReturn = $fltValue;
+        $fltReturn = static::toDecimal($fltValue);
 
-        if (strlen($fltValue) > $intMaxLength) {
-            $fltReturn = round($fltValue / pow(10, strlen($fltValue) - $intMaxLength), $intRoundMode);
+        $intBase = (int) $fltReturn;
+
+        if (strlen($intBase) > $intMaxLength) {
+            $fltReturn = (1 * pow(10, $intMaxLength)) - 1;
         }
 
         return $fltReturn;
