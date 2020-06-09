@@ -100,13 +100,19 @@ class Date
 
         return $intReturn;
     }
-
+    
+    /**
+     * This method parses a date/time value using a defined format.
+     * It returns a timestamp that can be used with strftime of false if the date could not be parsed.
+     *
+     * @param string $strDate
+     * @param string $strFormat
+     * @return bool|int
+     */
     public static function parseDate($strDate, $strFormat)
     {
-        /* This method parses a date/time value using a defined format.
-         * It returns a timestamp that can be used with strftime.
-        */
-        
+        $intReturn = false;
+
         //*** Prepare possible special strftime formats.
         $arrSpecialFormat = [
             "%-e" => "%e",
@@ -121,20 +127,23 @@ class Date
         //*** Parse the format.
         $arrDate = (function_exists("strptime")) ?
             strptime($strDate, $strFormat) : self::strptime($strDate, $strFormat);
-        $hour     = ($arrDate['tm_hour'] > 23 || $arrDate['tm_hour'] < 0) ? 0 : $arrDate['tm_hour'];
-        $minute = ($arrDate['tm_min'] > 59 || $arrDate['tm_min'] < 0) ? 0 : $arrDate['tm_min'];
-        $second = ($arrDate['tm_sec'] > 61 || $arrDate['tm_sec'] < 0) ? 0 : $arrDate['tm_sec'];
 
-        $timestamp = mktime(
-            $hour,
-            $minute,
-            $second,
-            $arrDate['tm_mon'] + 1,
-            $arrDate['tm_mday'],
-            $arrDate['tm_year'] + 1900
-        );
+        if ($arrDate !== false) {
+            $hour = ($arrDate['tm_hour'] > 23 || $arrDate['tm_hour'] < 0) ? 0 : $arrDate['tm_hour'];
+            $minute = ($arrDate['tm_min'] > 59 || $arrDate['tm_min'] < 0) ? 0 : $arrDate['tm_min'];
+            $second = ($arrDate['tm_sec'] > 61 || $arrDate['tm_sec'] < 0) ? 0 : $arrDate['tm_sec'];
 
-        return $timestamp;
+            $intReturn = mktime(
+                $hour,
+                $minute,
+                $second,
+                $arrDate['tm_mon'] + 1,
+                $arrDate['tm_mday'],
+                $arrDate['tm_year'] + 1900
+            );
+        }
+
+        return $intReturn;
     }
 
     /**
