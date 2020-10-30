@@ -18,6 +18,7 @@
     "require": {
         "php": ">=5.4.0",
         "ext-curl": "*",
+        "ext-fileinfo": "*",
         "mrclay/minify": "2.*",
         "pear/cache_lite": "1.*"
     },

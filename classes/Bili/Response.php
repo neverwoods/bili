@@ -190,7 +190,7 @@ class Response
 
             //*** Detect if the input is a file path or binary file.
             try {
-                $blnBinary = is_file($varFileData) === false;
+                $blnBinary = @is_file($varFileData) !== true;
             } catch (\Exception $ex) {
                 //*** Skip detection.
             }
