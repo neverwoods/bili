@@ -21,6 +21,7 @@ class Rewrite
     private $parser                        = null;
     private $parameters                    = null;
     private $reservedParameters         = array("view");
+    private $attributes                 = ["first"];
 
     private function __construct()
     {
@@ -400,6 +401,8 @@ class Rewrite
                         } else {
                             if (ctype_digit(strval($value))) {
                                 $this->element = $this::decode($value);
+                            } else if (in_array($value, $this->attributes)) {
+                                $this->element = $value;
                             } else {
                                 $this->parameters = $this->arrayToAssociated(
                                     array_slice($arrUrl, ($blnHasDepartment) ? $key + 1 : $key)
@@ -414,6 +417,8 @@ class Rewrite
                         if ($blnHasSubsection) {
                             if (ctype_digit(strval($value))) {
                                 $this->element = $this::decode($value);
+                            } else if (in_array($value, $this->attributes)) {
+                                $this->element = $value;
                             } else {
                                 $this->parameters = $this->arrayToAssociated(
                                     array_slice($arrUrl, ($blnHasDepartment) ? $key + 1 : $key)
