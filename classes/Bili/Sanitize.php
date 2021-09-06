@@ -80,7 +80,7 @@ class Sanitize
 
     public static function toFilename($strOutput)
     {
-        $strOutput = preg_replace('/([^\w\s\d\-\.%_~,;:\(\)\[\]\|])/u', '', $strOutput);
+        $strOutput = preg_replace('/([^\w\d\-\.%_~,;: \(\)\[\]\|])/u', '', $strOutput);
 
         return $strOutput;
     }
