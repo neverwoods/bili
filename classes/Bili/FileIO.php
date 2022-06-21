@@ -15,13 +15,13 @@ class FileIO
     public static function extension($filename)
     {
         $path_info = pathinfo($filename);
-        return $path_info['extension'];
+        return $path_info['extension'] ?? null;
     }
 
     public static function add2Base($filename, $addition)
     {
         $strBase = basename($filename, self::extension($filename));
-        if (substr($strBase, -1) == ".") {
+        if (substr($strBase, -1) === ".") {
             $strBase = substr($strBase, 0, -1);
         }
 
@@ -45,7 +45,9 @@ class FileIO
             }
 
             return rmdir($dir);
-        } elseif (is_file($dir) === true) {
+        }
+
+        if (is_file($dir) === true) {
             return unlink($dir);
         }
 
