@@ -261,7 +261,7 @@ class Rewrite
         $intCommand = null,
         $intElement = null,
         $strParseType = null,
-        $intSubSection = SUB_SECTION_EMPTY,
+        $intSubSection = null,
         $arrParameters = null,
         $intDepartment = null,
         $strFragment = null
@@ -283,7 +283,7 @@ class Rewrite
         }
 
         //*** Sub section.
-        if ($intSubSection != SUB_SECTION_EMPTY) {
+        if (!is_null($intSubSection)) {
             foreach (self::$subsections as $key => $value) {
                 if ($value == $intSubSection) {
                     $strReturn .= "/" . urlencode($key);

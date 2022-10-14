@@ -98,35 +98,24 @@ class Response
     }
 
     /**
-     * Generate a download link for an exisiting file in the cache.
+     * Generate a download link for an existing file in the cache.
      *
-     * @param  string $strCachedName The name of the file in the cache
-     * @param  string $strFilename File name
+     * @param string $strCachedName The name of the file in the cache
+     * @param string $strFilename File name
+     * @param string $strDownloadUrl
      * @return string The generated download link
      */
-    public static function generateDownloadLinkForExisting($strCachedName, $strFilename, $strDownloadUrl = null)
-    {
+    public static function generateDownloadLinkForExisting(
+        string $strCachedName,
+        string $strFilename,
+        string $strDownloadUrl
+    ): string {
         // Save in session
         $_SESSION["documents"][$strCachedName] = $strFilename;
 
-        if (is_null($strDownloadUrl)) {
-            $objRewrite = Rewrite::getInstance();
+        $strDownloadUrl .= "/t/" . Rewrite::encode($strCachedName);
 
-            $strDownloadUrl = $objRewrite->getUrl(
-                SECTION_DOCUMENT,
-                CMD_DOWNLOAD,
-                null,
-                null,
-                SUB_SECTION_EMPTY,
-                array("t" => $strCachedName)
-            );
-        } else {
-            $strDownloadUrl .= "/t/" . Rewrite::encode($strCachedName);
-        }
-
-        $strReturn = Request::getRootURI() . $strDownloadUrl;
-
-        return $strReturn;
+        return Request::getRootURI() . $strDownloadUrl;
     }
 
     public static function pushDownloadHeadersToBrowser($mimeType, $strFilename, $intContentLength = 0)
