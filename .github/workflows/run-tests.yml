@@ -1,0 +1,42 @@
+name: "Run Tests"
+
+on: [push]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.2, 8.1, 8.0, 7.4]
+        dependency-version: [prefer-lowest, prefer-stable]
+
+    name: P${{ matrix.php }} - ${{ matrix.dependency-version }}
+
+    steps:
+      - name: Install locales
+        run: |
+          sudo locale-gen nl_NL
+          sudo locale-gen nl_NL.UTF-8
+          sudo locale-gen en_US
+          sudo locale-gen en_US.UTF-8
+          sudo update-locale
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, zip, iconv
+          coverage: none
+
+      - name: Install dependencies
+        run: |
+          composer require "symfony/console:>=4.3.4" --no-interaction --no-update
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+
+      - name: Execute tests
+        run: vendor/bin/phpunit tests

@@ -2,6 +2,9 @@
 
 namespace Bili;
 
+use Carbon\Carbon;
+use DateTime;
+
 /**
  * Date Class v0.3.0
  * Holds methods for misc. date calls.
@@ -33,16 +36,19 @@ namespace Bili;
 
 class Date
 {
-    public static function fromMysql($strFormat, $strDateTime)
+    /**
+     * Transform mysql format datetime string to given iso format.
+     *
+     * @param string $strIsoFormat
+     * @param string $strDateTime
+     * @return string
+     */
+    public static function fromMysql(string $strIsoFormat, string $strDateTime): string
     {
-        $strReturn = $strDateTime;
-
-        if ($strDateTime != "0000-00-00 00:00:00" && !empty($strDateTime)) {
-            $strTStamp = strtotime($strDateTime);
-
-            if ($strTStamp !== -1 || $strTStamp !== false) {
-                $strReturn = strftime($strFormat, $strTStamp);
-            }
+        Carbon::setLocale('auto');
+        if ($strDateTime !== "0000-00-00 00:00:00" && !empty($strDateTime)) {
+            $objCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $strDateTime);
+            $strReturn = $objCarbon->isoFormat($strIsoFormat);
         } else {
             $strReturn = "";
         }
@@ -50,13 +56,19 @@ class Date
         return $strReturn;
     }
 
-    public static function toMysql($strDateTime = "")
+    /**
+     * Gives mysql string.
+     *
+     * @param string $strDateTime
+     * @return string
+     */
+    public static function toMysql(string $strDateTime = ""): string
     {
         $strReturn = $strDateTime;
-        $strFormat = "%Y-%m-%d %H:%M:%S";
+        $strFormat = "Y-m-d H:i:s";
 
         if (empty($strDateTime)) {
-            $strTStamp = strtotime("now");
+            $strTStamp = time();
         } elseif (is_numeric($strDateTime)) {
             $strTStamp = $strDateTime;
         } else {
@@ -64,83 +76,98 @@ class Date
         }
 
         if ($strTStamp !== -1 || $strTStamp !== false) {
-            $strReturn = strftime($strFormat, $strTStamp);
+            $strReturn = DateTime::createFromFormat('U', $strTStamp)->format($strFormat);
         }
 
         return $strReturn;
     }
 
-    public static function minDate()
+    /**
+     * @return DateTime
+     */
+    public static function minDate(): DateTime
     {
-        $dtReturn = new \DateTime("1901-12-13");
+        $dtReturn = new DateTime("1901-12-13");
 
         return $dtReturn;
     }
 
-    public static function maxDate()
+    /**
+     * @return DateTime
+     */
+    public static function maxDate(): DateTime
     {
-        $dtReturn = new \DateTime("2038-01-18");
+        $dtReturn = new DateTime("2038-01-18");
 
         return $dtReturn;
     }
 
-    public static function getMonthName($intMonth)
+    /**
+     * Returns Month name.
+     *
+     * @param $intMonth
+     * @return string
+     */
+    public static function getMonthName($intMonth): string
     {
-        return strftime("%B", mktime(0, 0, 0, $intMonth, 10));
+        $strTStamp = mktime(0, 0, 0, $intMonth, 10);
+        Carbon::setLocale('auto');
+        $strReturn = Carbon::createFromTimestamp($strTStamp)->monthName;
+
+        return $strReturn;
     }
 
-    public static function getShortMonthName($intMonth)
+    /**
+     * Returns Short month name.
+     *
+     * @param $intMonth
+     * @return string
+     */
+    public static function getShortMonthName($intMonth): string
     {
-        return strftime("%b", mktime(0, 0, 0, $intMonth, 10));
+        $strTStamp = mktime(0, 0, 0, $intMonth, 10);
+        Carbon::setLocale('auto');
+        $strReturn = Carbon::createFromTimestamp($strTStamp)->shortMonthName;
+
+        return $strReturn;
     }
 
+    /**
+     * @param $intMonth
+     * @return false|float
+     */
     public static function getQuarter($intMonth)
     {
         $intReturn = ceil($intMonth / 3);
 
         return $intReturn;
     }
-    
+
     /**
      * This method parses a date/time value using a defined format.
-     * It returns a timestamp that can be used with strftime of false if the date could not be parsed.
+     * It returns a timestamp or false if the date could not be parsed.
      *
      * @param string $strDate
-     * @param string $strFormat
+     * @param string $strIsoFormat
      * @return bool|int
      */
-    public static function parseDate($strDate, $strFormat)
+    public static function parseDate(string $strDate, string $strIsoFormat)
     {
-        $intReturn = false;
+        $objCarbon = Carbon::createFromIsoFormat($strIsoFormat, $strDate);
 
-        //*** Prepare possible special strftime formats.
-        $arrSpecialFormat = [
-            "%-e" => "%e",
-            "%-k" => "%k",
-            "%-l" => "%l"
-        ];
-
-        foreach ($arrSpecialFormat as $key => $value) {
-            $strFormat = str_replace($key, $value, $strFormat);
+        /**
+         * If there are only date related formats and no time formats,
+         * we set the time to the start of the day.
+         */
+        if (!self::stringContainsItemFromArray($strIsoFormat, ["HH", "mm", "ss"])) {
+            $objCarbon->startOfDay();
         }
 
-        //*** Parse the format.
-        $arrDate = (function_exists("strptime")) ?
-            strptime($strDate, $strFormat) : self::strptime($strDate, $strFormat);
+        $intReturn = $objCarbon->getTimestamp();
 
-        if ($arrDate !== false) {
-            $hour = ($arrDate['tm_hour'] > 23 || $arrDate['tm_hour'] < 0) ? 0 : $arrDate['tm_hour'];
-            $minute = ($arrDate['tm_min'] > 59 || $arrDate['tm_min'] < 0) ? 0 : $arrDate['tm_min'];
-            $second = ($arrDate['tm_sec'] > 61 || $arrDate['tm_sec'] < 0) ? 0 : $arrDate['tm_sec'];
-
-            $intReturn = mktime(
-                $hour,
-                $minute,
-                $second,
-                $arrDate['tm_mon'] + 1,
-                $arrDate['tm_mday'],
-                $arrDate['tm_year'] + 1900
-            );
+        //*** Check if reverse result is the same otherwise return false.
+        if ($objCarbon->isoFormat($strIsoFormat) !== $strDate) {
+            $intReturn = false;
         }
 
         return $intReturn;
@@ -153,9 +180,9 @@ class Date
      * @param string $strFormat
      * @param int $intMinYear
      * @param int|null $intMaxYear
-     * @return \DateTime|null
+     * @return DateTime|null
      */
-    public static function testParsedDate($strDate, $strFormat, $intMinYear, $intMaxYear = null)
+    public static function testParsedDate($strDate, $strFormat, $intMinYear, $intMaxYear = null): ?DateTime
     {
         $objReturn = null;
 
@@ -163,8 +190,8 @@ class Date
             $intTimestamp = true;
             $objTestDate = $strDate;
         } else {
-            $intTimestamp = Date::parseDate($strDate, $strFormat);
-            $objTestDate = \DateTime::createFromFormat('U', $intTimestamp);
+            $intTimestamp = self::parseDate($strDate, $strFormat);
+            $objTestDate = DateTime::createFromFormat('U', $intTimestamp);
         }
 
         if ($intTimestamp !== false) {
@@ -191,7 +218,7 @@ class Date
      * @param string $strDate
      * @return string|null
      */
-    public static function getDateDelimiter($strDate)
+    public static function getDateDelimiter($strDate): ?string
     {
         $strReturn = null;
 
@@ -216,7 +243,7 @@ class Date
      * @param $strDate
      * @return string
      */
-    public static function fixShortYearInDate($strDate)
+    public static function fixShortYearInDate($strDate): string
     {
         $strReturn = $strDate;
 
@@ -272,9 +299,10 @@ class Date
      * @param string $strOutFormat
      * @return string
      */
-    public static function convertDate($strDate, $strInFormat, $strOutFormat)
+    public static function convertDate(string $strDate, string $strInFormat, string $strOutFormat): string
     {
-        return strftime($strOutFormat, self::parseDate($strDate, $strInFormat));
+        Carbon::setLocale('auto');
+        return Carbon::createFromTimestamp(self::parseDate($strDate, $strInFormat))->isoFormat($strOutFormat);
     }
 
     /**
@@ -284,7 +312,7 @@ class Date
      * @param array $arrSuffixes An array like ['th','st','nd','rd','th','th','th','th','th','th']
      * @return string The day with the suffix
      */
-    public static function getOrdinalSuffix($intDay, $arrSuffixes)
+    public static function getOrdinalSuffix($intDay, $arrSuffixes): string
     {
         $intDay = abs($intDay);
         $intMod100 = $intDay % 100;
@@ -293,12 +321,20 @@ class Date
         return $strReturn;
     }
 
+    /**
+     * @param $t1
+     * @param $t2
+     * @param int $precision
+     * @param array $arrDiffSingular
+     * @param array $arrDiffPlural
+     * @return false|string
+     */
     public static function dateDifference(
         $t1,
         $t2,
-        $precision = 6,
-        $arrDiffSingular = array('year', 'month', 'day', 'hour', 'minute', 'second'),
-        $arrDiffPlural = array('years', 'months', 'days', 'hours', 'minutes', 'seconds')
+        int $precision = 6,
+        array $arrDiffSingular = array('year', 'month', 'day', 'hour', 'minute', 'second'),
+        array $arrDiffPlural = array('years', 'months', 'days', 'hours', 'minutes', 'seconds')
     ) {
         /* This method calculates the difference between 2 dates and
          * returns the result in a human readable format.
@@ -345,195 +381,78 @@ class Date
         return implode(', ', $ret);
     }
 
-    private static function strptime($sDate, $sFormat)
-    {
-        $aResult = array
-        (
-            'tm_sec'   => 0,
-            'tm_min'   => 0,
-            'tm_hour'  => 0,
-            'tm_mday'  => 1,
-            'tm_mon'   => 0,
-            'tm_year'  => 0,
-            'tm_wday'  => 0,
-            'tm_yday'  => 0,
-            'unparsed' => $sDate,
-        );
-
-        while ($sFormat != "") {
-            // ===== Search a %x element, Check the static string before the %x =====
-            $nIdxFound = strpos($sFormat, '%');
-            if ($nIdxFound === false) {
-                // There is no more format. Check the last static string.
-                $aResult['unparsed'] = ($sFormat == $sDate) ? "" : $sDate;
-                break;
-            }
-
-            $sFormatBefore = substr($sFormat, 0, $nIdxFound);
-            $sDateBefore = substr($sDate, 0, $nIdxFound);
-
-            if ($sFormatBefore != $sDateBefore) {
-                break;
-            }
-
-            // ===== Read the value of the %x found =====
-            $sFormat = substr($sFormat, $nIdxFound);
-            $sDate = substr($sDate, $nIdxFound);
-
-            $aResult['unparsed'] = $sDate;
-
-            $sFormatCurrent = substr($sFormat, 0, 2);
-            $sFormatAfter   = substr($sFormat, 2);
-
-            $nValue = -1;
-            $sDateAfter = "";
-
-            switch ($sFormatCurrent) {
-                case '%S': // Seconds after the minute (0-59)
-
-                    sscanf($sDate, "%2d%[^\\n]", $nValue, $sDateAfter);
-
-                    if (($nValue < 0) || ($nValue > 59)) {
-                        return false;
-                    }
-
-                    $aResult['tm_sec']  = $nValue;
-                    break;
-
-                // ----------
-                case '%M': // Minutes after the hour (0-59)
-                    sscanf($sDate, "%2d%[^\\n]", $nValue, $sDateAfter);
-
-                    if (($nValue < 0) || ($nValue > 59)) {
-                        return false;
-                    }
-
-                    $aResult['tm_min']  = $nValue;
-                    break;
-
-                // ----------
-                case '%H': // Hour since midnight (0-23)
-                    sscanf($sDate, "%2d%[^\\n]", $nValue, $sDateAfter);
-
-                    if (($nValue < 0) || ($nValue > 23)) {
-                        return false;
-                    }
-
-                    $aResult['tm_hour']  = $nValue;
-                    break;
-
-                // ----------
-                case '%d': // Day of the month (1-31)
-                    sscanf($sDate, "%2d%[^\\n]", $nValue, $sDateAfter);
-
-                    if (($nValue < 1) || ($nValue > 31)) {
-                        return false;
-                    }
-
-                    $aResult['tm_mday']  = $nValue;
-                    break;
-
-                // ----------
-                case '%m': // Months since January (0-11)
-                    sscanf($sDate, "%2d%[^\\n]", $nValue, $sDateAfter);
-
-                    if (($nValue < 1) || ($nValue > 12)) {
-                        return false;
-                    }
-
-                    $aResult['tm_mon']  = ($nValue - 1);
-                    break;
-
-                // ----------
-                case '%Y': // Years since 1900
-                    sscanf($sDate, "%4d%[^\\n]", $nValue, $sDateAfter);
-
-                    if ($nValue < 1900) {
-                        return false;
-                    }
-
-                    $aResult['tm_year']  = ($nValue - 1900);
-                    break;
-
-                // ----------
-                case '%B': // Monthname
-                    $arrDate = explode(" ", $sDate);
-                    $nValue = array_shift($arrDate);
-                    $sDateAfter = " " . implode(" ", $arrDate);
-
-                    for ($intCount = 1; $intCount <= 12; $intCount++) {
-                        $sName = date("F", mktime(0, 0, 0, $intCount, 10));
-                        if ($sName == $nValue) {
-                            $nValue = $intCount - 1;
-                            break;
-                        }
-                    }
-
-                    if (is_string($nValue)) {
-                        return false;
-                    }
-
-                    $aResult['tm_mon'] = $nValue;
-                    break;
-
-                // ----------
-                default:
-                    break 2; // Break Switch and while
-
-            } // END of case format
-
-            // ===== Next please =====
-            $sFormat = $sFormatAfter;
-            $sDate   = $sDateAfter;
-
-            $aResult['unparsed'] = $sDate;
-
-        } // END of while($sFormat != "")
-
-        // ===== Create the other value of the result array =====
-        $nParsedDateTimestamp = mktime(
-            $aResult['tm_hour'],
-            $aResult['tm_min'],
-            $aResult['tm_sec'],
-            $aResult['tm_mon'] + 1,
-            $aResult['tm_mday'],
-            $aResult['tm_year'] + 1900
-        );
-
-        // Before PHP 5.1 return -1 when error
-        if (($nParsedDateTimestamp === false) || ($nParsedDateTimestamp === -1)) {
-            return false;
-        }
-
-        $aResult['tm_wday'] = (int) strftime("%w", $nParsedDateTimestamp); // Days since Sunday (0-6)
-        $aResult['tm_yday'] = (strftime("%j", $nParsedDateTimestamp) - 1); // Days since January 1 (0-365)
-
-        return $aResult;
-    }
-
+    /**
+     * @param $dtTimestamp
+     * @return false|int
+     */
     public static function getFirstDayTimestamp($dtTimestamp = null)
     {
         if (is_null($dtTimestamp)) {
-            $dtTimestamp = strtotime("now");
+            $dtTimestamp = time();
         }
 
         return mktime(0, 0, 0, (date("m", $dtTimestamp)), 1, date("Y", $dtTimestamp));
     }
 
+    /**
+     * @param $dtTimestamp
+     * @return false|int
+     */
     public static function getLastDayTimestamp($dtTimestamp = null)
     {
         if (is_null($dtTimestamp)) {
-            $dtTimestamp = strtotime("now");
+            $dtTimestamp = time();
         }
 
         return mktime(0, 0, 0, (date("m", $dtTimestamp) + 1), 0, date("Y", $dtTimestamp));
     }
 
-    public static function getDateDifference($strFirst, $strSecond)
+    /**
+     * @throws \Exception
+     */
+    public static function getDateDifference($strFirst, $strSecond): \DateInterval
     {
-        $objFirstDate = new \DateTime($strFirst);
-        $objSecondDate = new \DateTime($strSecond);
+        $objFirstDate = new DateTime($strFirst);
+        $objSecondDate = new DateTime($strSecond);
 
         return $objFirstDate->diff($objSecondDate);
+    }
+
+    /**
+     * Converts deprecated strftime format to iso format.
+     *
+     * https://www.php.net/manual/en/function.strftime.php
+     * https://carbon.nesbot.com/docs/#api-localization
+     *
+     * @param $strFormat
+     * @return string|null
+     */
+    public static function convertStrftimeFormat($strFormat): ?string
+    {
+        $strPhpDateFormat = str_replace(
+            ['%a', '%A',  '%d','%e','%u','%w','%W','%b', '%h', '%B',  '%m', '%y', '%Y',  '%D',       '%F',         '%x',        '%n', '%t', '%H', '%k', '%I', '%l', '%M', '%p', '%P', '%r',         '%R',    '%S', '%T',       '%X',    '%z', '%Z', '%s', '%%', '%-e'],
+            ['ddd','dddd','DD', 'D', 'd', 'E', 'W', 'MMM','MMM','MMMM','MM', 'YY', 'YYYY','MM/DD/YY', 'YYYY-MM-DD', 'MM/DD/YYYY',"\n", "\t", 'HH', 'H',  'hh', 'h',  'mm', 'A',  'a',  'hh:mm:ss A', 'HH:mm', 'ss', 'HH:mm:ss', 'H:i:s', 'ZZ', 'zz', 'X', '%',  'D'],
+            $strFormat
+        );
+
+        return $strPhpDateFormat;
+    }
+
+    /**
+     * Check if one of the items in the array has a match in the string.
+     *
+     * @param string $strLine
+     * @param array $arrItems
+     * @return bool
+     */
+    protected static function stringContainsItemFromArray(string $strLine, array $arrItems): bool
+    {
+        foreach($arrItems as $item) {
+            if (strpos($strLine, $item) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
