@@ -29,7 +29,7 @@ class DateTest extends TestCase
      */
     public function testFromMysqlNl(): void
     {
-        setlocale(LC_ALL, 'nl_NL');
+        setlocale(LC_ALL, 'nl_NL.UTF-8');
         $this->assertEquals("2020-09-02", Date::fromMysql("YYYY-MM-DD", "2020-09-02 08:05:09"));
         $this->assertEquals("woensdag 2 september", Date::fromMysql("dddd D MMMM", "2020-09-02 08:05:09"));
     }
@@ -53,7 +53,7 @@ class DateTest extends TestCase
      */
     public function testGetMonthNameNl(): void
     {
-        setlocale(LC_ALL, 'nl_NL');
+        setlocale(LC_ALL, 'nl_NL.UTF-8');
         $this->assertEquals("januari", Date::getMonthName(1));
         $this->assertEquals("maart", Date::getMonthName(3));
         $this->assertEquals("mei", Date::getMonthName(5));
@@ -85,7 +85,7 @@ class DateTest extends TestCase
      */
     public function testGetShortMonthNameNl(): void
     {
-        setlocale(LC_ALL, 'nl_NL');
+        setlocale(LC_ALL, 'nl_NL.UTF-8');
         $this->assertEquals("jan", Date::getShortMonthName(1));
         $this->assertEquals("feb", Date::getShortMonthName(2));
         $this->assertEquals("apr", Date::getShortMonthName(4));
@@ -106,6 +106,22 @@ class DateTest extends TestCase
         $this->assertEquals("Dec", Date::getShortMonthName(12));
     }
 
+    public function testGetQuarter(): void
+    {
+        $this->assertSame(1.0, Date::getQuarter(1));
+        $this->assertSame(1.0, Date::getQuarter(2));
+        $this->assertSame(1.0, Date::getQuarter(3));
+        $this->assertSame(2.0, Date::getQuarter(4));
+        $this->assertSame(2.0, Date::getQuarter(5));
+        $this->assertSame(2.0, Date::getQuarter(6));
+        $this->assertSame(3.0, Date::getQuarter(7));
+        $this->assertSame(3.0, Date::getQuarter(8));
+        $this->assertSame(3.0, Date::getQuarter(9));
+        $this->assertSame(4.0, Date::getQuarter(10));
+        $this->assertSame(4.0, Date::getQuarter(11));
+        $this->assertSame(4.0, Date::getQuarter(12));
+    }
+
     /**
      * Tests Date::parseDate.
      *
@@ -122,7 +138,7 @@ class DateTest extends TestCase
      *
      * @return void
      */
-    public function testTestParseDate(): void
+    public function testTestParsedDate(): void
     {
         $this->assertSame(50889600, Date::testParsedDate("08/13/1971", "MM/DD/YYYY", 1900, 2025)->getTimestamp());
         $this->assertSame(50889600, Date::testParsedDate("13/08/1971", "DD/MM/YYYY", 1900, 2025)->getTimestamp());
@@ -142,6 +158,26 @@ class DateTest extends TestCase
         $this->assertNull(Date::testParsedDate("13/08/1971", "MM/DD/YYYY", 1900, 2025));
     }
 
+    public function testGetDateDelimiter(): void
+    {
+        $this->assertEquals("/", Date::getDateDelimiter("10/13/2020"));
+        $this->assertEquals("-", Date::getDateDelimiter("10-13-2020"));
+        $this->assertEquals(".", Date::getDateDelimiter("10.13.2020"));
+    }
+
+    /**
+     * Tests Date::fixShortYearInDate.
+     *
+     * @return void
+     */
+    public function testFixShortYearInDate(): void
+    {
+        $this->assertEquals("1971-08-13", Date::fixShortYearInDate("71-08-13"));
+        $this->assertEquals("13/08/1971", Date::fixShortYearInDate("13/08/71"));
+        $this->assertEquals("1971-13-08", Date::fixShortYearInDate("71-13-08"));
+        $this->assertEquals("1971-08-13", Date::fixShortYearInDate("1971-08-13"));
+    }
+
     /**
      * Tests Date::convertDate in Dutch.
      *
@@ -149,7 +185,7 @@ class DateTest extends TestCase
      */
     public function testConvertDateNl(): void
     {
-        setlocale(LC_ALL, 'nl_NL');
+        setlocale(LC_ALL, 'nl_NL.UTF-8');
         $this->assertSame("13 augustus 1971", Date::convertDate("1971-08-13", "YYYY-MM-DD", "DD MMMM YYYY"));
     }
 
@@ -162,6 +198,53 @@ class DateTest extends TestCase
     {
         setlocale(LC_ALL, 'en_US.UTF-8');
         $this->assertSame("13 August 1971", Date::convertDate("1971-08-13", "YYYY-MM-DD", "DD MMMM YYYY"));
+    }
+
+    /**
+     * Tests Date::convertDate in English.
+     *
+     * @return void
+     */
+    public function testGetOrdinalSuffix(): void
+    {
+        $arrItems = ['','st','nd','rd'];
+
+        $this->assertSame("1st", Date::getOrdinalSuffix(1, $arrItems));
+        $this->assertSame("2nd", Date::getOrdinalSuffix(2, $arrItems));
+        $this->assertSame("3rd", Date::getOrdinalSuffix(3, $arrItems));
+    }
+
+    /**
+     * Tests Date::dateDifference.
+     *
+     * @return void
+     */
+    public function testDateDifference(): void
+    {
+        $this->assertSame(
+            "5 years",
+            Date::dateDifference("13-08-1971 08:30:00", "16-11-1976 11:00:00", 1)
+        );
+        $this->assertSame(
+            "5 years, 3 months",
+            Date::dateDifference("13-08-1971 08:30:00", "16-11-1976 11:00:00", 2)
+        );
+        $this->assertSame(
+            "5 years, 3 months, 3 days",
+            Date::dateDifference("13-08-1971 08:30:00", "16-11-1976 11:00:00", 3)
+        );
+        $this->assertSame(
+            "5 years, 3 months, 3 days, 2 hours",
+            Date::dateDifference("13-08-1971 08:30:00", "16-11-1976 11:00:00", 4)
+        );
+        $this->assertSame(
+            "5 years, 3 months, 3 days, 2 hours, 30 minutes",
+            Date::dateDifference("13-08-1971 08:30:00", "16-11-1976 11:00:00", 5)
+        );
+        $this->assertSame(
+            "5 years, 3 months, 3 days, 2 hours, 30 minutes, 1 second",
+            Date::dateDifference("13-08-1971 08:30:00", "16-11-1976 11:00:01")
+        );
     }
 
     /**

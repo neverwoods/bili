@@ -3,7 +3,9 @@
 namespace Bili;
 
 use Carbon\Carbon;
+use DateInterval;
 use DateTime;
+use Exception;
 
 /**
  * Date Class v0.3.0
@@ -47,7 +49,8 @@ class Date
     {
         Carbon::setLocale('auto');
         if ($strDateTime !== "0000-00-00 00:00:00" && !empty($strDateTime)) {
-            $objCarbon = Carbon::createFromFormat('Y-m-d H:i:s', $strDateTime);
+            $strTStamp = strtotime($strDateTime);
+            $objCarbon = Carbon::createFromTimestamp($strTStamp);
             $strReturn = $objCarbon->isoFormat($strIsoFormat);
         } else {
             $strReturn = "";
@@ -65,7 +68,7 @@ class Date
     public static function toMysql(string $strDateTime = ""): string
     {
         $strReturn = $strDateTime;
-        $strFormat = "Y-m-d H:i:s";
+        $strIsoFormat = "YYYY-MM-DD HH:mm:ss";
 
         if (empty($strDateTime)) {
             $strTStamp = time();
@@ -76,7 +79,7 @@ class Date
         }
 
         if ($strTStamp !== -1 || $strTStamp !== false) {
-            $strReturn = DateTime::createFromFormat('U', $strTStamp)->format($strFormat);
+            $strReturn = Carbon::createFromFormat('U', $strTStamp)->isoFormat($strIsoFormat);
         }
 
         return $strReturn;
@@ -105,10 +108,10 @@ class Date
     /**
      * Returns Month name.
      *
-     * @param $intMonth
+     * @param string $intMonth
      * @return string
      */
-    public static function getMonthName($intMonth): string
+    public static function getMonthName(string $intMonth): string
     {
         $strTStamp = mktime(0, 0, 0, $intMonth, 10);
         Carbon::setLocale('auto');
@@ -120,10 +123,10 @@ class Date
     /**
      * Returns Short month name.
      *
-     * @param $intMonth
+     * @param string $intMonth
      * @return string
      */
-    public static function getShortMonthName($intMonth): string
+    public static function getShortMonthName(string $intMonth): string
     {
         $strTStamp = mktime(0, 0, 0, $intMonth, 10);
         Carbon::setLocale('auto');
@@ -133,10 +136,12 @@ class Date
     }
 
     /**
-     * @param $intMonth
+     * Returns the quarter for a month.
+     *
+     * @param int $intMonth
      * @return false|float
      */
-    public static function getQuarter($intMonth)
+    public static function getQuarter(int $intMonth)
     {
         $intReturn = ceil($intMonth / 3);
 
@@ -159,7 +164,7 @@ class Date
          * If there are only date related formats and no time formats,
          * we set the time to the start of the day.
          */
-        if (!self::stringContainsItemFromArray($strIsoFormat, ["HH", "mm", "ss"])) {
+        if (!static::stringContainsItemFromArray($strIsoFormat, ["HH", "mm", "ss"])) {
             $objCarbon->startOfDay();
         }
 
@@ -177,22 +182,21 @@ class Date
      * Parse and test a date string using a specific format.
      *
      * @param string $strDate
-     * @param string $strFormat
+     * @param string $strIsoFormat
      * @param int $intMinYear
      * @param int|null $intMaxYear
      * @return DateTime|null
      */
-    public static function testParsedDate($strDate, $strFormat, $intMinYear, $intMaxYear = null): ?DateTime
-    {
+    public static function testParsedDate(
+        string $strDate,
+        string $strIsoFormat,
+        int $intMinYear,
+        int $intMaxYear = null
+    ): ?DateTime {
         $objReturn = null;
 
-        if (is_object($strDate)) {
-            $intTimestamp = true;
-            $objTestDate = $strDate;
-        } else {
-            $intTimestamp = self::parseDate($strDate, $strFormat);
-            $objTestDate = DateTime::createFromFormat('U', $intTimestamp);
-        }
+        $intTimestamp = static::parseDate($strDate, $strIsoFormat);
+        $objTestDate = DateTime::createFromFormat('U', $intTimestamp);
 
         if ($intTimestamp !== false) {
             //*** An invalid date returns 1899 as year.
@@ -218,7 +222,7 @@ class Date
      * @param string $strDate
      * @return string|null
      */
-    public static function getDateDelimiter($strDate): ?string
+    public static function getDateDelimiter(string $strDate): ?string
     {
         $strReturn = null;
 
@@ -240,49 +244,47 @@ class Date
     /**
      * Convert a 2 digit year in a date string to a 4 digit year.
      *
-     * @param $strDate
+     * @param string $strDate
      * @return string
      */
-    public static function fixShortYearInDate($strDate): string
+    public static function fixShortYearInDate(string $strDate): string
     {
         $strReturn = $strDate;
 
-        if (!is_object($strDate)) {
-            $strDelimiter = static::getDateDelimiter($strDate);
+        $strDelimiter = static::getDateDelimiter($strDate);
 
-            if (is_null($strDelimiter)) {
-                if (strlen($strDate) < 8) {
-                    $strNewDate = "";
-                    $arrDate = str_split($strDate, 2);
+        if (is_null($strDelimiter)) {
+            if (strlen($strDate) < 8) {
+                $strNewDate = "";
+                $arrDate = str_split($strDate, 2);
 
+                foreach ($arrDate as $strPart) {
+                    if ((int)$strPart > 31) {
+                        $strPart = (int)$strPart + 1900;
+                    }
+
+                    $strNewDate .= $strPart;
+                }
+
+                $strReturn = $strNewDate;
+            }
+        } else {
+            if (strlen($strDate) < 10) {
+                $arrNewDate = [];
+                $arrDate = explode($strDelimiter, $strDate);
+
+                $arrLengths = array_map('strlen', $arrDate);
+
+                if (max($arrLengths) < 4) {
                     foreach ($arrDate as $strPart) {
                         if ((int)$strPart > 31) {
                             $strPart = (int)$strPart + 1900;
                         }
 
-                        $strNewDate .= $strPart;
+                        $arrNewDate[] = $strPart;
                     }
 
-                    $strReturn = $strNewDate;
-                }
-            } else {
-                if (strlen($strDate) < 10) {
-                    $arrNewDate = [];
-                    $arrDate = explode($strDelimiter, $strDate);
-
-                    $arrLengths = array_map('strlen', $arrDate);
-
-                    if (max($arrLengths) < 4) {
-                        foreach ($arrDate as $strPart) {
-                            if ((int)$strPart > 31) {
-                                $strPart = (int)$strPart + 1900;
-                            }
-
-                            $arrNewDate[] = $strPart;
-                        }
-
-                        $strReturn = implode($strDelimiter, $arrNewDate);
-                    }
+                    $strReturn = implode($strDelimiter, $arrNewDate);
                 }
             }
         }
@@ -295,14 +297,14 @@ class Date
      * It returns the converted value.
      *
      * @param string $strDate
-     * @param string $strInFormat
-     * @param string $strOutFormat
+     * @param string $strInIsoFormat
+     * @param string $strOutIsoFormat
      * @return string
      */
-    public static function convertDate(string $strDate, string $strInFormat, string $strOutFormat): string
+    public static function convertDate(string $strDate, string $strInIsoFormat, string $strOutIsoFormat): string
     {
         Carbon::setLocale('auto');
-        return Carbon::createFromTimestamp(self::parseDate($strDate, $strInFormat))->isoFormat($strOutFormat);
+        return Carbon::createFromTimestamp(static::parseDate($strDate, $strInIsoFormat))->isoFormat($strOutIsoFormat);
     }
 
     /**
@@ -312,7 +314,7 @@ class Date
      * @param array $arrSuffixes An array like ['th','st','nd','rd','th','th','th','th','th','th']
      * @return string The day with the suffix
      */
-    public static function getOrdinalSuffix($intDay, $arrSuffixes): string
+    public static function getOrdinalSuffix(int $intDay, array $arrSuffixes): string
     {
         $intDay = abs($intDay);
         $intMod100 = $intDay % 100;
@@ -322,16 +324,16 @@ class Date
     }
 
     /**
-     * @param $t1
-     * @param $t2
+     * @param string $strDate1
+     * @param string $strDate2
      * @param int $precision
      * @param array $arrDiffSingular
      * @param array $arrDiffPlural
      * @return false|string
      */
     public static function dateDifference(
-        $t1,
-        $t2,
+        string $strDate1,
+        string $strDate2,
         int $precision = 6,
         array $arrDiffSingular = array('year', 'month', 'day', 'hour', 'minute', 'second'),
         array $arrDiffPlural = array('years', 'months', 'days', 'hours', 'minutes', 'seconds')
@@ -339,16 +341,16 @@ class Date
         /* This method calculates the difference between 2 dates and
          * returns the result in a human readable format.
         */
-        if (preg_match('/\D/', $t1) && ($t1 = strtotime($t1)) === false) {
+        if (preg_match('/\D/', $strDate1) && ($strDate1 = strtotime($strDate1)) === false) {
             return false;
         }
 
-        if (preg_match('/\D/', $t2) && ($t2 = strtotime($t2)) === false) {
+        if (preg_match('/\D/', $strDate2) && ($strDate2 = strtotime($strDate2)) === false) {
             return false;
         }
 
-        if ($t1 > $t2) {
-            list($t1, $t2) = array($t2, $t1);
+        if ($strDate1 > $strDate2) {
+            list($strDate1, $strDate2) = array($strDate2, $strDate1);
         }
 
         $diffs = array(
@@ -357,8 +359,8 @@ class Date
         );
 
         foreach (array_keys($diffs) as $interval) {
-            while ($t2 >= ($t3 = strtotime("+1 ${interval}", $t1))) {
-                $t1 = $t3;
+            while ($strDate2 >= ($t3 = strtotime("+1 ${interval}", $strDate1))) {
+                $strDate1 = $t3;
                 ++$diffs[$interval];
             }
         }
@@ -408,9 +410,9 @@ class Date
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
-    public static function getDateDifference($strFirst, $strSecond): \DateInterval
+    public static function getDateDifference($strFirst, $strSecond): DateInterval
     {
         $objFirstDate = new DateTime($strFirst);
         $objSecondDate = new DateTime($strSecond);
@@ -424,10 +426,10 @@ class Date
      * https://www.php.net/manual/en/function.strftime.php
      * https://carbon.nesbot.com/docs/#api-localization
      *
-     * @param $strFormat
+     * @param string $strFormat
      * @return string|null
      */
-    public static function convertStrftimeFormat($strFormat): ?string
+    public static function convertStrftimeFormat(string $strFormat): ?string
     {
         $strPhpDateFormat = str_replace(
             ['%a', '%A',  '%d','%e','%u','%w','%W','%b', '%h', '%B',  '%m', '%y', '%Y',  '%D',       '%F',         '%x',        '%n', '%t', '%H', '%k', '%I', '%l', '%M', '%p', '%P', '%r',         '%R',    '%S', '%T',       '%X',    '%z', '%Z', '%s', '%%', '%-e'],
