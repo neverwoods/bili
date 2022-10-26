@@ -47,11 +47,16 @@ class Date
      */
     public static function fromMysql(string $strIsoFormat, string $strDateTime): string
     {
-        Carbon::setLocale('auto');
+        $strReturn = $strDateTime;
+
         if ($strDateTime !== "0000-00-00 00:00:00" && !empty($strDateTime)) {
-            $strTStamp = strtotime($strDateTime);
-            $objCarbon = Carbon::createFromTimestamp($strTStamp);
-            $strReturn = $objCarbon->isoFormat($strIsoFormat);
+            $intTimestamp = strtotime($strDateTime);
+
+            if ($intTimestamp !== -1 && $intTimestamp !== false) {
+                Carbon::setLocale('auto');
+
+                $strReturn = Carbon::createFromTimestamp($intTimestamp)->isoFormat($strIsoFormat);
+            }
         } else {
             $strReturn = "";
         }
@@ -68,18 +73,17 @@ class Date
     public static function toMysql(string $strDateTime = ""): string
     {
         $strReturn = $strDateTime;
-        $strIsoFormat = "YYYY-MM-DD HH:mm:ss";
 
         if (empty($strDateTime)) {
-            $strTStamp = time();
+            $intTimestamp = time();
         } elseif (is_numeric($strDateTime)) {
-            $strTStamp = $strDateTime;
+            $intTimestamp = $strDateTime;
         } else {
-            $strTStamp = strtotime($strDateTime);
+            $intTimestamp = strtotime($strDateTime);
         }
 
-        if ($strTStamp !== -1 || $strTStamp !== false) {
-            $strReturn = Carbon::createFromFormat('U', $strTStamp)->isoFormat($strIsoFormat);
+        if ($intTimestamp !== -1 && $intTimestamp !== false) {
+            $strReturn = Carbon::createFromTimestamp($intTimestamp)->isoFormat("YYYY-MM-DD HH:mm:ss");
         }
 
         return $strReturn;
@@ -113,9 +117,10 @@ class Date
      */
     public static function getMonthName(string $intMonth): string
     {
-        $strTStamp = mktime(0, 0, 0, $intMonth, 10);
+        $intTimestamp = mktime(0, 0, 0, $intMonth, 10);
+
         Carbon::setLocale('auto');
-        $strReturn = Carbon::createFromTimestamp($strTStamp)->monthName;
+        $strReturn = Carbon::createFromTimestamp($intTimestamp)->monthName;
 
         return $strReturn;
     }
@@ -128,9 +133,10 @@ class Date
      */
     public static function getShortMonthName(string $intMonth): string
     {
-        $strTStamp = mktime(0, 0, 0, $intMonth, 10);
+        $intTimestamp = mktime(0, 0, 0, $intMonth, 10);
+
         Carbon::setLocale('auto');
-        $strReturn = Carbon::createFromTimestamp($strTStamp)->shortMonthName;
+        $strReturn = Carbon::createFromTimestamp($intTimestamp)->shortMonthName;
 
         return $strReturn;
     }
@@ -384,29 +390,29 @@ class Date
     }
 
     /**
-     * @param $dtTimestamp
+     * @param int|null $intTimestamp
      * @return false|int
      */
-    public static function getFirstDayTimestamp($dtTimestamp = null)
+    public static function getFirstDayTimestamp(?int $intTimestamp = null)
     {
-        if (is_null($dtTimestamp)) {
-            $dtTimestamp = time();
+        if (is_null($intTimestamp)) {
+            $intTimestamp = time();
         }
 
-        return mktime(0, 0, 0, (date("m", $dtTimestamp)), 1, date("Y", $dtTimestamp));
+        return mktime(0, 0, 0, (date("m", $intTimestamp)), 1, date("Y", $intTimestamp));
     }
 
     /**
-     * @param $dtTimestamp
+     * @param int|null $intTimestamp
      * @return false|int
      */
-    public static function getLastDayTimestamp($dtTimestamp = null)
+    public static function getLastDayTimestamp(?int $intTimestamp = null)
     {
-        if (is_null($dtTimestamp)) {
-            $dtTimestamp = time();
+        if (is_null($intTimestamp)) {
+            $intTimestamp = time();
         }
 
-        return mktime(0, 0, 0, (date("m", $dtTimestamp) + 1), 0, date("Y", $dtTimestamp));
+        return mktime(0, 0, 0, (date("m", $intTimestamp) + 1), 0, date("Y", $intTimestamp));
     }
 
     /**
