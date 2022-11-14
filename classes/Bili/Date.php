@@ -158,6 +158,7 @@ class Date
     /**
      * This method parses a date/time value using a defined format.
      * It returns a timestamp or false if the date could not be parsed.
+     * remark: the given string can only be in english
      *
      * @param string $strDate
      * @param string $strIsoFormat
