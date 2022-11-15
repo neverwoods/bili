@@ -3,6 +3,7 @@
 namespace Bili;
 
 use Carbon\Carbon;
+use Carbon\Exceptions\InvalidFormatException;
 use DateInterval;
 use DateTime;
 use Exception;
@@ -157,6 +158,7 @@ class Date
     /**
      * This method parses a date/time value using a defined format.
      * It returns a timestamp or false if the date could not be parsed.
+     * remark: the given string can only be in english
      *
      * @param string $strDate
      * @param string $strIsoFormat
@@ -164,7 +166,11 @@ class Date
      */
     public static function parseDate(string $strDate, string $strIsoFormat)
     {
-        $objCarbon = Carbon::createFromIsoFormat($strIsoFormat, $strDate);
+        try {
+            $objCarbon = Carbon::createFromIsoFormat($strIsoFormat, $strDate);
+        } catch (InvalidFormatException $ex) {
+            return false;
+        }
 
         /**
          * If there are only date related formats and no time formats,
@@ -177,7 +183,7 @@ class Date
         $intReturn = $objCarbon->getTimestamp();
 
         //*** Check if reverse result is the same otherwise return false.
-        if ($objCarbon->isoFormat($strIsoFormat) !== $strDate) {
+        if ($objCarbon->locale('en')->isoFormat($strIsoFormat) !== $strDate) {
             $intReturn = false;
         }
 
