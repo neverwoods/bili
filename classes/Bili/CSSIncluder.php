@@ -45,25 +45,30 @@ class CSSIncluder
         }
     }
 
-    public function toHtml()
+    public function toHtml($strVersion = "")
     {
         $strReturn = "";
 
         foreach ($this->arrFiles as $key => $value) {
-            $strReturn .= $this->renderHtml($key);
+            $strReturn .= $this->renderHtml($key, $strVersion);
         }
 
         return $strReturn;
     }
 
-    private function renderHtml($strMedia)
+    private function renderHtml($strMedia, $strVersion = "")
     {
         $strReturn = "";
 
         if (count($this->arrFiles[$strMedia]) > 0) {
             $strFilter = implode(",", $this->arrFiles[$strMedia]);
+
+            if (!empty($strVersion)) {
+                $strFilter .= ",version-" . $strVersion;
+            }
+
             $strReturn = '<link rel="stylesheet" type="text/css" href="/css?'
-                       . $strFilter . '" media="' . $strMedia . '" />';
+                . $strFilter . '" media="' . $strMedia . '" />';
         }
 
         return $strReturn;
@@ -77,13 +82,17 @@ class CSSIncluder
         if (is_dir($GLOBALS["_PATHS"]['css'])) {
             //*** Directory exists.
             foreach ($arrFilter as $strFilter) {
-                $strFile = $GLOBALS["_PATHS"]['css'] . "{$strFilter}.css";
-                $dtLastModified = self::getLastModified($strFile, $dtLastModified);
-
-                //*** Auto check custom files.
-                if (strpos($strFilter, "-custom") === false) {
-                    $strFile = $GLOBALS["_PATHS"]['css'] . "{$strFilter}-custom.css";
+                //*** Check if we are requesting a version hash. In that case we skip the file.
+                if (mb_stripos($strFilter, "version-") !== 0) {
+                    //*** No version cache, proceed normally.
+                    $strFile = $GLOBALS["_PATHS"]['css'] . "{$strFilter}.css";
                     $dtLastModified = self::getLastModified($strFile, $dtLastModified);
+
+                    //*** Auto check custom files.
+                    if (strpos($strFilter, "-custom") === false) {
+                        $strFile = $GLOBALS["_PATHS"]['css'] . "{$strFilter}-custom.css";
+                        $dtLastModified = self::getLastModified($strFile, $dtLastModified);
+                    }
                 }
             }
         }
@@ -160,7 +169,7 @@ class CSSIncluder
                 $strOutput = \Minify_CSS::minify(
                     $strOutput,
                     array(
-                           "preserveComments" => false
+                        "preserveComments" => false
                     )
                 );
             }
