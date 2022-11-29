@@ -35,12 +35,16 @@ class JSIncluder
         }
     }
 
-    public function toHtml()
+    public function toHtml($strVersion = "")
     {
         $strReturn = "";
 
         if (count($this->arrClasses) > 0) {
             $strFilter = implode(",", $this->arrClasses);
+            if (!empty($strVersion)) {
+                $strFilter .= ",version-" . $strVersion;
+            }
+
             $strReturn = "<script type=\"text/javascript\" src=\"/js?{$strFilter}\"></script>";
         }
 
@@ -55,11 +59,15 @@ class JSIncluder
         if (is_dir($GLOBALS["_PATHS"]['js'])) {
             //*** Directory exists.
             foreach ($arrFilter as $strFilter) {
-                $strFile = $GLOBALS["_PATHS"]['js'] . $strFilter . ".js";
-                if (is_file($strFile)) {
-                    $lngLastModified = filemtime($strFile);
-                    if (empty($dtLastModified) || $lngLastModified > $dtLastModified) {
-                        $dtLastModified = $lngLastModified;
+                //*** Check if we are requesting a version hash. In that case we skip the file.
+                if (mb_stripos($strFilter, "version-") !== 0) {
+                    //*** No version cache, proceed normally.
+                    $strFile = $GLOBALS["_PATHS"]['js'] . $strFilter . ".js";
+                    if (is_file($strFile)) {
+                        $lngLastModified = filemtime($strFile);
+                        if (empty($dtLastModified) || $lngLastModified > $dtLastModified) {
+                            $dtLastModified = $lngLastModified;
+                        }
                     }
                 }
             }
@@ -76,7 +84,7 @@ class JSIncluder
             array(
                 "content" => $strOutput,
                 "type" => "text/javascript"
-                )
+            )
         );
 
         $objEncoder->encode();
