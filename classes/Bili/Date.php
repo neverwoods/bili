@@ -444,8 +444,8 @@ class Date
     public static function convertStrftimeFormat(string $strFormat): ?string
     {
         $strPhpDateFormat = str_replace(
-            ['%a', '%A',  '%d','%e','%u','%w','%W','%b', '%h', '%B',  '%m', '%y', '%Y',  '%D',       '%F',         '%x',        '%n', '%t', '%H', '%k', '%I', '%l', '%M', '%p', '%P', '%r',         '%R',    '%S', '%T',       '%X',    '%z', '%Z', '%s', '%%', '%-e'],
-            ['ddd','dddd','DD', 'D', 'd', 'E', 'W', 'MMM','MMM','MMMM','MM', 'YY', 'YYYY','MM/DD/YY', 'YYYY-MM-DD', 'MM/DD/YYYY',"\n", "\t", 'HH', 'H',  'hh', 'h',  'mm', 'A',  'a',  'hh:mm:ss A', 'HH:mm', 'ss', 'HH:mm:ss', 'H:i:s', 'ZZ', 'zz', 'X', '%',  'D'],
+            ['%a', '%A',  '%d', '%j',   '%e','%u','%w','%W','%b', '%h', '%B',  '%m', '%y', '%Y',  '%D',       '%F',         '%x',        '%n', '%t', '%H', '%k', '%I', '%l', '%M', '%p', '%P', '%r',         '%R',    '%S', '%T',       '%X',    '%z', '%Z', '%s', '%%', '%-e', '%V', '%G'],
+            ['ddd','dddd','DD', 'DDDD', 'D', 'd', 'E', 'W', 'MMM','MMM','MMMM','MM', 'YY', 'YYYY','MM/DD/YY', 'YYYY-MM-DD', 'MM/DD/YYYY',"\n", "\t", 'HH', 'H',  'hh', 'h',  'mm', 'A',  'a',  'hh:mm:ss A', 'HH:mm', 'ss', 'HH:mm:ss', 'H:i:s', 'ZZ', 'zz', 'X',  '%',  'D',   'WW', 'GGGG'],
             $strFormat
         );
 
