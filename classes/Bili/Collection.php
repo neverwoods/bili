@@ -2,6 +2,8 @@
 
 namespace Bili;
 
+use ReturnTypeWillChange;
+
 class Collection implements \Iterator, \JsonSerializable
 {
     protected $collection = array();
@@ -152,7 +154,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Get the current item from the collection.
      */
-    public function current()
+    public function current(): mixed
     {
         return current($this->collection);
     }
@@ -160,6 +162,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Place the pointer one item forward and return the item.
      */
+    #[ReturnTypeWillChange]
     public function next()
     {
         return next($this->collection);
@@ -192,7 +195,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Get the current position of the pointer.
      */
-    public function key()
+    public function key(): mixed
     {
         return key($this->collection);
     }
@@ -226,7 +229,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Test if the requested item is valid.
      */
-    public function valid()
+    public function valid(): bool
     {
         if ($this->pageItems > 0) {
             if ($this->key() + 1 > $this->pageEnd()) {
@@ -242,6 +245,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Reset the internal pointer of the collection to the first item.
      */
+    #[ReturnTypeWillChange]
     public function rewind()
     {
         if ($this->pageItems > 0) {
@@ -326,7 +330,7 @@ class Collection implements \Iterator, \JsonSerializable
             $intPage = 1;
             $strRewrite    = Request::get('rewrite');
             if (!empty($strRewrite) && mb_strpos($strRewrite, "__page") !== false) {
-                $strRewrite = rtrim($strRewrite, " \/");
+                $strRewrite = rtrim((string)$strRewrite, " \/");
                 $arrParams = explode("/", $strRewrite);
                 $intPage = array_pop($arrParams);
             } else {
@@ -460,7 +464,7 @@ class Collection implements \Iterator, \JsonSerializable
         return $intReturn;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->collection;
     }

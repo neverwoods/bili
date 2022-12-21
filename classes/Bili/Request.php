@@ -117,7 +117,7 @@ class Request
 
     public static function getSubURI()
     {
-        return (strlen(dirname($_SERVER['PHP_SELF'])) > 1) ?
+        return (strlen((string)dirname($_SERVER['PHP_SELF'])) > 1) ?
             dirname($_SERVER['PHP_SELF']) : substr(dirname($_SERVER['PHP_SELF']), 0, -1);
     }
 
