@@ -154,7 +154,8 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Get the current item from the collection.
      */
-    public function current(): mixed
+    #[\ReturnTypeWillChange]
+    public function current()
     {
         return current($this->collection);
     }
@@ -195,7 +196,8 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Get the current position of the pointer.
      */
-    public function key(): mixed
+    #[\ReturnTypeWillChange]
+    public function key()
     {
         return key($this->collection);
     }
@@ -464,7 +466,8 @@ class Collection implements \Iterator, \JsonSerializable
         return $intReturn;
     }
 
-    public function jsonSerialize(): mixed
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
     {
         return $this->collection;
     }

@@ -100,7 +100,8 @@ class BubbleMessage extends ClassDynamic implements \JsonSerializable
         return $this->icon;
     }
 
-    public function jsonSerialize(): mixed
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
     {
         return [
             "type" => $this->type,

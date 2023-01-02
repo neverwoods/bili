@@ -259,7 +259,7 @@ class Sanitize
      */
     public static function toString($varInput)
     {
-        $strReturn = filter_var(trim((string)$varInput), FILTER_SANITIZE_STRING);
+        $strReturn = htmlspecialchars(trim((string)$varInput));
 
         return $strReturn;
     }
@@ -300,5 +300,18 @@ class Sanitize
     {
         $text = str_ireplace("target=\"_blank\"", "rel=\"external\"", $text);
         $text = str_ireplace("target=\"_top\"", "rel=\"external\"", $text);
+    }
+
+    /**
+     * Replacement for the FILTER_SANITIZE_STRING which is deprecated in PHP 8.1.
+     * source https://stackoverflow.com/questions/69207368/constant-filter-sanitize-string-is-deprecated
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function filterStringPolyfill(string $string): string
+    {
+        $str = preg_replace('/\x00|<[^>]*>?/', '', $string);
+        return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
     }
 }
