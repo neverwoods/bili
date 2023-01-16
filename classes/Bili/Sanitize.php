@@ -131,11 +131,11 @@ class Sanitize
     {
         $varReturn = 0;
 
-        if (strpos($varInput, ".") < strpos($varInput, ",")) {
-            $varInput = str_replace(".", "", $varInput);
+        if (strpos((string) $varInput, ".") < strpos((string) $varInput, ",")) {
+            $varInput = str_replace(".", "", (string) $varInput);
             $varInput = strtr($varInput, ",", ".");
         } else {
-            $varInput = str_replace(",", "", $varInput);
+            $varInput = str_replace(",", "", (string) $varInput);
         }
 
         $varReturn = (float) $varInput;
