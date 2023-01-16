@@ -161,7 +161,7 @@ class Response
                 //*** Skip detection.
             }
 
-            self::pushDownloadHeadersToBrowser($mimeType, $strFilename, strlen($strFileData));
+            self::pushDownloadHeadersToBrowser($mimeType, $strFilename, strlen((string)$strFileData));
 
             echo $strFileData;
         } else {
@@ -200,7 +200,7 @@ class Response
                 //*** Skip detection.
             }
 
-            self::pushFileHeadersToBrowser($mimeType, strlen($binFileData));
+            self::pushFileHeadersToBrowser($mimeType, strlen((string)$binFileData));
 
             echo $binFileData;
         } else {

@@ -203,12 +203,12 @@ class Display
 
         $strReturn = substr($strValue, 0, $intCharLength);
 
-        if ($blnPreserveWord == true && strlen($strReturn) < strlen($strValue)) {
+        if ($blnPreserveWord == true && strlen((string)$strReturn) < strlen((string)$strValue)) {
             $intLastSpace = strrpos($strReturn, " ");
             $strReturn = substr($strReturn, 0, $intLastSpace);
         }
 
-        if (strlen($strReturn) < strlen($strValue)) {
+        if (strlen((string)$strReturn) < strlen((string)$strValue)) {
             $strReturn .= $strAppend;
         }
 
@@ -242,7 +242,7 @@ class Display
      */
     public static function filterForJavascript($text, $strAllowedTags = "<a>")
     {
-        $text = trim($text);
+        $text = trim((string)$text);
         $text = strip_tags($text, $strAllowedTags);
         $text = json_encode($text);
 

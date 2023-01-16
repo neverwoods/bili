@@ -301,22 +301,22 @@ class FTP
 
         if (stristr($strWildcard, "*") !== false) {
             if (strpos($strWildcard, "*") === 0) {
-                if (strrpos($strWildcard, "*") === (strlen($strWildcard) - 1)) {
+                if (strrpos($strWildcard, "*") === (strlen((string)$strWildcard) - 1)) {
                     //*** Wildcard at start and end.
-                    $strNoWildcard = substr(substr($strWildcard, 0, (strlen($strWildcard) - 1)), 1);
+                    $strNoWildcard = substr(substr($strWildcard, 0, (strlen((string)$strWildcard) - 1)), 1);
                     if (strpos($strName, $strNoWildcard) !== false) {
                         $blnReturn = true;
                     }
                 } else {
                     //*** Wildcard at start.
                     $strNoWildcard = substr($strWildcard, 1);
-                    if (strpos($strName, $strNoWildcard) === strlen($strName) - strlen($strNoWildcard)) {
+                    if (strpos($strName, $strNoWildcard) === strlen((string)$strName) - strlen((string)$strNoWildcard)) {
                         $blnReturn = true;
                     }
                 }
-            } elseif (strpos($strWildcard, "*") === (strlen($strWildcard) - 1)) {
+            } elseif (strpos($strWildcard, "*") === (strlen((string)$strWildcard) - 1)) {
                 //*** Wildcard at end.
-                $strNoWildcard = substr($strWildcard, 0, (strlen($strWildcard) - 1));
+                $strNoWildcard = substr($strWildcard, 0, (strlen((string)$strWildcard) - 1));
                 if (strpos($strName, $strNoWildcard) === 0) {
                     $blnReturn = true;
                 }

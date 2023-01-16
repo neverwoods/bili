@@ -266,7 +266,7 @@ class Date
         $strDelimiter = static::getDateDelimiter($strDate);
 
         if (is_null($strDelimiter)) {
-            if (strlen($strDate) < 8) {
+            if (strlen((string)$strDate) < 8) {
                 $strNewDate = "";
                 $arrDate = str_split($strDate, 2);
 
@@ -281,7 +281,7 @@ class Date
                 $strReturn = $strNewDate;
             }
         } else {
-            if (strlen($strDate) < 10) {
+            if (strlen((string)$strDate) < 10) {
                 $arrNewDate = [];
                 $arrDate = explode($strDelimiter, $strDate);
 

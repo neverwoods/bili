@@ -103,7 +103,7 @@ class Sanitize
 
         $intBase = (int) $fltReturn;
 
-        if (strlen($intBase) > $intMaxLength) {
+        if (strlen((string)$intBase) > $intMaxLength) {
             $fltReturn = (1 * pow(10, $intMaxLength)) - 1;
         }
 
@@ -131,11 +131,11 @@ class Sanitize
     {
         $varReturn = 0;
 
-        if (strpos($varInput, ".") < strpos($varInput, ",")) {
-            $varInput = str_replace(".", "", $varInput);
+        if (strpos((string) $varInput, ".") < strpos((string) $varInput, ",")) {
+            $varInput = str_replace(".", "", (string) $varInput);
             $varInput = strtr($varInput, ",", ".");
         } else {
-            $varInput = str_replace(",", "", $varInput);
+            $varInput = str_replace(",", "", (string) $varInput);
         }
 
         $varReturn = (float) $varInput;
@@ -143,7 +143,7 @@ class Sanitize
         // If the conversion isn't forced we check for specific cases.
         if (!$blnForceConversion) {
             //*** If the return value is 0 and the input was longer we return the input value.
-            if ($varReturn === 0.0 && strlen($varInput) > 1) {
+            if ($varReturn === 0.0 && strlen((string)$varInput) > 1) {
                 $varReturn = $varInput;
             }
 
@@ -210,7 +210,7 @@ class Sanitize
         $strReturn = iconv('UTF-8', 'ASCII//TRANSLIT', $strReturn);
 
         //*** Convert to lower case, trim and replace spaces with dashes.
-        $strReturn = str_replace(' ', '-', trim(strtolower($strReturn)));
+        $strReturn = str_replace(' ', '-', trim((string)strtolower($strReturn)));
 
         //*** Remove anything that isn't a regular character or number.
         $strReturn = preg_replace('/[^\w\s\d\-]/', '', $strReturn);
@@ -259,7 +259,7 @@ class Sanitize
      */
     public static function toString($varInput)
     {
-        $strReturn = filter_var(trim($varInput), FILTER_SANITIZE_STRING);
+        $strReturn = htmlspecialchars(trim((string)$varInput));
 
         return $strReturn;
     }
@@ -282,8 +282,12 @@ class Sanitize
         return $strReturn;
     }
 
-    private static function filterAmpersandEntity(&$text)
+    private static function filterAmpersandEntity(&$text): void
     {
+        if (is_null($text)) {
+            $text = "";
+        }
+
         $text = preg_replace('/&(?!#?[xX]?(?:[0-9a-fA-F]+|\w{1,8});)/i', "&amp;", $text);
     }
 
@@ -296,5 +300,18 @@ class Sanitize
     {
         $text = str_ireplace("target=\"_blank\"", "rel=\"external\"", $text);
         $text = str_ireplace("target=\"_top\"", "rel=\"external\"", $text);
+    }
+
+    /**
+     * Replacement for the FILTER_SANITIZE_STRING which is deprecated in PHP 8.1.
+     * source https://stackoverflow.com/questions/69207368/constant-filter-sanitize-string-is-deprecated
+     *
+     * @param string $string
+     * @return string
+     */
+    public static function filterStringPolyfill(string $string): string
+    {
+        $str = preg_replace('/\x00|<[^>]*>?/', '', $string);
+        return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
     }
 }

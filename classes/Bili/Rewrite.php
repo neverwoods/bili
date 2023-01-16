@@ -348,7 +348,7 @@ class Rewrite
         $strRewrite    = Request::get('rewrite');
 
         if (!empty($strRewrite)) {
-            $strRewrite = rtrim($strRewrite, " \/");
+            $strRewrite = rtrim((string)$strRewrite, " \/");
 
             $blnHasSubsection = false;
             $arrUrl = explode("/", $strRewrite);
