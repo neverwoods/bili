@@ -25,7 +25,7 @@ class Crypt
                 throw new \InvalidArgumentException('Length must be a positive integer');
             }
 
-            $alphaMax = strlen($strChars) - 1;
+            $alphaMax = strlen((string)$strChars) - 1;
             if ($alphaMax < 1) {
                 throw new \InvalidArgumentException('Invalid alphabet');
             }
@@ -44,12 +44,12 @@ class Crypt
             $key = '7398541620';
             $out = "";
 
-            for ($i=0; $i < strlen($in); $i++) {
+            for ($i=0; $i < strlen((string)$in); $i++) {
                 $out .= $key[substr($in, $i, 1)]; // Encode string according to key.
             }
 
-            if (strlen($out) < 7) {
-                $padding = (7 - strlen($out));
+            if (strlen((string)$out) < 7) {
+                $padding = (7 - strlen((string)$out));
                 $out .= substr(($in * 534648), 0, $padding); // Add padding characters.
                 $out .= $padding; // Add number of padding characters.
             } else {
@@ -75,7 +75,7 @@ class Crypt
                 $in = substr($in, 0, -1); // Remove the padding.
             }
 
-            for ($i=0; $i<strlen($in); $i++) {
+            for ($i=0; $i<strlen((string)$in); $i++) {
                 $out .= strpos($key, $in[$i]); // Decode string according to key.
             }
 

@@ -139,7 +139,7 @@ class RestRequest
             $this->buildPostBody();
         }
 
-        $this->requestLength = strlen($this->requestBody);
+        $this->requestLength = strlen((string)$this->requestBody);
 
         $fh = fopen("php://memory", "rw");
         fwrite($fh, $this->requestBody);
