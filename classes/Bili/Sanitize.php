@@ -306,12 +306,17 @@ class Sanitize
      * Replacement for the FILTER_SANITIZE_STRING which is deprecated in PHP 8.1.
      * source https://stackoverflow.com/questions/69207368/constant-filter-sanitize-string-is-deprecated
      *
-     * @param string $string
+     * @param string|null $string
      * @return string
      */
-    public static function filterStringPolyfill(string $string): string
+    public static function filterStringPolyfill(?string $string): string
     {
+        if (is_null($string)) {
+            return "";
+        }
+
         $str = preg_replace('/\x00|<[^>]*>?/', '', $string);
+
         return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
     }
 }
