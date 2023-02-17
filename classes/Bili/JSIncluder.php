@@ -2,6 +2,8 @@
 
 namespace Bili;
 
+use JSMin\JSMin;
+
 /**
  * Class to hold Javascript include logic.
  *
@@ -113,7 +115,7 @@ class JSIncluder
             $strOutput = $strReturn;
         } else {
             if ($GLOBALS["_CONF"]["cache"]["caching"]) {
-                $strOutput = \JSMin::minify($strOutput);
+                $strOutput = JSMin::minify($strOutput);
             }
 
             $objCache->save($strOutput, $strHash, "js");
