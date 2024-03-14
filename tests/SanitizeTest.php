@@ -50,6 +50,23 @@ class SanitizeTest extends TestCase
         $this->assertEquals(1541045.45, Sanitize::toDecimal("1,541,045.45"));
         $this->assertEquals(1541045.45, Sanitize::toDecimal("1541045,45"));
         $this->assertEquals(1541045.45, Sanitize::toDecimal("1541045.45"));
+        $this->assertEquals(0.0, Sanitize::toDecimal("thisIsAnString"));
+        $this->assertEquals("thisIsAnString", Sanitize::toDecimal("thisIsAnString", false));
+        $this->assertEquals("10.0", Sanitize::toDecimal("10Jan", false));
+        $this->assertEquals("Jan10", Sanitize::toDecimal("Jan10", false));
+    }
+
+    public function testToFloat(): void
+    {
+        $this->assertEquals(23.0, Sanitize::toFloat(23));
+        $this->assertEquals(23.0, Sanitize::toFloat("23"));
+        $this->assertEquals(99348871.343434, Sanitize::toFloat(99348871.3434344));
+        $this->assertEquals(1541045.45, Sanitize::toFloat("1.541.045,45"));
+        $this->assertEquals(1541045.45, Sanitize::toFloat("1,541,045.45"));
+        $this->assertEquals(1541045.45, Sanitize::toFloat("1541045,45"));
+        $this->assertEquals(1541045.45, Sanitize::toFloat("1541045.45"));
+        $this->assertEquals(0.0, Sanitize::toFloat("thisIsAnString"));
+        $this->assertEquals("10.0", Sanitize::toFloat("10Jan"));
     }
 
     public function testBr2nl(): void
@@ -96,35 +113,27 @@ class SanitizeTest extends TestCase
     public function testFilterSanitizeString(): void
     {
         $varInput = "Dit is een test string";
-        $this->assertSame("Dit is een test string", filter_var($varInput, FILTER_SANITIZE_STRING));
         $this->assertSame("Dit is een test string", Sanitize::filterStringPolyfill($varInput));
 
         $varInput = "Dit is een test string, $10";
-        $this->assertSame("Dit is een test string, $10", filter_var($varInput, FILTER_SANITIZE_STRING));
         $this->assertSame("Dit is een test string, $10", Sanitize::filterStringPolyfill($varInput));
 
         $varInput = "Dit is een test string, $10\"\"";
-        $this->assertSame("Dit is een test string, $10&#34;&#34;", filter_var($varInput, FILTER_SANITIZE_STRING));
         $this->assertSame("Dit is een test string, $10&#34;&#34;", Sanitize::filterStringPolyfill($varInput));
 
         $varInput = "Dit is een test string, $10\"\"";
-        $this->assertSame("Dit is een test string, $10&#34;&#34;", filter_var($varInput, FILTER_SANITIZE_STRING));
         $this->assertSame("Dit is een test string, $10&#34;&#34;", Sanitize::filterStringPolyfill($varInput));
 
         $varInput = "Dit is een 'test' string, $10\"\"";
-        $this->assertSame("Dit is een &#39;test&#39; string, $10&#34;&#34;", filter_var($varInput, FILTER_SANITIZE_STRING));
         $this->assertSame("Dit is een &#39;test&#39; string, $10&#34;&#34;", Sanitize::filterStringPolyfill($varInput));
 
         $varInput = "<a href=''>Dit is een 'test' string, $10\"\"</a>";
-        $this->assertSame("Dit is een &#39;test&#39; string, $10&#34;&#34;", filter_var($varInput, FILTER_SANITIZE_STRING));
         $this->assertSame("Dit is een &#39;test&#39; string, $10&#34;&#34;", Sanitize::filterStringPolyfill($varInput));
 
         $varInput = "<a href=\"http://localhost:8080\">Dit is een 'test' string, $10\"\"</a>";
-        $this->assertSame("Dit is een &#39;test&#39; string, $10&#34;&#34;", filter_var($varInput, FILTER_SANITIZE_STRING));
         $this->assertSame("Dit is een &#39;test&#39; string, $10&#34;&#34;", Sanitize::filterStringPolyfill($varInput));
 
         $varInput = "Bon aña 2023, !@#5^&*<>$";
-        $this->assertSame("Bon aña 2023, !@#5^&*$", filter_var($varInput, FILTER_SANITIZE_STRING));
         $this->assertSame("Bon aña 2023, !@#5^&*$", Sanitize::filterStringPolyfill($varInput));
     }
 }
