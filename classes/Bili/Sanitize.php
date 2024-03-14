@@ -129,7 +129,16 @@ class Sanitize
      */
     public static function toDecimal(mixed $varInput, bool $blnForceConversion = true): mixed
     {
-        $varReturn = static::toFloat($varInput);
+        $varReturn = 0;
+
+        if (strpos((string) $varInput, ".") < strpos((string) $varInput, ",")) {
+            $varInput = str_replace(".", "", (string) $varInput);
+            $varInput = strtr($varInput, ",", ".");
+        } else {
+            $varInput = str_replace(",", "", (string) $varInput);
+        }
+
+        $varReturn = (float) $varInput;
 
         // If the conversion isn't forced we check for specific cases.
         if (!$blnForceConversion) {
