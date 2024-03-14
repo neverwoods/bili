@@ -50,6 +50,23 @@ class SanitizeTest extends TestCase
         $this->assertEquals(1541045.45, Sanitize::toDecimal("1,541,045.45"));
         $this->assertEquals(1541045.45, Sanitize::toDecimal("1541045,45"));
         $this->assertEquals(1541045.45, Sanitize::toDecimal("1541045.45"));
+        $this->assertEquals(0.0, Sanitize::toDecimal("thisIsAnString"));
+        $this->assertEquals("thisIsAnString", Sanitize::toDecimal("thisIsAnString", false));
+        $this->assertEquals("10.0", Sanitize::toDecimal("10Jan", false));
+        $this->assertEquals("Jan10", Sanitize::toDecimal("Jan10", false));
+    }
+
+    public function testToFloat(): void
+    {
+        $this->assertEquals(23.0, Sanitize::toFloat(23));
+        $this->assertEquals(23.0, Sanitize::toFloat("23"));
+        $this->assertEquals(99348871.343434, Sanitize::toFloat(99348871.3434344));
+        $this->assertEquals(1541045.45, Sanitize::toFloat("1.541.045,45"));
+        $this->assertEquals(1541045.45, Sanitize::toFloat("1,541,045.45"));
+        $this->assertEquals(1541045.45, Sanitize::toFloat("1541045,45"));
+        $this->assertEquals(1541045.45, Sanitize::toFloat("1541045.45"));
+        $this->assertEquals(0.0, Sanitize::toFloat("thisIsAnString"));
+        $this->assertEquals("10.0", Sanitize::toFloat("10Jan"));
     }
 
     public function testBr2nl(): void

@@ -123,22 +123,13 @@ class Sanitize
      * 1541045.45
      *
      * @param  mixed   $varInput           Either number or string that needs conversion
-     * @param  boolean $blnForceConversion Indicate if the input has to be converted in any case.
+     * @param  bool    $blnForceConversion Indicate if the input has to be converted in any case.
      *                                     Strings return 0 if true.
-     * @return mixed   Either the converted value of the original value if conversion wasn't forced
+     * @return mixed   Either the converted value or the original value if conversion wasn't forced
      */
-    public static function toDecimal($varInput, $blnForceConversion = true)
+    public static function toDecimal(mixed $varInput, bool $blnForceConversion = true): mixed
     {
-        $varReturn = 0;
-
-        if (strpos((string) $varInput, ".") < strpos((string) $varInput, ",")) {
-            $varInput = str_replace(".", "", (string) $varInput);
-            $varInput = strtr($varInput, ",", ".");
-        } else {
-            $varInput = str_replace(",", "", (string) $varInput);
-        }
-
-        $varReturn = (float) $varInput;
+        $varReturn = static::toFloat($varInput);
 
         // If the conversion isn't forced we check for specific cases.
         if (!$blnForceConversion) {
@@ -154,6 +145,30 @@ class Sanitize
         }
 
         return $varReturn;
+    }
+
+    /**
+     * Convert any numeric input to a float.
+     *
+     * Possible input:
+     * 1.541.045,45 => 1541045.45
+     * 1,541,045.45 => 1541045.45
+     * 1541045,45   => 1541045.45
+     * 1541045.45   => 1541045.45
+     *
+     * @param float|int|string $strValue
+     * @return float
+     */
+    public static function toFloat(float|int|string $strValue): float
+    {
+        if (strpos((string) $strValue, ".") < strpos((string) $strValue, ",")) {
+            $strValue = str_replace(".", "", (string) $strValue);
+            $strValue = str_replace(",", ".", $strValue);
+        } else {
+            $strValue = str_replace(",", "", (string) $strValue);
+        }
+
+        return (float) $strValue;
     }
 
     public static function br2nl($strInput)
