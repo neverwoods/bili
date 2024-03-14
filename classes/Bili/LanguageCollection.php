@@ -2,6 +2,8 @@
 
 namespace Bili;
 
+use ReturnTypeWillChange;
+
 /** Language Collection Class v0.1.0
  * Collection that holds all available languages.
  *
@@ -37,26 +39,28 @@ class LanguageCollection implements \Iterator
         return count($this->collection);
     }
 
-    public function current()
+    public function current(): mixed
     {
         return current($this->collection);
     }
 
+    #[ReturnTypeWillChange]
     public function next()
     {
         return next($this->collection);
     }
 
-    public function key()
+    public function key(): mixed
     {
         return key($this->collection);
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return $this->current() !== false;
     }
 
+    #[ReturnTypeWillChange]
     public function rewind()
     {
         reset($this->collection);
