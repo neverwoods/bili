@@ -183,7 +183,7 @@ class Sanitize
     /**
      * Sanitize input to be an integer. Works on single values and arrays.
      *
-     * @param  string|decimal|array $varInput
+     * @param  string|float|array $varInput
      * @param  boolean $blnDiscardInvalid Indicate if the input array should be compacted, leaving out invalid values.
      * @return null|integer
      */
@@ -240,7 +240,7 @@ class Sanitize
      * Sanitize input to be a numeric value. Works on single values and arrays.
      * This will retain leading zeros.
      *
-     * @param  string|decimal|array $varInput
+     * @param  string|float|array $varInput
      * @param  boolean $blnDiscardInvalid Indicate if the input array should be compacted, leaving out invalid values.
      * @return null|float|integer
      */
