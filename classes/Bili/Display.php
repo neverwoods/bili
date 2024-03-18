@@ -145,7 +145,7 @@ class Display
      *
      * @param integer $intFrom
      * @param string $strTargetUnit
-     * @return decimal
+     * @return float
      */
     public static function renderBytes($intFrom, $strTargetUnit, $strSourceUnit = "B")
     {
