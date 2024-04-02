@@ -112,7 +112,7 @@ class Display
 
         $intValue = floor($fltValue);
 
-        for ($intDecimals = 0; $fltValue != round($fltValue, $intDecimals); $intDecimals++) {
+        for ($intDecimals = 0; bccomp($fltValue, round($fltValue, $intDecimals), 8) !== 0; $intDecimals++) {
             //*** Just counting.
         }
 
