@@ -112,11 +112,11 @@ class Display
         }
 
         //*** Convert possible scientific notation to a maximum of 9 decimals.
-        $strValue = sprintf('%.9f', $fltValue);
+        $strValue = str_replace(",", ".", sprintf('%.9f', $fltValue));
 
         for (
             $intDecimals = 0;
-            bccomp($strValue, sprintf('%.9f', round($fltValue, $intDecimals)), 8) !== 0;
+            bccomp($strValue, str_replace(",", ".", sprintf('%.9f', round($fltValue, $intDecimals))), 8) !== 0;
             $intDecimals++
         ) {
             //*** Just counting.
