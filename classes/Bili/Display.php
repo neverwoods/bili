@@ -96,7 +96,8 @@ class Display
     }
 
     /**
-     * Format a numeric value according to the language settings.
+     * Format a numeric value according to the language settings. The input can be very small, even in scientific
+     * notation. We will only go to a maximum decimal amount of 8. Anything more than that is stupid.
      *
      * @return string string representation of a numeric value
      */
@@ -110,9 +111,14 @@ class Display
             $fltValue = floatval($fltValue);
         }
 
-        $intValue = floor($fltValue);
+        //*** Convert possible scientific notation to a maximum of 9 decimals.
+        $strValue = sprintf('%.9f', $fltValue);
 
-        for ($intDecimals = 0; bccomp($fltValue, round($fltValue, $intDecimals), 8) !== 0; $intDecimals++) {
+        for (
+            $intDecimals = 0;
+            bccomp($strValue, sprintf('%.9f', round($fltValue, $intDecimals)), 8) !== 0;
+            $intDecimals++
+        ) {
             //*** Just counting.
         }
 
