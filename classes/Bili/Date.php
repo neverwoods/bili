@@ -371,7 +371,7 @@ class Date
         );
 
         foreach (array_keys($diffs) as $interval) {
-            while ($strDate2 >= ($t3 = strtotime("+1 ${interval}", $strDate1))) {
+            while ($strDate2 >= ($t3 = strtotime("+1 {$interval}", $strDate1))) {
                 $strDate1 = $t3;
                 ++$diffs[$interval];
             }
