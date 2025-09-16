@@ -6,22 +6,23 @@ class Rewrite
 {
     public static $instance             = null;
     public static $sections             = [];
-    public static $subsections             = [];
-    public static $commands                = [];
-    public static $parseTypes            = [];
+    public static $subsections          = [];
+    public static $commands             = [];
+    public static $parseTypes           = [];
     public static $defaultSection       = null;
     public static $defaultSubSection    = null;
-    public static $defaultCommand         = null;
+    public static $defaultCommand       = null;
     public static $defaultParser        = null;
-    private $department                    = null;
+    private $department                 = null;
     private $section                    = null;
-    private $subsection                    = null;
+    private $subsection                 = null;
     private $command                    = null;
     private $element                    = null;
-    private $parser                        = null;
-    private $parameters                    = null;
+    private $parser                     = null;
+    private $parameters                 = null;
     private $reservedParameters         = array("view");
     private $attributes                 = ["first"];
+    protected bool $enforceDepartment   = false;
 
     private function __construct()
     {
@@ -36,7 +37,8 @@ class Rewrite
         $intDefaultSection = null,
         $intDefaultSubSection = null,
         $intDefaultCommand = null,
-        $intDefaultParser = null
+        $intDefaultParser = null,
+        ?bool $blnEnforceDepartment = false,
     ) {
         /* Method to initially instanciate the class */
         self::$instance = new Rewrite();
@@ -60,6 +62,8 @@ class Rewrite
         if (!is_null($intDefaultParser)) {
             self::$instance->setDefaultParser($intDefaultParser);
         }
+
+        self::$instance->enforceDepartment = $blnEnforceDepartment;
 
         return self::$instance;
     }
@@ -263,15 +267,33 @@ class Rewrite
         $strParseType = null,
         $intSubSection = null,
         $arrParameters = null,
-        $intDepartment = null,
+        $varDepartment = null,
         $strFragment = null
     ) {
-        //*** Convert navigational elements to an URL.
+        //*** Convert navigational elements to a URL.
         $strReturn = "/";
 
         //*** Department.
-        if (!is_null($intDepartment) && ctype_digit(strval($intDepartment))) {
-            $strReturn .= $this::encode($intDepartment) . "/";
+        if (!is_null($varDepartment) && is_array($varDepartment)) {
+            //*** Support for an array of values. Values will be encoded and joined with a dot.
+            $blnValid = true;
+            foreach ($varDepartment as $value) {
+                $blnValid &= ctype_digit((string)$value);
+            }
+
+            if ($blnValid) {
+                $strReturn .= implode(".", array_map([static::class, 'encode'], $varDepartment)) . "/";
+            }
+        } elseif (!is_null($varDepartment) && ctype_digit(strval($varDepartment))) {
+            //*** Retain support for a single value. Value will be encoded.
+            $strReturn .= $this::encode($varDepartment) . "/";
+        } elseif (!is_null($this->department) && $this->enforceDepartment) {
+            //*** Make sure we set the current department in the next url.
+            if (is_array($this->department)) {
+                $strReturn .= implode(".", array_map([static::class, 'encode'], $this->department)) . "/";
+            } elseif (ctype_digit(strval($this->department))) {
+                $strReturn .= $this::encode($this->department) . "/";
+            }
         }
 
         //*** Section.
@@ -355,9 +377,32 @@ class Rewrite
 
             $blnHasDepartment = false;
             if (count($arrUrl) > 0) {
-                if (ctype_digit(strval($arrUrl[0]))) {
+                if (ctype_digit($arrUrl[0])) {
                     $this->department = $this::decode($arrUrl[0]);
                     $blnHasDepartment = true;
+                } else if(str_contains($arrUrl[0], ".")) {
+                    //*** Support for an array of values. Values must be encoded and joined with a dot.
+                    $arrContext = explode(".", $arrUrl[0]);
+                    $varDepartment = [];
+                    $blnHasDepartment = true;
+
+                    foreach ($arrContext as $value) {
+                        if (ctype_digit($value)) {
+                            $varDepartment[] = $this::decode($value);
+                        } else {
+                            /**
+                             * Enforce only numeric departments. If we encounter a non-numeric value, this means
+                             * it is not meant to be a department. So we break out of the loop and treat the
+                             * rest of the URL as a normal rewrite.
+                             */
+                            $blnHasDepartment = false;
+                            break;
+                        }
+                    }
+
+                    if ($blnHasDepartment === true && count($varDepartment) > 0) {
+                        $this->department = $varDepartment;
+                    }
                 }
             }
 
