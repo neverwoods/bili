@@ -11,7 +11,7 @@ namespace Bili;
  */
 class FTP
 {
-    /** @var resource */
+    /** @var \FTP\Connection|resource|false */
     private $objFTP;
     
     /** @var string */
