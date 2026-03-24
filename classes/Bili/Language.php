@@ -33,7 +33,7 @@ class Language
     private $activeLang             = "";
     private $forceReload            = false;
 
-    private function __construct($strLang, $langPath, $overwritePaths)
+    private function __construct($strLang = "", $langPath = "", $overwritePaths = null)
     {
         $this->defaultLang = $strLang;
         $this->langPath = $langPath;

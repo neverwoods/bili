@@ -1,0 +1,7 @@
+parameters:
+    level: 1
+    paths:
+        - classes
+    excludePaths:
+        - classes/Bili/TemplateInterface.php
+    phpVersion: 80100
