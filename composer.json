@@ -26,7 +26,8 @@
         "ext-ctype": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^2.1"
     },
     "autoload": {
         "psr-0": {"Bili": "classes/"}

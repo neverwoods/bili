@@ -135,6 +135,7 @@ class ImageEditor {
     {
       ## FIRST SEE IF WE CAN FIND IMAGE
 
+      $file = null;
       if(is_file($path . $filename))
       {
         $file = $path . $filename;

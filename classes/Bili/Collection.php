@@ -182,7 +182,8 @@ class Collection implements \Iterator, \JsonSerializable
      */
     public function first()
     {
-        return $this->rewind()->current();
+        $this->rewind();
+        return $this->current();
     }
 
     /**

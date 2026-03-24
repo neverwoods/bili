@@ -2,6 +2,10 @@
 
 namespace Bili;
 
+/**
+ * @method array|false nlist(string $directory)
+ * @method bool rmdir(string $directory)
+ */
 class FTP
 {
     /** @var resource */
