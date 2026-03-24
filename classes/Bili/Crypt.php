@@ -45,7 +45,7 @@ class Crypt
             $out = "";
 
             for ($i=0; $i < strlen((string)$in); $i++) {
-                $out .= $key[substr($in, $i, 1)]; // Encode string according to key.
+                $out .= $key[(int)substr($in, $i, 1)]; // Encode string according to key.
             }
 
             if (strlen((string)$out) < 7) {
