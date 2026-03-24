@@ -13,8 +13,8 @@ class BubbleMessenger
     /**
      * Add a new message to the message stack.
      *
-     * @var string $message The message to display
-     * @var array $options An array of options for the message
+     * @param string $message The message to display
+     * @param array $options An array of options for the message
      *                     "title" = Title of the message
      *                     "type" = Message type (MSG_TYPE_INFO, MSG_TYPE_ERROR, MSG_TYPE_WARNING, MSG_TYPE_CONFIRM)
      *                     "location" = Location on the page (MSG_LOC_PAGE, MSG_LOC_CONTAINER, MSG_LOC_SIDEBAR)
@@ -29,7 +29,7 @@ class BubbleMessenger
     /**
      * Add a new message object to the message stack.
      *
-     * @var BubbleMessage $objMessage The message object to display
+     * @param BubbleMessage $objMessage The message object to display
      */
     public static function addMessage(BubbleMessage $objMessage)
     {

@@ -5,6 +5,9 @@ namespace Bili;
 /**
  * @method array|false nlist(string $directory)
  * @method bool rmdir(string $directory)
+ * @method bool pasv(bool $enable)
+ * @method int nb_put(string $remote_filename, string $local_filename, int $mode)
+ * @method int nb_continue()
  */
 class FTP
 {

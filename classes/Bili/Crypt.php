@@ -66,7 +66,7 @@ class Crypt
     {
         if (is_numeric($in) && $in > 0) {
             $key = '7398541620';
-            $padding = substr($in, -1);
+            $padding = (int)substr($in, -1);
             $out = "";
 
             if ($padding > 0) {

@@ -80,7 +80,7 @@ class Response
     /**
      * Store binary data in the cache and generate a download link.
      *
-     * @param  binary $binData     The binary data
+     * @param  string $binData     The binary data
      * @param  string $strFilename File name
      * @return string The generated download link
      */
