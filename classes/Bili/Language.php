@@ -21,8 +21,10 @@ namespace Bili;
 class Language
 {
     private static $instance		= null;
-    private static $sanitizeType    = null;
-    private static $secureCookie    = false;
+    /** @var string|null */
+    protected static $sanitizeType    = null;
+    /** @var bool */
+    protected static $secureCookie    = false;
     private static $languages       = array();
     private static $error           = "TRANSLATION '%s' NOT FOUND IN '%s'.";
     public $name                    = "";

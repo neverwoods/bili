@@ -196,7 +196,7 @@ class Rewrite
      * Get a named parameter from the URL.
      * @param  string   $strKey           The name of the parameter
      * @param  mixed    $alternateValue   An alternate value if the parameter is not set
-     * @param  function $validateFunction A validation lambda that returns FALSE if the parameter is not valid
+     * @param  callable|null $validateFunction A validation lambda that returns FALSE if the parameter is not valid
      * @return mixed    The named parameter, the alternate value or an empty string
      */
     public function getParameter($strKey, $alternateValue = "", $validateFunction = null)

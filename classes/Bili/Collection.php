@@ -26,8 +26,8 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Add object to the collection
      *
-     * @param object The object
-     * @param boolean Add object to beginning of array or not
+     * @param object $value The object
+     * @param boolean $blnAddToBeginning Add object to beginning of array or not
      */
     public function addObject($value, $blnAddToBeginning = false)
     {
@@ -283,7 +283,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Check if an object is in the collection
      *
-     * @param variable $varValue
+     * @param mixed $varValue
      */
     public function inCollection($varValue)
     {

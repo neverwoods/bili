@@ -227,7 +227,7 @@ class SessionManager
      *
      * @param string $session_data
      * @throws \Exception
-     * @return multitype:mixed
+     * @return array<string, mixed>
      */
     public static function unserialize($session_data)
     {

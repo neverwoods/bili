@@ -18,7 +18,7 @@ class Display
     /**
      * Convert HTML markup to a binary PDF
      * @param  string      $strHtml The HTML input
-     * @return binary|null The binary PDF output or null if something went wrong.
+     * @return string|null The binary PDF output or null if something went wrong.
      */
     public static function html2pdf($strHtml, $strFilePrefix = "document")
     {
