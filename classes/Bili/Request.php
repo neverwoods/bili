@@ -135,7 +135,7 @@ class Request
     {
         (isset($_REQUEST[$strParam])) ? $strReturn = $_REQUEST[$strParam] : $strReturn = "";
 
-        if (empty($strReturn) && !is_numeric($strReturn) && $strReturn !== 0) {
+        if (empty($strReturn) && !is_numeric($strReturn)) {
             $strReturn = $strReplaceEmpty;
         }
 

@@ -149,7 +149,7 @@ class ImageEditor {
         $this->errorImage("File Could Not Be Loaded");
       }
 
-      if(!($this->error))
+      if($file !== null)
       {
         ## LOAD OUR IMAGE WITH CORRECT FUNCTION
         $arrFilename = explode('.', $filename);

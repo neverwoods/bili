@@ -74,7 +74,7 @@ class DataTableHelper
                 $strColumn = Request::get("mDataProp_" . $intOrderColumn);
                 if (!empty($strColumn)) {
                     if (is_null($arrWhiteList)
-                            || (!is_null($arrWhiteList) && in_array($strColumn, $arrWhiteList))) {
+                            || in_array($strColumn, $arrWhiteList)) {
                         $arrWhitelisted[] = $strColumn;
                     }
                 }

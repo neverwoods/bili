@@ -235,10 +235,8 @@ class SessionManager
         switch ($method) {
             case "php":
                 return self::unserializPhp($session_data);
-                break;
             case "php_binary":
                 return self::unserializePhpBinary($session_data);
-                break;
             default:
                 throw new \Exception(
                     "Unsupported session.serialize_handler: " . $method . ". Supported: php, php_binary"

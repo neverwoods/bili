@@ -33,8 +33,8 @@ class BubbleMessenger
      */
     public static function addMessage(BubbleMessage $objMessage)
     {
-        if (!isset($_SESSION["bubble-messages"]) || (isset($_SESSION["bubble-messages"])
-                && !is_array(unserialize($_SESSION["bubble-messages"])))) {
+        if (!isset($_SESSION["bubble-messages"])
+                || !is_array(unserialize($_SESSION["bubble-messages"]))) {
             $_SESSION["bubble-messages"] = serialize(array());
         }
 
@@ -101,7 +101,7 @@ class BubbleMessenger
     /**
      * Check if a message with a specific key exists in the Messenger.
      *
-     * @param string[] $arrKey
+     * @param string[]|string $arrKey
      * @return boolean
      */
     public static function hasMessage($arrKey)

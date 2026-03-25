@@ -377,7 +377,7 @@ class Rewrite
 
             $blnHasDepartment = false;
             if (count($arrUrl) > 0) {
-                if (ctype_digit($arrUrl[0])) {
+                if (ctype_digit(strval($arrUrl[0]))) {
                     $this->department = $this::decode($arrUrl[0]);
                     $blnHasDepartment = true;
                 } else if(str_contains($arrUrl[0], ".")) {
@@ -387,7 +387,7 @@ class Rewrite
                     $blnHasDepartment = true;
 
                     foreach ($arrContext as $value) {
-                        if (ctype_digit($value)) {
+                        if (ctype_digit(strval($value))) {
                             $varDepartment[] = $this::decode($value);
                         } else {
                             /**

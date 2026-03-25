@@ -11,7 +11,7 @@ namespace Bili;
  */
 class FTP
 {
-    /** @var \FTP\Connection|resource|false */
+    /** @var \FTP\Connection|false */
     private $objFTP;
     
     /** @var string */
@@ -23,17 +23,12 @@ class FTP
     /** @var int */
     private $intTimeout;
     
-    /** @var string */
-    private $strUsername;
-    
-    /** @var string */
-    private $strPassword;
 
     /**
      * FTP constructor.
      * @param $host
-     * @param int $port
-     * @param int $timeout
+     * @param int|null $port
+     * @param int|null $timeout
      * @param bool $blnSecure
      * @throws \Exception when the ftp connection failed
      */
@@ -118,9 +113,6 @@ class FTP
      */
     public function login($strUsername, $strPassword)
     {
-        $this->strUsername = $strUsername;
-        $this->strPassword = $strPassword;
-
         return ftp_login($this->objFTP, $strUsername, $strPassword);
     }
 
@@ -261,7 +253,7 @@ class FTP
      * 
      * @param string $sourceFile local file name
      * @param array $ftpSettings (path.uploads, host, username, password)
-     * @param null $targetFile
+     * @param string|null $targetFile
      * @param bool $blnSecure
      */
     public static function ftpUpload($sourceFile, $ftpSettings, $targetFile = null, $blnSecure = false)
