@@ -11,12 +11,24 @@ namespace Bili;
  */
 class SessionManager
 {
+    /** @var self|null */
     private static $instance = null;
+    /** @var string|null */
     private $transferId = null;
+    /** @var int */
     private $timeout = 1440;
+    /** @var class-string|null */
     private $session = null;
+    /** @var bool */
     private $validateFingerprint = true;
 
+    /**
+     * @param string|null $transferId
+     * @param int $timeout
+     * @param class-string|null $diSession
+     * @param bool $blnStart
+     * @return self
+     */
     public static function singleton($transferId = null, $timeout = 1440, $diSession = null, $blnStart = true)
     {
         self::$instance = new SessionManager($transferId, $timeout, $diSession);
@@ -46,6 +58,11 @@ class SessionManager
         return self::$instance;
     }
 
+    /**
+     * @param string|null $transferId
+     * @param int $timeout
+     * @param class-string|null $diSession
+     */
     private function __construct($transferId = null, $timeout = 1440, $diSession = null)
     {
         if (!is_null($transferId) && !empty($transferId)) {
@@ -58,11 +75,19 @@ class SessionManager
         ini_set('session.gc_maxlifetime', $this->timeout);
     }
 
+    /**
+     * @param string $strSavePath
+     * @param string $strSessionName
+     * @return bool
+     */
     public function open($strSavePath, $strSessionName)
     {
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function close()
     {
         $this->gc();
@@ -74,6 +99,7 @@ class SessionManager
      * Override the timeout setting from the singleton call.
      *
      * @param int $intTimeout
+     * @return void
      */
     public function setTimeout(int $intTimeout)
     {
@@ -98,6 +124,10 @@ class SessionManager
         return $blnReturn;
     }
 
+    /**
+     * @param string $strId
+     * @return string
+     */
     public function read($strId)
     {
         $session = $this->session;
@@ -108,6 +138,11 @@ class SessionManager
         return $strReturn;
     }
 
+    /**
+     * @param string $strId
+     * @param string $strData
+     * @return bool
+     */
     public function write($strId, $strData)
     {
         $session = $this->session;
@@ -118,6 +153,10 @@ class SessionManager
         return true;
     }
 
+    /**
+     * @param string $strId
+     * @return bool
+     */
     public function destroy($strId)
     {
         $session = $this->session;
@@ -126,6 +165,9 @@ class SessionManager
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function gc()
     {
         $session = $this->session;
@@ -134,11 +176,17 @@ class SessionManager
         return true;
     }
 
+    /**
+     * @return void
+     */
     public function writeClose()
     {
         session_write_close();
     }
 
+    /**
+     * @return void
+     */
     public function reset()
     {
         if (session_status() === PHP_SESSION_ACTIVE) {
@@ -151,13 +199,19 @@ class SessionManager
     /**
      * Override the default action (true) to validate using the fingerprint method (IP and browser).
      *
-     * @param $blnValue
+     * @param bool $blnValue
+     * @return void
      */
     public function useFingerprint($blnValue)
     {
         $this->validateFingerprint = $blnValue;
     }
 
+    /**
+     * @param string $strKey
+     * @param mixed $varData
+     * @return void
+     */
     public static function setData($strKey, $varData = null)
     {
         if (isset($_SESSION)) {
@@ -171,6 +225,10 @@ class SessionManager
         }
     }
 
+    /**
+     * @param string $strKey
+     * @return mixed
+     */
     public static function getData($strKey)
     {
         if (isset($_SESSION[$strKey])) {
@@ -178,6 +236,10 @@ class SessionManager
         }
     }
 
+    /**
+     * @param int $timeout
+     * @return bool
+     */
     protected function isExpired($timeout = 1800)
     {
         $blnReturn = false;
@@ -191,6 +253,9 @@ class SessionManager
         return $blnReturn;
     }
 
+    /**
+     * @return bool
+     */
     protected function isFingerprint()
     {
         $blnReturn = true;
@@ -244,6 +309,10 @@ class SessionManager
         }
     }
 
+    /**
+     * @param string $session_data
+     * @return array<string, mixed>
+     */
     private static function unserializPhp($session_data)
     {
         $return_data = array();
@@ -263,6 +332,10 @@ class SessionManager
         return $return_data;
     }
 
+    /**
+     * @param string $session_data
+     * @return array<string, mixed>
+     */
     private static function unserializePhpBinary($session_data)
     {
         $return_data = array();

@@ -12,7 +12,7 @@ class DataTableHelper
     /**
      * Get a default response array for server side results.
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public static function getInitialServerResponse()
     {
@@ -40,7 +40,7 @@ class DataTableHelper
      * Get the first order column that was send by the client.
      *
      * @param string $strDefaultColumn
-     * @param array|null $arrWhiteList
+     * @param array<int, string>|null $arrWhiteList
      * @return string
      */
     public static function getOrderColumn($strDefaultColumn, $arrWhiteList = null)
@@ -59,8 +59,8 @@ class DataTableHelper
      * Get all order columns that were sent by the client.
      *
      * @param string $strDefaultColumn
-     * @param array|null $arrWhiteList
-     * @return array
+     * @param array<int, string>|null $arrWhiteList
+     * @return array<int, string>
      */
     public static function getOrderColumns($strDefaultColumn, $arrWhiteList = null)
     {
@@ -91,9 +91,9 @@ class DataTableHelper
     /**
      * Check if a single column or array of columns have been send as order column(s) by the client.
      *
-     * @param array|string $varColumn
+     * @param array<int, string>|string $varColumn
      * @param string $strDefaultColumn
-     * @param array|null $arrWhiteList
+     * @param array<int, string>|null $arrWhiteList
      * @return bool
      */
     public static function hasOrderColumn($varColumn, $strDefaultColumn, $arrWhiteList = null)

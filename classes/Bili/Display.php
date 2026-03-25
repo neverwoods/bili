@@ -18,6 +18,7 @@ class Display
     /**
      * Convert HTML markup to a binary PDF
      * @param  string      $strHtml The HTML input
+     * @param  string      $strFilePrefix The file prefix for the generated PDF
      * @return string|null The binary PDF output or null if something went wrong.
      */
     public static function html2pdf($strHtml, $strFilePrefix = "document")
@@ -55,6 +56,15 @@ class Display
         return $varReturn;
     }
 
+    /**
+     * Render an HTML anchor link.
+     *
+     * @param string $strLabel The label text for the link
+     * @param string $strLink The URL for the link
+     * @param bool $blnExternal Whether the link is external
+     * @param string $strClass Optional CSS class
+     * @return string The rendered HTML link
+     */
     public static function renderLink($strLabel, $strLink, $blnExternal = false, $strClass = "")
     {
         $strExternal = ($blnExternal) ? " rel=\"external\"" : "";
@@ -63,6 +73,13 @@ class Display
         return "<a href=\"{$strLink}\"{$strExternal}{$strClass}>{$strLabel}</a>";
     }
 
+    /**
+     * Render an "add" link with a default label.
+     *
+     * @param string $strLink The URL for the link
+     * @param string|null $strLabel Optional label override
+     * @return string The rendered HTML link
+     */
     public static function renderAddLink($strLink, $strLabel = null)
     {
         $strLabel = (!is_null($strLabel)) ? $strLabel : Language::get("add", "button");
@@ -70,6 +87,13 @@ class Display
         return self::renderLink($strLabel, $strLink, false, "addData");
     }
 
+    /**
+     * Wrap text at a specific character count using HTML line breaks.
+     *
+     * @param string $strInput The input text
+     * @param int $intMaxCharacters Maximum characters before wrapping
+     * @return string The wrapped text
+     */
     public static function wrapText($strInput, $intMaxCharacters)
     {
         return wordwrap($strInput, $intMaxCharacters, "<br />");
@@ -78,6 +102,8 @@ class Display
     /**
      * Get the string value for the boolean value.
      *
+     * @param bool $blnValue The boolean value to render
+     * @param bool $blnEmptyOnFalse Whether to return empty string on false
      * @return string string representation of a boolean value
      */
     public static function renderBoolean($blnValue, $blnEmptyOnFalse = false)
@@ -99,6 +125,10 @@ class Display
      * Format a numeric value according to the language settings. The input can be very small, even in scientific
      * notation. We will only go to a maximum decimal amount of 8. Anything more than that is stupid.
      *
+     * @param float|int|string $fltValue The numeric value to format
+     * @param int $intMaxDecimal Maximum number of decimal places
+     * @param int $intMinDecimal Minimum number of decimal places
+     * @param bool $blnShowThousandSeparator Whether to show the thousand separator
      * @return string string representation of a numeric value
      */
     public static function renderNumber(
@@ -151,7 +181,8 @@ class Display
      *
      * @param integer $intFrom
      * @param string $strTargetUnit
-     * @return float
+     * @param string $strSourceUnit The source unit (B, KB, MB, GB)
+     * @return float|int
      */
     public static function renderBytes($intFrom, $strTargetUnit, $strSourceUnit = "B")
     {
@@ -187,6 +218,9 @@ class Display
     /**
      * Format a numeric value according to the language settings for a form value.
      *
+     * @param float|int|string $fltValue The numeric value to format
+     * @param int $intMaxDecimal Maximum number of decimal places
+     * @param int $intMinDecimal Minimum number of decimal places
      * @return string string representation of a numeric value
      */
     public static function renderFormNumber($fltValue, $intMaxDecimal = 2, $intMinDecimal = 2)
@@ -221,6 +255,12 @@ class Display
         return $strReturn;
     }
 
+    /**
+     * Filter a string for safe use in XML output.
+     *
+     * @param string $text The input text to filter
+     * @return string The filtered text safe for XML
+     */
     public static function filterForXML($text)
     {
         $strReturn = $text;

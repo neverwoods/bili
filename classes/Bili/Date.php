@@ -323,7 +323,7 @@ class Date
      * Determine the ordinal suffixes using the day and an array of suffixes.
      *
      * @param integer $intDay
-     * @param array $arrSuffixes An array like ['th','st','nd','rd','th','th','th','th','th','th']
+     * @param array<int, string> $arrSuffixes An array like ['th','st','nd','rd','th','th','th','th','th','th']
      * @return string The day with the suffix
      */
     public static function getOrdinalSuffix(int $intDay, array $arrSuffixes): string
@@ -339,8 +339,8 @@ class Date
      * @param string $strDate1
      * @param string $strDate2
      * @param int $precision
-     * @param array $arrDiffSingular
-     * @param array $arrDiffPlural
+     * @param array<int, string> $arrDiffSingular
+     * @param array<int, string> $arrDiffPlural
      * @return false|string
      */
     public static function dateDifference(
@@ -422,6 +422,9 @@ class Date
     }
 
     /**
+     * @param string $strFirst
+     * @param string $strSecond
+     * @return DateInterval
      * @throws Exception
      */
     public static function getDateDifference($strFirst, $strSecond): DateInterval
@@ -456,7 +459,7 @@ class Date
      * Check if one of the items in the array has a match in the string.
      *
      * @param string $strLine
-     * @param array $arrItems
+     * @param array<int, string> $arrItems
      * @return bool
      */
     protected static function stringContainsItemFromArray(string $strLine, array $arrItems): bool

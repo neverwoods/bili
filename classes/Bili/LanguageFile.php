@@ -13,6 +13,8 @@ namespace Bili;
 
 class LanguageFile
 {
+    /** @var string */
     public $name;
+    /** @var string */
     public $language;
 }

@@ -4,6 +4,10 @@ namespace Bili;
 
 class ClassDynamic
 {
+    /**
+     * @param string $property
+     * @return mixed
+     */
     public function __get($property)
     {
         $property = lcfirst($property);
@@ -20,6 +24,11 @@ class ClassDynamic
         throw new \BadMethodCallException($strErrorMessage, 1);
     }
 
+    /**
+     * @param string $property
+     * @param mixed $value
+     * @return void
+     */
     public function __set($property, $value)
     {
         $blnExists = false;
@@ -42,6 +51,11 @@ class ClassDynamic
         }
     }
 
+    /**
+     * @param string $method
+     * @param array<int, mixed> $values
+     * @return mixed
+     */
     public function __call($method, $values)
     {
         if (substr($method, 0, 3) == "get") {

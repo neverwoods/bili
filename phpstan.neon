@@ -1,10 +1,11 @@
 parameters:
-    level: 5
+    level: 6
     paths:
         - classes
     excludePaths:
         - classes/Bili/TemplateInterface.php
     phpVersion: 80100
+    treatPhpDocTypesAsCertain: false
     ignoreErrors:
         -
             identifier: return.void
