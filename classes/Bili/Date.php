@@ -118,7 +118,7 @@ class Date
      */
     public static function getMonthName(string $intMonth): string
     {
-        $intTimestamp = mktime(0, 0, 0, $intMonth, 10);
+        $intTimestamp = mktime(0, 0, 0, (int)$intMonth, 10);
 
         Carbon::setLocale('auto');
         $strReturn = Carbon::createFromTimestamp($intTimestamp)->monthName;
@@ -134,7 +134,7 @@ class Date
      */
     public static function getShortMonthName(string $intMonth): string
     {
-        $intTimestamp = mktime(0, 0, 0, $intMonth, 10);
+        $intTimestamp = mktime(0, 0, 0, (int)$intMonth, 10);
 
         Carbon::setLocale('auto');
         $strReturn = Carbon::createFromTimestamp($intTimestamp)->shortMonthName;
@@ -208,7 +208,7 @@ class Date
         $objReturn = null;
 
         $intTimestamp = static::parseDate($strDate, $strIsoFormat);
-        $objTestDate = DateTime::createFromFormat('U', $intTimestamp);
+        $objTestDate = DateTime::createFromFormat('U', (string)$intTimestamp);
 
         if ($intTimestamp !== false) {
             //*** An invalid date returns 1899 as year.
@@ -405,7 +405,7 @@ class Date
             $intTimestamp = time();
         }
 
-        return mktime(0, 0, 0, (date("m", $intTimestamp)), 1, date("Y", $intTimestamp));
+        return mktime(0, 0, 0, (int)date("m", $intTimestamp), 1, (int)date("Y", $intTimestamp));
     }
 
     /**
@@ -418,7 +418,7 @@ class Date
             $intTimestamp = time();
         }
 
-        return mktime(0, 0, 0, (date("m", $intTimestamp) + 1), 0, date("Y", $intTimestamp));
+        return mktime(0, 0, 0, (int)date("m", $intTimestamp) + 1, 0, (int)date("Y", $intTimestamp));
     }
 
     /**

@@ -87,7 +87,7 @@ class Response
     public static function generateDownloadLink($binData, $strFilename, $strDownloadUrl = null)
     {
         // Generate a unique number.
-        $strUniqueName = mt_rand(1000000, 9999999);
+        $strUniqueName = (string)mt_rand(1000000, 9999999);
 
         // Store in the cache.
         file_put_contents($GLOBALS["_PATHS"]["cache"] . $strUniqueName, $binData);

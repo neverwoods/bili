@@ -123,7 +123,8 @@ class Request
 
     public static function getVar($strRequest, $strVarName)
     {
-        parse_str(array_pop(explode("?", $strRequest)), $arrRequest);
+        $arrParts = explode("?", $strRequest);
+        parse_str(array_pop($arrParts), $arrRequest);
         foreach ($arrRequest as $key => $value) {
             if (strtolower($key) == strtolower($strVarName)) {
                 return $value;

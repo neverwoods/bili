@@ -19,7 +19,7 @@ class Geocoder
 
         $objCurlRequest = curl_init();
         curl_setopt($objCurlRequest, CURLOPT_URL, sprintf(self::$googleMapsApi, $strAddress));
-        curl_setopt($objCurlRequest, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($objCurlRequest, CURLOPT_RETURNTRANSFER, true);
 
         $arrResponse = json_decode(
             curl_exec($objCurlRequest),
