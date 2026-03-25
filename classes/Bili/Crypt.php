@@ -25,10 +25,7 @@ class Crypt
                 throw new \InvalidArgumentException('Length must be a positive integer');
             }
 
-            $alphaMax = strlen((string)$strChars) - 1;
-            if ($alphaMax < 1) {
-                throw new \InvalidArgumentException('Invalid alphabet');
-            }
+            $alphaMax = strlen($strChars) - 1;
 
             for ($i = 0; $i < $intMaxLength; ++$i) {
                 $strReturn .= substr($strChars, random_int(0, $alphaMax), 1);

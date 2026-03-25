@@ -14,7 +14,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Constructor method
      *
-     * @param array $initArray
+     * @param mixed $initArray
      */
     public function __construct($initArray = array())
     {
@@ -41,7 +41,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Advance internal pointer to a specific index
      *
-     * @param integer $intPosition
+     * @param mixed $intPosition
      */
     public function seek($intPosition)
     {
@@ -420,7 +420,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Get the page number the child item is in.
      *
-     * @param object $objChild
+     * @param mixed $objChild
      */
     public function getPageByChild($objChild)
     {
@@ -445,7 +445,7 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Advance the internal pointer to a specific index indicated by a child item and return the index.
      *
-     * @param object $objChild
+     * @param mixed $objChild
      */
     public function seekByChild($objChild)
     {

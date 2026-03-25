@@ -102,10 +102,8 @@ class RestRequest
         $arrReturn = array();
 
         $this->requestHeaders = (!is_array($this->requestHeaders)) ? array() : $this->requestHeaders;
-        if (is_array($this->requestHeaders)) {
-            foreach ($this->requestHeaders as $key => $value) {
-                $arrReturn[] = "{$key}: {$value}";
-            }
+        foreach ($this->requestHeaders as $key => $value) {
+            $arrReturn[] = "{$key}: {$value}";
         }
         $arrReturn[] = "Accept: " . $this->acceptType;
 
