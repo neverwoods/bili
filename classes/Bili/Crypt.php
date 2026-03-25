@@ -47,7 +47,7 @@ class Crypt
 
             if (strlen((string)$out) < 7) {
                 $padding = (7 - strlen((string)$out));
-                $out .= substr(($in * 534648), 0, $padding); // Add padding characters.
+                $out .= substr((string)($in * 534648), 0, $padding); // Add padding characters.
                 $out .= $padding; // Add number of padding characters.
             } else {
                 $out .= '0'; // No padding characters.

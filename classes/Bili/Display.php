@@ -24,9 +24,9 @@ class Display
     {
         $varReturn = null;
 
-        srand((double) microtime()*1000000);
+        srand((int)(microtime(true) * 1000000));
         $random_number = rand();
-        $sid = md5($random_number);
+        $sid = md5((string)$random_number);
 
         $strHash         = $strFilePrefix . "-" . $sid;
         $strPdfFile     = $GLOBALS["_PATHS"]["cache"] . $strHash . ".pdf"; // TODO: Check if global exists.

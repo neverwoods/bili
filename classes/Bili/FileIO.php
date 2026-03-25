@@ -91,9 +91,9 @@ class FileIO
             $arrSettings["wkhtmltopdfPath"] = $GLOBALS["_CONF"]["app"]["wkhtmltopdf"];
         }
 
-        srand((double) microtime()*1000000);
+        srand((int)(microtime(true) * 1000000));
         $random_number = rand();
-        $sid = md5($random_number);
+        $sid = md5((string)$random_number);
 
         $strHash = $strFilePrefix . "-" . $sid;
         $strPdfFile = $arrSettings["tempPath"] . $strHash . ".pdf";
@@ -392,7 +392,7 @@ class FileIO
             curl_setopt($objCurl, CURLOPT_NOBODY, true);
             curl_setopt($objCurl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
             curl_setopt($objCurl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($objCurl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($objCurl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($objCurl, CURLOPT_MAXREDIRS, 10); //follow up to 10 redirections - avoids loops
@@ -450,7 +450,7 @@ class FileIO
             curl_setopt($objCurl, CURLOPT_HEADER, false);
             curl_setopt($objCurl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
             curl_setopt($objCurl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($objCurl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($objCurl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($objCurl, CURLOPT_MAXREDIRS, 10); //follow up to 10 redirections - avoids loops
