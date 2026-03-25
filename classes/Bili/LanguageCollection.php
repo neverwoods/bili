@@ -12,10 +12,17 @@ use ReturnTypeWillChange;
  *   NEW: Created class.
  */
 
+/**
+ * @implements \Iterator<int, LanguageFile>
+ */
 class LanguageCollection implements \Iterator
 {
+    /** @var array<int, LanguageFile> */
     private $collection = array();
 
+    /**
+     * @param array<int, LanguageFile> $initArray
+     */
     public function __construct($initArray = array())
     {
         if (is_array($initArray)) {
@@ -23,6 +30,10 @@ class LanguageCollection implements \Iterator
         }
     }
 
+    /**
+     * @param LanguageFile $value
+     * @return void
+     */
     public function addObject($value)
     {
         /* Add an object to the collection.
@@ -34,6 +45,9 @@ class LanguageCollection implements \Iterator
         array_push($this->collection, $value);
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
         return count($this->collection);

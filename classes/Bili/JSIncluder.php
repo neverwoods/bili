@@ -11,9 +11,15 @@ use JSMin\JSMin;
  */
 class JSIncluder
 {
+    /** @var array<int, string> */
     private $arrClasses;
+    /** @var string */
     private $sourcePath;
 
+    /**
+     * @param string $strSourcePath
+     * @param array<int, string>|string|null $varClasses
+     */
     public function __construct($strSourcePath, $varClasses = null)
     {
         $this->sourcePath = $strSourcePath;
@@ -28,6 +34,10 @@ class JSIncluder
         }
     }
 
+    /**
+     * @param string $strClass
+     * @return void
+     */
     public function add($strClass)
     {
         if (is_file($this->sourcePath . $strClass . ".js")) {
@@ -37,6 +47,10 @@ class JSIncluder
         }
     }
 
+    /**
+     * @param string $strVersion
+     * @return string
+     */
     public function toHtml($strVersion = "")
     {
         $strReturn = "";
@@ -53,6 +67,10 @@ class JSIncluder
         return $strReturn;
     }
 
+    /**
+     * @param array<int, string> $arrFilter
+     * @return void
+     */
     public static function render($arrFilter)
     {
         $dtLastModified = 0;
@@ -93,6 +111,10 @@ class JSIncluder
         $objEncoder->sendAll();
     }
 
+    /**
+     * @param array<int, string> $arrFilter
+     * @return string
+     */
     private static function minify($arrFilter)
     {
         $strOutput = "";

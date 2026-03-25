@@ -7,8 +7,8 @@ class Crypt
     /**
      * Generate a token using a dynamic array of parameters.
      *
-     * @param array $arrInput
-     * @param int|number $intMaxLength
+     * @param array<int, string> $arrInput
+     * @param int $intMaxLength
      * @return string
      */
     public static function generateToken($arrInput = [], $intMaxLength = 40)
@@ -35,6 +35,10 @@ class Crypt
         return $strReturn;
     }
 
+    /**
+     * @param string|int $in
+     * @return string|false
+     */
     public static function doEncode($in)
     {
         if (is_numeric($in) && $in > 0) {
@@ -59,6 +63,10 @@ class Crypt
         return false;
     }
 
+    /**
+     * @param string|int $in
+     * @return string|false
+     */
     public static function doDecode($in)
     {
         if (is_numeric($in) && $in > 0) {

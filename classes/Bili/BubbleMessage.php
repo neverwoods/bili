@@ -47,17 +47,31 @@ class BubbleMessage extends ClassDynamic implements \JsonSerializable
     const MSG_HIDE_TIME_INFO = 5000;
     const MSG_HIDE_TIME_ERROR = 15000;
 
+    /** @var string */
     protected $message;
+    /** @var string */
     protected $title;
+    /** @var string */
     protected $type;
+    /** @var string */
     protected $icon;
+    /** @var int */
     protected $location;
+    /** @var int */
     protected $timeout;
+    /** @var bool */
     protected $permanent;
+    /** @var bool */
     protected $dismiss;
+    /** @var string */
     protected $key;
+    /** @var string */
     protected $id;
 
+    /**
+     * @param string $message The message body
+     * @param array<string, mixed> $options An array of options for the message
+     */
     public function __construct($message, $options = array())
     {
         $this->message = $message;
@@ -73,6 +87,9 @@ class BubbleMessage extends ClassDynamic implements \JsonSerializable
         $this->setId();
     }
 
+    /**
+     * @return void
+     */
     public function setId()
     {
         $this->id = "message-";
@@ -84,16 +101,20 @@ class BubbleMessage extends ClassDynamic implements \JsonSerializable
         }
     }
 
-    /*
+    /**
      * Get the CSS class for a message type.
+     *
+     * @return string
      */
     public function getCssType()
     {
         return $this->type;
     }
 
-    /*
+    /**
      * Get the CSS icon class for a message type.
+     *
+     * @return string
      */
     public function getCssIcon()
     {
