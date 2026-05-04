@@ -368,4 +368,32 @@ class Sanitize
 
         return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
     }
+
+    /**
+     * Sanitize a string for safe use as a filename.
+     *
+     * Strips null bytes, HTML tags and shell metacharacters that allow command
+     * substitution or chaining when the filename is later interpolated into a
+     * shell command (e.g. for preview generation). Quote characters are stripped
+     * rather than HTML-encoded, because encoding would introduce `&` and `;`
+     * which are themselves shell metacharacters.
+     *
+     * Defense-in-depth — callers MUST still escape filename arguments with
+     * escapeshellarg() before passing them to exec()/shell_exec()/system().
+     *
+     * @param string|null $string
+     * @return string
+     */
+    public static function filterFilename(?string $string): string
+    {
+        if (is_null($string)) {
+            return "";
+        }
+
+        //*** Strip null bytes and HTML tags (parity with filterStringPolyfill).
+        $str = preg_replace('/\x00|<[^>]*>?/', '', $string);
+
+        //*** Strip shell metacharacters, quotes, backslash and newlines.
+        return preg_replace('/[$`|;&!(){}\[\]\'"\\\\\r\n]/', '', $str);
+    }
 }
