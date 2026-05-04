@@ -256,7 +256,7 @@ class FileIO
 
         // Clean the fileName for security reasons
         $originalName = $fileName;
-        $fileName = Sanitize::filterStringPolyfill($fileName);
+        $fileName = Sanitize::filterFilename($fileName);
         $fileName = str_replace(" ", "-", $fileName);
         $fileName = str_replace("---", "-", $fileName);
         $fileName = str_replace("--", "-", $fileName);

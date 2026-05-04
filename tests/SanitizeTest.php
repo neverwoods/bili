@@ -136,4 +136,67 @@ class SanitizeTest extends TestCase
         $varInput = "Bon aña 2023, !@#5^&*<>$";
         $this->assertSame("Bon aña 2023, !@#5^&*$", Sanitize::filterStringPolyfill($varInput));
     }
+
+    /**
+     * Sanitize a filename so it is safe to interpolate into a shell command.
+     *
+     * filterFilename() must:
+     *  - return an empty string for null input
+     *  - strip null bytes and HTML tags (parity with filterStringPolyfill())
+     *  - strip shell metacharacters that allow command substitution / chaining when
+     *    the filename is later passed to exec() (e.g. `$()`, backticks, |, ;, &)
+     *  - leave benign filename characters (letters, digits, dot, dash, underscore,
+     *    spaces, accented characters) untouched so that legitimate uploads keep
+     *    their human-readable names.
+     */
+    public function testFilterFilenameReturnsEmptyStringForNull(): void
+    {
+        $this->assertSame("", Sanitize::filterFilename(null));
+    }
+
+    public function testFilterFilenameLeavesBenignFilenameUntouched(): void
+    {
+        $this->assertSame("report.pdf", Sanitize::filterFilename("report.pdf"));
+        $this->assertSame("My Report 2025.pdf", Sanitize::filterFilename("My Report 2025.pdf"));
+        $this->assertSame("año-2025_v1.pdf", Sanitize::filterFilename("año-2025_v1.pdf"));
+    }
+
+    public function testFilterFilenameStripsHtmlTagsAndNullBytes(): void
+    {
+        $this->assertSame("clean.pdf", Sanitize::filterFilename("<script>clean.pdf"));
+        $this->assertSame("clean.pdf", Sanitize::filterFilename("clean\x00.pdf"));
+    }
+
+    public function testFilterFilenameStripsCommandSubstitutionMetacharacters(): void
+    {
+        //*** $() command substitution must not survive into the filename.
+        $this->assertSame("pocwhoami.pdf", Sanitize::filterFilename("poc\$(whoami).pdf"));
+
+        //*** Backtick command substitution must also be stripped.
+        $this->assertSame("pocwhoami.pdf", Sanitize::filterFilename("poc`whoami`.pdf"));
+    }
+
+    public function testFilterFilenameStripsShellChainingMetacharacters(): void
+    {
+        $this->assertSame("aabbc.pdf", Sanitize::filterFilename("a;a|b&b!c.pdf"));
+    }
+
+    public function testFilterFilenameStripsBracesParensAndBrackets(): void
+    {
+        $this->assertSame("abcd.pdf", Sanitize::filterFilename("a(b)c{d}.pdf"));
+        $this->assertSame("abcd.pdf", Sanitize::filterFilename("a[b]c[d].pdf"));
+    }
+
+    public function testFilterFilenameStripsQuotesAndBackslash(): void
+    {
+        //*** Single and double quotes are stripped (not HTML-encoded — encoding would
+        //*** introduce `&` and `;` which themselves are shell metacharacters).
+        $this->assertSame("abc.pdf", Sanitize::filterFilename("a'b\"c.pdf"));
+        $this->assertSame("abc.pdf", Sanitize::filterFilename("a\\b\\c.pdf"));
+    }
+
+    public function testFilterFilenameStripsNewlineAndCarriageReturn(): void
+    {
+        $this->assertSame("abc.pdf", Sanitize::filterFilename("a\nb\rc.pdf"));
+    }
 }
