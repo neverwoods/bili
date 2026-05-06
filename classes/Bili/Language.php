@@ -120,7 +120,7 @@ class Language
      * @param string $strName
      * @param string $strCategory
      * @param bool $blnReturnError
-     * @return string
+     * @return string|array<string>
      */
     public static function get($strName, $strCategory = "global", $blnReturnError = true)
     {
@@ -131,7 +131,7 @@ class Language
             $strReturn = self::$languages[$strCategory][$strName];
         }
 
-        //*** Output sanitisation?
+        //*** Output sanitization?
         switch (self::$sanitizeType) {
             case "xhtml":
                 if (class_exists("Bili\\Sanitize", true)) {
