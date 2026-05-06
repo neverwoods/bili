@@ -118,7 +118,7 @@ class Date
      */
     public static function getMonthName(string $intMonth): string
     {
-        $intTimestamp = mktime(0, 0, 0, $intMonth, 10);
+        $intTimestamp = mktime(0, 0, 0, (int)$intMonth, 10);
 
         Carbon::setLocale('auto');
         $strReturn = Carbon::createFromTimestamp($intTimestamp)->monthName;
@@ -134,7 +134,7 @@ class Date
      */
     public static function getShortMonthName(string $intMonth): string
     {
-        $intTimestamp = mktime(0, 0, 0, $intMonth, 10);
+        $intTimestamp = mktime(0, 0, 0, (int)$intMonth, 10);
 
         Carbon::setLocale('auto');
         $strReturn = Carbon::createFromTimestamp($intTimestamp)->shortMonthName;
@@ -208,7 +208,7 @@ class Date
         $objReturn = null;
 
         $intTimestamp = static::parseDate($strDate, $strIsoFormat);
-        $objTestDate = DateTime::createFromFormat('U', $intTimestamp);
+        $objTestDate = DateTime::createFromFormat('U', (string)$intTimestamp);
 
         if ($intTimestamp !== false) {
             //*** An invalid date returns 1899 as year.
@@ -323,7 +323,7 @@ class Date
      * Determine the ordinal suffixes using the day and an array of suffixes.
      *
      * @param integer $intDay
-     * @param array $arrSuffixes An array like ['th','st','nd','rd','th','th','th','th','th','th']
+     * @param array<int, string> $arrSuffixes An array like ['th','st','nd','rd','th','th','th','th','th','th']
      * @return string The day with the suffix
      */
     public static function getOrdinalSuffix(int $intDay, array $arrSuffixes): string
@@ -339,8 +339,8 @@ class Date
      * @param string $strDate1
      * @param string $strDate2
      * @param int $precision
-     * @param array $arrDiffSingular
-     * @param array $arrDiffPlural
+     * @param array<int, string> $arrDiffSingular
+     * @param array<int, string> $arrDiffPlural
      * @return false|string
      */
     public static function dateDifference(
@@ -405,7 +405,7 @@ class Date
             $intTimestamp = time();
         }
 
-        return mktime(0, 0, 0, (date("m", $intTimestamp)), 1, date("Y", $intTimestamp));
+        return mktime(0, 0, 0, (int)date("m", $intTimestamp), 1, (int)date("Y", $intTimestamp));
     }
 
     /**
@@ -418,10 +418,13 @@ class Date
             $intTimestamp = time();
         }
 
-        return mktime(0, 0, 0, (date("m", $intTimestamp) + 1), 0, date("Y", $intTimestamp));
+        return mktime(0, 0, 0, (int)date("m", $intTimestamp) + 1, 0, (int)date("Y", $intTimestamp));
     }
 
     /**
+     * @param string $strFirst
+     * @param string $strSecond
+     * @return DateInterval
      * @throws Exception
      */
     public static function getDateDifference($strFirst, $strSecond): DateInterval
@@ -456,7 +459,7 @@ class Date
      * Check if one of the items in the array has a match in the string.
      *
      * @param string $strLine
-     * @param array $arrItems
+     * @param array<int, string> $arrItems
      * @return bool
      */
     protected static function stringContainsItemFromArray(string $strLine, array $arrItems): bool

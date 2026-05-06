@@ -4,30 +4,60 @@ namespace Bili;
 
 class Rewrite
 {
+    /** @var Rewrite|null */
     public static $instance             = null;
+    /** @var array<string, mixed> */
     public static $sections             = [];
-    public static $subsections             = [];
-    public static $commands                = [];
-    public static $parseTypes            = [];
+    /** @var array<string, mixed> */
+    public static $subsections          = [];
+    /** @var array<string, mixed> */
+    public static $commands             = [];
+    /** @var array<string, mixed> */
+    public static $parseTypes           = [];
+    /** @var mixed */
     public static $defaultSection       = null;
+    /** @var mixed */
     public static $defaultSubSection    = null;
-    public static $defaultCommand         = null;
+    /** @var mixed */
+    public static $defaultCommand       = null;
+    /** @var mixed */
     public static $defaultParser        = null;
-    private $department                    = null;
+    /** @var string|false|array<int, string|false>|null */
+    private $department                 = null;
+    /** @var mixed */
     private $section                    = null;
-    private $subsection                    = null;
+    /** @var mixed */
+    private $subsection                 = null;
+    /** @var mixed */
     private $command                    = null;
+    /** @var string|false|null */
     private $element                    = null;
-    private $parser                        = null;
-    private $parameters                    = null;
+    /** @var mixed */
+    private $parser                     = null;
+    /** @var array<string, string|false>|null */
+    private $parameters                 = null;
+    /** @var array<int, string> */
     private $reservedParameters         = array("view");
+    /** @var array<int, string> */
     private $attributes                 = ["first"];
+    protected bool $enforceDepartment   = false;
 
     private function __construct()
     {
         /* Private constructor to insure singleton behaviour */
     }
 
+    /**
+     * @param array<string, mixed> $arrSections
+     * @param array<string, mixed> $arrSubSections
+     * @param array<string, mixed> $arrCommands
+     * @param array<string, mixed> $arrParseTypes
+     * @param mixed $intDefaultSection
+     * @param mixed $intDefaultSubSection
+     * @param mixed $intDefaultCommand
+     * @param mixed $intDefaultParser
+     * @return Rewrite
+     */
     public static function singleton(
         $arrSections,
         $arrSubSections,
@@ -36,7 +66,8 @@ class Rewrite
         $intDefaultSection = null,
         $intDefaultSubSection = null,
         $intDefaultCommand = null,
-        $intDefaultParser = null
+        $intDefaultParser = null,
+        ?bool $blnEnforceDepartment = false,
     ) {
         /* Method to initially instanciate the class */
         self::$instance = new Rewrite();
@@ -61,6 +92,8 @@ class Rewrite
             self::$instance->setDefaultParser($intDefaultParser);
         }
 
+        self::$instance->enforceDepartment = $blnEnforceDepartment;
+
         return self::$instance;
     }
 
@@ -80,51 +113,89 @@ class Rewrite
         return self::$instance;
     }
 
+    /**
+     * @param array<string, mixed> $arrValue
+     * @return void
+     */
     public function setSections($arrValue)
     {
         self::$sections = $arrValue;
     }
 
+    /**
+     * @param array<string, mixed> $arrValue
+     * @return void
+     */
     public function setSubSections($arrValue)
     {
         self::$subsections = $arrValue;
     }
 
+    /**
+     * @param array<string, mixed> $arrValue
+     * @return void
+     */
     public function setCommands($arrValue)
     {
         self::$commands = $arrValue;
     }
 
+    /**
+     * @param array<string, mixed> $arrValue
+     * @return void
+     */
     public function setParseTypes($arrValue)
     {
         self::$parseTypes = $arrValue;
     }
 
+    /**
+     * @param mixed $intValue
+     * @return void
+     */
     public function setDefaultSection($intValue)
     {
         self::$defaultSection = $intValue;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDefaultSection()
     {
         return self::$defaultSection;
     }
 
+    /**
+     * @param mixed $intValue
+     * @return void
+     */
     public function setDefaultSubSection($intValue)
     {
         self::$defaultSubSection = $intValue;
     }
 
+    /**
+     * @param mixed $intValue
+     * @return void
+     */
     public function setDefaultCommand($intValue)
     {
         self::$defaultCommand = $intValue;
     }
 
+    /**
+     * @param mixed $intValue
+     * @return void
+     */
     public function setDefaultParser($intValue)
     {
         self::$defaultParser = $intValue;
     }
 
+    /**
+     * @return string|false|array<int, string|false>|null
+     */
     public function getDepartment()
     {
         if (is_null($this->department)) {
@@ -134,6 +205,9 @@ class Rewrite
         return $this->department;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSection()
     {
         if (is_null($this->section)) {
@@ -143,6 +217,9 @@ class Rewrite
         return $this->section;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSubSection()
     {
         if (is_null($this->subsection)) {
@@ -152,6 +229,9 @@ class Rewrite
         return $this->subsection;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCommand()
     {
         if (is_null($this->command)) {
@@ -161,6 +241,9 @@ class Rewrite
         return $this->command;
     }
 
+    /**
+     * @return string|false|null
+     */
     public function getElement()
     {
         if (is_null($this->element)) {
@@ -170,6 +253,9 @@ class Rewrite
         return $this->element;
     }
 
+    /**
+     * @return mixed
+     */
     public function getParseType()
     {
         if (is_null($this->parser)) {
@@ -179,6 +265,9 @@ class Rewrite
         return $this->parser;
     }
 
+    /**
+     * @return array<string, string|false>|null
+     */
     public function getParameters()
     {
         if (is_null($this->parameters)) {
@@ -192,7 +281,7 @@ class Rewrite
      * Get a named parameter from the URL.
      * @param  string   $strKey           The name of the parameter
      * @param  mixed    $alternateValue   An alternate value if the parameter is not set
-     * @param  function $validateFunction A validation lambda that returns FALSE if the parameter is not valid
+     * @param  callable|null $validateFunction A validation lambda that returns FALSE if the parameter is not valid
      * @return mixed    The named parameter, the alternate value or an empty string
      */
     public function getParameter($strKey, $alternateValue = "", $validateFunction = null)
@@ -218,7 +307,7 @@ class Rewrite
      * Get the current active URL.
      *
      * @param bool $blnIncludeDepartment
-     * @param null|string|array $varExcludeParameters
+     * @param null|string|array<int, string> $varExcludeParameters
      * @return string
      */
     public function getCurrentUrl($blnIncludeDepartment = true, $varExcludeParameters = null)
@@ -256,6 +345,17 @@ class Rewrite
         return $strReturn;
     }
 
+    /**
+     * @param mixed $intSection
+     * @param mixed $intCommand
+     * @param string|false|null $intElement
+     * @param mixed $strParseType
+     * @param mixed $intSubSection
+     * @param array<string, string|false>|null $arrParameters
+     * @param string|false|array<int, string|false>|null $varDepartment
+     * @param string|null $strFragment
+     * @return string
+     */
     public function getUrl(
         $intSection,
         $intCommand = null,
@@ -263,15 +363,33 @@ class Rewrite
         $strParseType = null,
         $intSubSection = null,
         $arrParameters = null,
-        $intDepartment = null,
+        $varDepartment = null,
         $strFragment = null
     ) {
-        //*** Convert navigational elements to an URL.
+        //*** Convert navigational elements to a URL.
         $strReturn = "/";
 
         //*** Department.
-        if (!is_null($intDepartment) && ctype_digit(strval($intDepartment))) {
-            $strReturn .= $this::encode($intDepartment) . "/";
+        if (!is_null($varDepartment) && is_array($varDepartment)) {
+            //*** Support for an array of values. Values will be encoded and joined with a dot.
+            $blnValid = true;
+            foreach ($varDepartment as $value) {
+                $blnValid &= ctype_digit((string)$value);
+            }
+
+            if ($blnValid) {
+                $strReturn .= implode(".", array_map([static::class, 'encode'], $varDepartment)) . "/";
+            }
+        } elseif (!is_null($varDepartment) && ctype_digit(strval($varDepartment))) {
+            //*** Retain support for a single value. Value will be encoded.
+            $strReturn .= $this::encode($varDepartment) . "/";
+        } elseif (!is_null($this->department) && $this->enforceDepartment) {
+            //*** Make sure we set the current department in the next url.
+            if (is_array($this->department)) {
+                $strReturn .= implode(".", array_map([static::class, 'encode'], $this->department)) . "/";
+            } elseif (ctype_digit(strval($this->department))) {
+                $strReturn .= $this::encode($this->department) . "/";
+            }
         }
 
         //*** Section.
@@ -342,6 +460,9 @@ class Rewrite
         return $strReturn;
     }
 
+    /**
+     * @return void
+     */
     private function getRewrite()
     {
         //*** Extract the logic from the URL.
@@ -358,6 +479,29 @@ class Rewrite
                 if (ctype_digit(strval($arrUrl[0]))) {
                     $this->department = $this::decode($arrUrl[0]);
                     $blnHasDepartment = true;
+                } else if(str_contains($arrUrl[0], ".")) {
+                    //*** Support for an array of values. Values must be encoded and joined with a dot.
+                    $arrContext = explode(".", $arrUrl[0]);
+                    $varDepartment = [];
+                    $blnHasDepartment = true;
+
+                    foreach ($arrContext as $value) {
+                        if (ctype_digit(strval($value))) {
+                            $varDepartment[] = $this::decode($value);
+                        } else {
+                            /**
+                             * Enforce only numeric departments. If we encounter a non-numeric value, this means
+                             * it is not meant to be a department. So we break out of the loop and treat the
+                             * rest of the URL as a normal rewrite.
+                             */
+                            $blnHasDepartment = false;
+                            break;
+                        }
+                    }
+
+                    if ($blnHasDepartment === true && count($varDepartment) > 0) {
+                        $this->department = $varDepartment;
+                    }
                 }
             }
 
@@ -479,6 +623,9 @@ class Rewrite
         }
     }
 
+    /**
+     * @return void
+     */
     private function cleanupParameters()
     {
         if (is_array($this->parameters)) {
@@ -491,6 +638,11 @@ class Rewrite
         }
     }
 
+    /**
+     * @param array<int, string> $arrInput
+     * @param array<int, string> $arrReservedKeys
+     * @return array<string, string|false>
+     */
     private function arrayToAssociated($arrInput, $arrReservedKeys = array())
     {
         $arrReturn = array();
@@ -511,6 +663,10 @@ class Rewrite
         return $arrReturn;
     }
 
+    /**
+     * @param string|int|array<string|int, string|int> $varInput
+     * @return string|false|array<string|int, string|false>
+     */
     public static function encode($varInput)
     {
         $varReturn = null;
@@ -527,6 +683,10 @@ class Rewrite
         return $varReturn;
     }
 
+    /**
+     * @param string|int|array<string|int, string|int> $varInput
+     * @return string|false|array<string|int, string|false>
+     */
     public static function decode($varInput)
     {
         $varReturn = null;

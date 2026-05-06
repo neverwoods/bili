@@ -30,6 +30,10 @@ class Request
     const METHOD_HEAD = "HEAD";
     const METHOD_DELETE = "DELETE";
 
+    /**
+     * @param int $intId
+     * @return void
+     */
     public static function redirectInternal($intId)
     {
         /***
@@ -51,6 +55,10 @@ class Request
         }
     }
 
+    /**
+     * @param string|int $strQuery
+     * @return void
+     */
     public static function redirect($strQuery)
     {
         if (!empty($strQuery)) {
@@ -87,11 +95,17 @@ class Request
         return $strReturn;
     }
 
+    /**
+     * @return string
+     */
     public static function getURI()
     {
         return self::getRootURI() . self::getSubURI();
     }
 
+    /**
+     * @return string
+     */
     public static function getProtocol()
     {
         if ((isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") || (isset($_SERVER["HTTP_X_FORWARDED_PROTO"]) &&
@@ -104,6 +118,9 @@ class Request
         return $strReturn;
     }
 
+    /**
+     * @return string
+     */
     public static function getRootURI()
     {
         $strReturn = "";
@@ -115,33 +132,55 @@ class Request
         return $strReturn;
     }
 
+    /**
+     * @return string
+     */
     public static function getSubURI()
     {
         return (strlen((string)dirname($_SERVER['PHP_SELF'])) > 1) ?
             dirname($_SERVER['PHP_SELF']) : substr(dirname($_SERVER['PHP_SELF']), 0, -1);
     }
 
+    /**
+     * @param string $strRequest
+     * @param string $strVarName
+     * @return string|null
+     */
     public static function getVar($strRequest, $strVarName)
     {
-        parse_str(array_pop(explode("?", $strRequest)), $arrRequest);
+        $arrParts = explode("?", $strRequest);
+        parse_str(array_pop($arrParts), $arrRequest);
         foreach ($arrRequest as $key => $value) {
             if (strtolower($key) == strtolower($strVarName)) {
                 return $value;
             }
         }
+
+        return null;
     }
 
+    /**
+     * @param string $strParam
+     * @param string|int $strReplaceEmpty
+     * @return mixed
+     */
     public static function get($strParam, $strReplaceEmpty = "")
     {
         (isset($_REQUEST[$strParam])) ? $strReturn = $_REQUEST[$strParam] : $strReturn = "";
 
-        if (empty($strReturn) && !is_numeric($strReturn) && $strReturn !== 0) {
+        if (empty($strReturn) && !is_numeric($strReturn)) {
             $strReturn = $strReplaceEmpty;
         }
 
         return $strReturn;
     }
 
+    /**
+     * @param array<string, mixed> $array
+     * @param string $glue
+     * @param bool $is_query
+     * @return string
+     */
     private static function implodeWithKeys($array, $glue, $is_query = false)
     {
         if ($is_query == true) {

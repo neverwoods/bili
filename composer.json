@@ -22,10 +22,12 @@
         "ext-bcmath": "*",
         "mrclay/minify": "3.*",
         "pear/cache_lite": "1.*",
-        "nesbot/carbon": "^2.62.1"
+        "nesbot/carbon": "^2.62.1|^3.2",
+        "ext-ctype": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "phpstan/phpstan": "^2.1"
     },
     "autoload": {
         "psr-0": {"Bili": "classes/"}

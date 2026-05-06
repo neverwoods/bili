@@ -9,25 +9,37 @@ namespace Bili;
  */
 class CSSIncluder
 {
+    /** @var array<string, array<int, string>> */
     private $arrFiles;
+    /** @var string */
     private $sourcePath;
 
+    /**
+     * @param string $strSourcePath
+     * @param array<int, array<string, string>>|array<string, string>|null $varFiles
+     */
     public function __construct($strSourcePath, $varFiles = null)
     {
         $this->sourcePath = $strSourcePath;
         $this->arrFiles = array("all" => array(), "screen" => array(), "print" => array());
 
         if (is_array($varFiles)) {
-            if (is_array($varFiles[0])) {
+            if (isset($varFiles[0]) && is_array($varFiles[0])) {
+                /** @var array<int, array<string, string>> $varFiles */
                 foreach ($varFiles as $value) {
                     $this->add($value);
                 }
             } else {
+                /** @var array<string, string> $varFiles */
                 $this->add($varFiles);
             }
         }
     }
 
+    /**
+     * @param array<string, string> $arrFile
+     * @return void
+     */
     public function add($arrFile)
     {
         if (is_array($arrFile)) {
@@ -45,6 +57,10 @@ class CSSIncluder
         }
     }
 
+    /**
+     * @param string $strVersion
+     * @return string
+     */
     public function toHtml($strVersion = "")
     {
         $strReturn = "";
@@ -56,6 +72,11 @@ class CSSIncluder
         return $strReturn;
     }
 
+    /**
+     * @param string $strMedia
+     * @param string $strVersion
+     * @return string
+     */
     private function renderHtml($strMedia, $strVersion = "")
     {
         $strReturn = "";
@@ -74,6 +95,10 @@ class CSSIncluder
         return $strReturn;
     }
 
+    /**
+     * @param array<int, string> $arrFilter
+     * @return void
+     */
     public static function render($arrFilter)
     {
         $dtLastModified = 0;
@@ -115,6 +140,11 @@ class CSSIncluder
         $objEncoder->sendAll();
     }
 
+    /**
+     * @param string $strFile
+     * @param int|null $dtLastModified
+     * @return int|null
+     */
     private static function getLastModified($strFile, $dtLastModified = null)
     {
         $intReturn = $dtLastModified;
@@ -129,6 +159,10 @@ class CSSIncluder
         return $intReturn;
     }
 
+    /**
+     * @param string $strFile
+     * @return string
+     */
     private static function getFileContents($strFile)
     {
         $strReturn = "";
@@ -140,6 +174,10 @@ class CSSIncluder
         return $strReturn;
     }
 
+    /**
+     * @param array<int, string> $arrFilter
+     * @return string
+     */
     private static function minify($arrFilter)
     {
         $strOutput = "";

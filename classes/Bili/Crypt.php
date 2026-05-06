@@ -7,8 +7,8 @@ class Crypt
     /**
      * Generate a token using a dynamic array of parameters.
      *
-     * @param array $arrInput
-     * @param int|number $intMaxLength
+     * @param array<int, string> $arrInput
+     * @param int $intMaxLength
      * @return string
      */
     public static function generateToken($arrInput = [], $intMaxLength = 40)
@@ -25,10 +25,7 @@ class Crypt
                 throw new \InvalidArgumentException('Length must be a positive integer');
             }
 
-            $alphaMax = strlen((string)$strChars) - 1;
-            if ($alphaMax < 1) {
-                throw new \InvalidArgumentException('Invalid alphabet');
-            }
+            $alphaMax = strlen($strChars) - 1;
 
             for ($i = 0; $i < $intMaxLength; ++$i) {
                 $strReturn .= substr($strChars, random_int(0, $alphaMax), 1);
@@ -38,6 +35,10 @@ class Crypt
         return $strReturn;
     }
 
+    /**
+     * @param string|int $in
+     * @return string|false
+     */
     public static function doEncode($in)
     {
         if (is_numeric($in) && $in > 0) {
@@ -45,12 +46,12 @@ class Crypt
             $out = "";
 
             for ($i=0; $i < strlen((string)$in); $i++) {
-                $out .= $key[substr($in, $i, 1)]; // Encode string according to key.
+                $out .= $key[(int)substr($in, $i, 1)]; // Encode string according to key.
             }
 
             if (strlen((string)$out) < 7) {
                 $padding = (7 - strlen((string)$out));
-                $out .= substr(($in * 534648), 0, $padding); // Add padding characters.
+                $out .= substr((string)($in * 534648), 0, $padding); // Add padding characters.
                 $out .= $padding; // Add number of padding characters.
             } else {
                 $out .= '0'; // No padding characters.
@@ -62,11 +63,15 @@ class Crypt
         return false;
     }
 
+    /**
+     * @param string|int $in
+     * @return string|false
+     */
     public static function doDecode($in)
     {
         if (is_numeric($in) && $in > 0) {
             $key = '7398541620';
-            $padding = substr($in, -1);
+            $padding = (int)substr($in, -1);
             $out = "";
 
             if ($padding > 0) {

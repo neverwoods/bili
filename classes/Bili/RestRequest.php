@@ -7,18 +7,36 @@ namespace Bili;
  */
 class RestRequest
 {
+    /** @var string|null */
     protected $url;
+    /** @var string */
     protected $verb;
+    /** @var array<string, mixed>|string|null */
     protected $requestBody;
+    /** @var array<string, string>|null */
     protected $requestHeaders;
+    /** @var int */
     protected $requestLength;
+    /** @var string|null */
     protected $username;
+    /** @var string|null */
     protected $password;
+    /** @var string */
     protected $acceptType;
+    /** @var string|bool|null */
     protected $responseBody;
+    /** @var array<string, mixed>|null */
     protected $responseInfo;
+    /** @var bool */
     protected $multipart;
 
+    /**
+     * @param string|null $url
+     * @param string $verb
+     * @param array<string, mixed>|null $requestBody
+     * @param array<string, string>|null $headers
+     * @param bool $blnMultipart
+     */
     public function __construct($url = null, $verb = "GET", $requestBody = null, $headers = null, $blnMultipart = false)
     {
         $this->url                = $url;
@@ -38,6 +56,9 @@ class RestRequest
         }
     }
 
+    /**
+     * @return void
+     */
     public function flush()
     {
         $this->requestBody        = null;
@@ -47,6 +68,9 @@ class RestRequest
         $this->responseInfo        = null;
     }
 
+    /**
+     * @return void
+     */
     public function execute()
     {
         $ch = curl_init();
@@ -82,6 +106,10 @@ class RestRequest
         }
     }
 
+    /**
+     * @param array<string, mixed>|object|string|null $data
+     * @return void
+     */
     public function buildPostBody($data = null)
     {
         $data = ($data !== null) ? $data : $this->requestBody;
@@ -97,21 +125,26 @@ class RestRequest
         $this->requestBody = $data;
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function buildHeaders()
     {
         $arrReturn = array();
 
         $this->requestHeaders = (!is_array($this->requestHeaders)) ? array() : $this->requestHeaders;
-        if (is_array($this->requestHeaders)) {
-            foreach ($this->requestHeaders as $key => $value) {
-                $arrReturn[] = "{$key}: {$value}";
-            }
+        foreach ($this->requestHeaders as $key => $value) {
+            $arrReturn[] = "{$key}: {$value}";
         }
         $arrReturn[] = "Accept: " . $this->acceptType;
 
         return $arrReturn;
     }
 
+    /**
+     * @param \CurlHandle $ch
+     * @return void
+     */
     protected function executeGet($ch)
     {
         if (is_string($this->requestBody)) {
@@ -121,18 +154,26 @@ class RestRequest
         $this->doExecute($ch);
     }
 
+    /**
+     * @param \CurlHandle $ch
+     * @return void
+     */
     protected function executePost($ch)
     {
         if (!is_string($this->requestBody) && !$this->multipart) {
             $this->buildPostBody();
         }
 
-        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $this->requestBody);
 
         $this->doExecute($ch);
     }
 
+    /**
+     * @param \CurlHandle $ch
+     * @return void
+     */
     protected function executePut($ch)
     {
         if (!is_string($this->requestBody)) {
@@ -154,6 +195,10 @@ class RestRequest
         fclose($fh);
     }
 
+    /**
+     * @param \CurlHandle $ch
+     * @return void
+     */
     protected function executeDelete($ch)
     {
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
@@ -165,6 +210,10 @@ class RestRequest
         $this->doExecute($ch);
     }
 
+    /**
+     * @param \CurlHandle $curlHandle
+     * @return void
+     */
     protected function doExecute(&$curlHandle)
     {
         $this->setCurlOpts($curlHandle);
@@ -174,6 +223,10 @@ class RestRequest
         curl_close($curlHandle);
     }
 
+    /**
+     * @param \CurlHandle $curlHandle
+     * @return void
+     */
     protected function setCurlOpts(&$curlHandle)
     {
         curl_setopt($curlHandle, CURLOPT_TIMEOUT, 30);
@@ -182,6 +235,10 @@ class RestRequest
         curl_setopt($curlHandle, CURLOPT_HTTPHEADER, $this->buildHeaders());
     }
 
+    /**
+     * @param \CurlHandle $curlHandle
+     * @return void
+     */
     protected function setAuth(&$curlHandle)
     {
         if ($this->username !== null && $this->password !== null) {
@@ -190,61 +247,102 @@ class RestRequest
         }
     }
 
+    /**
+     * @return string
+     */
     public function getAcceptType()
     {
         return $this->acceptType;
     }
 
+    /**
+     * @param string $acceptType
+     * @return void
+     */
     public function setAcceptType($acceptType)
     {
         $this->acceptType = $acceptType;
     }
 
+    /**
+     * @return string|null
+     */
     public function getPassword()
     {
         return $this->password;
     }
 
+    /**
+     * @param string|null $password
+     * @return void
+     */
     public function setPassword($password)
     {
         $this->password = $password;
     }
 
+    /**
+     * @return string|bool|null
+     */
     public function getResponseBody()
     {
         return $this->responseBody;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getResponseInfo()
     {
         return $this->responseInfo;
     }
 
+    /**
+     * @return string|null
+     */
     public function getUrl()
     {
         return $this->url;
     }
 
+    /**
+     * @param string|null $url
+     * @return void
+     */
     public function setUrl($url)
     {
         $this->url = $url;
     }
 
+    /**
+     * @return string|null
+     */
     public function getUsername()
     {
         return $this->username;
     }
 
+    /**
+     * @param string|null $username
+     * @return void
+     */
     public function setUsername($username)
     {
         $this->username = $username;
     }
 
+    /**
+     * @return string
+     */
     public function getVerb()
     {
         return $this->verb;
     }
 
+    /**
+     * @param string $verb
+     * @return void
+     */
     public function setVerb($verb)
     {
         $this->verb = $verb;

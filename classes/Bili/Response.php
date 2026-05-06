@@ -7,6 +7,7 @@ class Response
     /**
      * Gzip (encode) the HTTP response and write to output with a MIME type for JSON content.
      * @param string $strBody The content that should be in the response.
+     * @return void
      */
     public static function sendJSON($strBody)
     {
@@ -16,6 +17,7 @@ class Response
     /**
      * Gzip (encode) the HTTP response and write to output with a MIME type for CSS content.
      * @param string $strBody The content that should be in the response.
+     * @return void
      */
     public static function sendCSS($strBody)
     {
@@ -25,6 +27,7 @@ class Response
     /**
      * Gzip (encode) the HTTP response and write to output with a MIME type for JavaScript content.
      * @param string $strBody The content that should be in the response.
+     * @return void
      */
     public static function sendJS($strBody)
     {
@@ -34,6 +37,7 @@ class Response
     /**
      * Gzip (encode) the HTTP response and write to output with a MIME type for JPG content.
      * @param string $binBody The content that should be in the response.
+     * @return void
      */
     public static function sendJPEG($binBody)
     {
@@ -43,6 +47,7 @@ class Response
     /**
      * Gzip (encode) the HTTP response and write to output with a MIME type for RSS feed content.
      * @param string $strBody The content that should be in the response.
+     * @return void
      */
     public static function sendRSS($strBody)
     {
@@ -52,6 +57,7 @@ class Response
     /**
      * Gzip (encode) the HTTP response and write to output with a MIME type for Atom feed content.
      * @param string $strBody The content that should be in the response.
+     * @return void
      */
     public static function sendAtom($strBody)
     {
@@ -62,6 +68,7 @@ class Response
      * Gzip (encode) the HTTP response and write to output.
      * @param string $strBody        The content that should be in the response.
      * @param string $strContentType The MIME type of the content.
+     * @return void
      */
     public static function send($strBody, $strContentType = "text/html")
     {
@@ -80,14 +87,15 @@ class Response
     /**
      * Store binary data in the cache and generate a download link.
      *
-     * @param  binary $binData     The binary data
+     * @param  string $binData     The binary data
      * @param  string $strFilename File name
+     * @param  string|null $strDownloadUrl Optional download URL prefix
      * @return string The generated download link
      */
     public static function generateDownloadLink($binData, $strFilename, $strDownloadUrl = null)
     {
         // Generate a unique number.
-        $strUniqueName = mt_rand(1000000, 9999999);
+        $strUniqueName = (string)mt_rand(1000000, 9999999);
 
         // Store in the cache.
         file_put_contents($GLOBALS["_PATHS"]["cache"] . $strUniqueName, $binData);
@@ -118,6 +126,14 @@ class Response
         return Request::getRootURI() . $strDownloadUrl;
     }
 
+    /**
+     * Push download headers to the browser for a file download.
+     *
+     * @param string $mimeType The MIME type of the content
+     * @param string $strFilename The filename for the download
+     * @param int $intContentLength The content length in bytes
+     * @return void
+     */
     public static function pushDownloadHeadersToBrowser($mimeType, $strFilename, $intContentLength = 0)
     {
         header("HTTP/1.1 200 OK");
@@ -133,6 +149,13 @@ class Response
         }
     }
 
+    /**
+     * Push file headers to the browser for inline file display.
+     *
+     * @param string $mimeType The MIME type of the content
+     * @param int $intContentLength The content length in bytes
+     * @return void
+     */
     public static function pushFileHeadersToBrowser($mimeType, $intContentLength = 0)
     {
         header("HTTP/1.1 200 OK");
@@ -147,6 +170,13 @@ class Response
         }
     }
 
+    /**
+     * Push file data as a download to the browser.
+     *
+     * @param string $strFileData The file data to push
+     * @param string $strFilename The filename for the download
+     * @return void
+     */
     public static function pushDownloadToBrowser($strFileData, $strFilename)
     {
         if ($strFileData !== false) {
@@ -172,6 +202,12 @@ class Response
         exit;
     }
 
+    /**
+     * Push file data or file path content to the browser for inline display.
+     *
+     * @param string $varFileData The file data or file path
+     * @return void
+     */
     public static function pushFileToBrowser($varFileData)
     {
         if ($varFileData !== false) {

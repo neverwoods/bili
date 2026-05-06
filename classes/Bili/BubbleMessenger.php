@@ -13,13 +13,14 @@ class BubbleMessenger
     /**
      * Add a new message to the message stack.
      *
-     * @var string $message The message to display
-     * @var array $options An array of options for the message
+     * @param string $message The message to display
+     * @param array<string, mixed> $options An array of options for the message
      *                     "title" = Title of the message
      *                     "type" = Message type (MSG_TYPE_INFO, MSG_TYPE_ERROR, MSG_TYPE_WARNING, MSG_TYPE_CONFIRM)
      *                     "location" = Location on the page (MSG_LOC_PAGE, MSG_LOC_CONTAINER, MSG_LOC_SIDEBAR)
      *                     "timeout" = Timeout in milliseconds (MSG_HIDE_TIME_INFO, MSG_HIDE_TIME_ERROR)
      *                     "permanent" = Indicate if the message should be displayed on every page and not only once.
+     * @return void
      */
     public static function add($message, $options = array())
     {
@@ -29,12 +30,13 @@ class BubbleMessenger
     /**
      * Add a new message object to the message stack.
      *
-     * @var BubbleMessage $objMessage The message object to display
+     * @param BubbleMessage $objMessage The message object to display
+     * @return void
      */
     public static function addMessage(BubbleMessage $objMessage)
     {
-        if (!isset($_SESSION["bubble-messages"]) || (isset($_SESSION["bubble-messages"])
-                && !is_array(unserialize($_SESSION["bubble-messages"])))) {
+        if (!isset($_SESSION["bubble-messages"])
+                || !is_array(unserialize($_SESSION["bubble-messages"]))) {
             $_SESSION["bubble-messages"] = serialize(array());
         }
 
@@ -79,6 +81,7 @@ class BubbleMessenger
      * Remove a message from the Messenger by it's key.
      *
      * @param string $strKey
+     * @return void
      */
     public static function remove($strKey)
     {
@@ -101,7 +104,7 @@ class BubbleMessenger
     /**
      * Check if a message with a specific key exists in the Messenger.
      *
-     * @param string[] $arrKey
+     * @param string[]|string $arrKey
      * @return boolean
      */
     public static function hasMessage($arrKey)
@@ -132,12 +135,20 @@ class BubbleMessenger
 
     /**
      * Clear all messages from the Messenger.
+     *
+     * @return void
      */
     public static function clear()
     {
         $_SESSION["bubble-messages"] = serialize(array());
     }
 
+    /**
+     * Convert a location constant to its string representation.
+     *
+     * @param int $location The location constant
+     * @return string The string representation of the location
+     */
     public static function locationToString($location)
     {
         $strReturn = "";

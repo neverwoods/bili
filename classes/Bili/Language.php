@@ -20,20 +20,37 @@ namespace Bili;
 
 class Language
 {
+    /** @var Language|null */
     private static $instance		= null;
-    private static $sanitizeType    = null;
-    private static $secureCookie    = false;
+    /** @var string|null */
+    protected static $sanitizeType    = null;
+    /** @var bool */
+    protected static $secureCookie    = false;
+    /** @var array<string, array<string, string>> */
     private static $languages       = array();
+    /** @var string */
     private static $error           = "TRANSLATION '%s' NOT FOUND IN '%s'.";
+    /** @var string */
     public $name                    = "";
+    /** @var string */
     public $language                = "";
+    /** @var string */
     private $defaultLang            = "";
+    /** @var string */
     private $langPath               = "";
+    /** @var string[]|null */
     private $langOverwritePaths     = null;
+    /** @var string */
     private $activeLang             = "";
+    /** @var bool */
     private $forceReload            = false;
 
-    private function __construct($strLang, $langPath, $overwritePaths)
+    /**
+     * @param string $strLang
+     * @param string $langPath
+     * @param string|string[]|null $overwritePaths
+     */
+    private function __construct($strLang = "", $langPath = "", $overwritePaths = null)
     {
         $this->defaultLang = $strLang;
         $this->langPath = $langPath;
@@ -45,6 +62,12 @@ class Language
         $this->getLang();
     }
 
+    /**
+     * @param string $strLang
+     * @param string $langPath
+     * @param string|string[]|null $varOverwritePaths
+     * @return Language
+     */
     public static function singleton($strLang = "english-utf-8", $langPath = "./lng/", $varOverwritePaths = null)
     {
         self::$instance = new Language($strLang, $langPath, $varOverwritePaths);
@@ -67,21 +90,38 @@ class Language
         return self::$instance;
     }
 
+    /**
+     * @param string|null $strSanitizeType
+     * @return void
+     */
     public static function setSanitize($strSanitizeType)
     {
         static::$sanitizeType = $strSanitizeType;
     }
 
+    /**
+     * @param bool $blnValue
+     * @return void
+     */
     public static function setUseSecureCookie($blnValue)
     {
         static::$secureCookie = $blnValue;
     }
 
+    /**
+     * @return string
+     */
     public function getActiveLang()
     {
         return $this->activeLang;
     }
 
+    /**
+     * @param string $strName
+     * @param string $strCategory
+     * @param bool $blnReturnError
+     * @return string|array<string>
+     */
     public static function get($strName, $strCategory = "global", $blnReturnError = true)
     {
         //*** Get a translation from the language file.
@@ -91,7 +131,7 @@ class Language
             $strReturn = self::$languages[$strCategory][$strName];
         }
 
-        //*** Output sanitisation?
+        //*** Output sanitization?
         switch (self::$sanitizeType) {
             case "xhtml":
                 if (class_exists("Bili\\Sanitize", true)) {
@@ -110,6 +150,10 @@ class Language
         return $strReturn;
     }
 
+    /**
+     * @param string $strLang
+     * @return bool
+     */
     public function getLang($strLang = "")
     {
         /* Get a specific language or, if argument is empty, get the
@@ -163,6 +207,10 @@ class Language
         return $blnReturn;
     }
 
+    /**
+     * @param string $strLang
+     * @return bool
+     */
     public function setLang($strLang)
     {
         //*** Set a specific language and write it to the session and cockie.
@@ -201,6 +249,9 @@ class Language
         return $blnReturn;
     }
 
+    /**
+     * @return LanguageCollection
+     */
     public function getLangs()
     {
         $objReturn = new LanguageCollection();
@@ -229,6 +280,9 @@ class Language
         return $objReturn;
     }
 
+    /**
+     * @return string|false
+     */
     public function setLocale()
     {
         $varReturn = false;
@@ -244,6 +298,7 @@ class Language
      * This will override specific items in the language array.
      *
      * @param string|string[] $varPath
+     * @return void
      */
     public function setOverwritePath($varPath)
     {

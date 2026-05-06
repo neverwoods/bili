@@ -2,9 +2,16 @@
 
 namespace Bili;
 
+/**
+ * @method array<int, string>|false nlist(string $directory)
+ * @method bool rmdir(string $directory)
+ * @method bool pasv(bool $enable)
+ * @method int nb_put(string $remote_filename, string $local_filename, int $mode)
+ * @method int nb_continue()
+ */
 class FTP
 {
-    /** @var resource */
+    /** @var \FTP\Connection|false */
     private $objFTP;
     
     /** @var string */
@@ -16,17 +23,12 @@ class FTP
     /** @var int */
     private $intTimeout;
     
-    /** @var string */
-    private $strUsername;
-    
-    /** @var string */
-    private $strPassword;
 
     /**
      * FTP constructor.
-     * @param $host
-     * @param int $port
-     * @param int $timeout
+     * @param string $host
+     * @param int|null $port
+     * @param int|null $timeout
      * @param bool $blnSecure
      * @throws \Exception when the ftp connection failed
      */
@@ -72,9 +74,9 @@ class FTP
 
     /**
      * Re-route all function calls to the PHP-functions
-     * 
-     * @param $function
-     * @param $arguments
+     *
+     * @param string $function
+     * @param array<int, mixed> $arguments
      * @return bool|mixed
      */
     public function __call($function, $arguments)
@@ -105,20 +107,18 @@ class FTP
     }
 
     /**
-     * @param $strUsername
-     * @param $strPassword
+     * @param string $strUsername
+     * @param string $strPassword
      * @return bool
      */
     public function login($strUsername, $strPassword)
     {
-        $this->strUsername = $strUsername;
-        $this->strPassword = $strPassword;
-
         return ftp_login($this->objFTP, $strUsername, $strPassword);
     }
 
     /**
      * @param string $strPath
+     * @return void
      */
     public function delete($strPath)
     {
@@ -164,8 +164,9 @@ class FTP
     }
 
     /**
-     * @param $ftpath
+     * @param string $ftpath
      * @param string|null $ftpbasedir
+     * @return void
      */
     public function mksubdirs($ftpath, $ftpbasedir = null)
     {
@@ -194,8 +195,9 @@ class FTP
      * Quick remove method for a single file.
      *
      * @param string $strFile
-     * @param array $ftpSettings (host, username, password)
+     * @param array<string, string> $ftpSettings (host, username, password)
      * @param boolean $blnSecure
+     * @return void
      * @throws \RuntimeException
      */
     public static function ftpRemove($strFile, $ftpSettings, $blnSecure = false)
@@ -221,8 +223,9 @@ class FTP
      * Quick remove method for a single folder.
      *
      * @param string $strFolder
-     * @param array $ftpSettings (host, username, password)
+     * @param array<string, string> $ftpSettings (host, username, password)
      * @param boolean $blnSecure
+     * @return void
      * @throws \RuntimeException
      */
     public static function ftpRemoveDir($strFolder, $ftpSettings, $blnSecure = false)
@@ -251,11 +254,12 @@ class FTP
 
     /**
      * Quick upload mthod for a single file.
-     * 
+     *
      * @param string $sourceFile local file name
-     * @param array $ftpSettings (path.uploads, host, username, password)
-     * @param null $targetFile
+     * @param array<string, mixed> $ftpSettings (path.uploads, host, username, password)
+     * @param string|null $targetFile
      * @param bool $blnSecure
+     * @return void
      */
     public static function ftpUpload($sourceFile, $ftpSettings, $targetFile = null, $blnSecure = false)
     {
@@ -295,6 +299,11 @@ class FTP
         }
     }
 
+    /**
+     * @param string $strWildcard
+     * @param string $strName
+     * @return bool
+     */
     private function hasWildcard($strWildcard, $strName)
     {
         $blnReturn = false;

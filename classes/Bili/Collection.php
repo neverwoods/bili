@@ -4,17 +4,24 @@ namespace Bili;
 
 use ReturnTypeWillChange;
 
+/**
+ * @implements \Iterator<int, mixed>
+ */
 class Collection implements \Iterator, \JsonSerializable
 {
+    /** @var array<int, mixed> */
     protected $collection = array();
+    /** @var bool */
     private $isSeek = false;
+    /** @var int */
     private $pageItems = 0;
+    /** @var int */
     private $currentPage = 1;
 
     /**
      * Constructor method
      *
-     * @param array $initArray
+     * @param mixed $initArray
      */
     public function __construct($initArray = array())
     {
@@ -26,8 +33,9 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Add object to the collection
      *
-     * @param object The object
-     * @param boolean Add object to beginning of array or not
+     * @param object $value The object
+     * @param boolean $blnAddToBeginning Add object to beginning of array or not
+     * @return void
      */
     public function addObject($value, $blnAddToBeginning = false)
     {
@@ -41,7 +49,8 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Advance internal pointer to a specific index
      *
-     * @param integer $intPosition
+     * @param mixed $intPosition
+     * @return void
      */
     public function seek($intPosition)
     {
@@ -57,6 +66,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Pick a random child element
+     *
+     * @return mixed
      */
     public function random()
     {
@@ -72,6 +83,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Randomize the collection
+     *
+     * @return void
      */
     public function randomize()
     {
@@ -80,6 +93,10 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get an element of the collection selected by property value.
+     *
+     * @param string $strSearchProperty
+     * @param mixed $strSearchValue
+     * @return mixed
      */
     public function getByPropertyValue($strSearchProperty, $strSearchValue)
     {
@@ -100,6 +117,11 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get the value of a property of a specific element, selected by property value.
+     *
+     * @param string $strSearchProperty
+     * @param mixed $strSearchValue
+     * @param string $strResultProperty
+     * @return mixed
      */
     public function getValueByValue($strSearchProperty, $strSearchValue, $strResultProperty = "value")
     {
@@ -121,6 +143,7 @@ class Collection implements \Iterator, \JsonSerializable
      *
      * @param string $strSubject
      * @param string $strOrder
+     * @return void
      */
     public function orderBy($strSubject, $strOrder = "asc")
     {
@@ -145,6 +168,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get the item count.
+     *
+     * @return int
      */
     public function count()
     {
@@ -171,6 +196,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Place the pointer one item back and return the item.
+     *
+     * @return mixed
      */
     public function previous()
     {
@@ -179,14 +206,19 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Return the first item from the collection.
+     *
+     * @return mixed
      */
     public function first()
     {
-        return $this->rewind()->current();
+        $this->rewind();
+        return $this->current();
     }
 
     /**
      * Return the last item from the collection.
+     *
+     * @return mixed
      */
     public function last()
     {
@@ -204,6 +236,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Check if the pointer is at the first record.
+     *
+     * @return bool
      */
     public function isFirst()
     {
@@ -212,6 +246,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Check if the pointer is at the last record.
+     *
+     * @return bool
      */
     public function isLast()
     {
@@ -220,6 +256,9 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Merge a collection with this collection.
+     *
+     * @param self $collection
+     * @return void
      */
     public function merge($collection)
     {
@@ -264,6 +303,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Reverse the order of the collection and return it.
+     *
+     * @return self
      */
     public function reverse()
     {
@@ -273,6 +314,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Set the internal pointer of the collection to the last item and return it.
+     *
+     * @return mixed
      */
     public function end()
     {
@@ -282,7 +325,8 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Check if an object is in the collection
      *
-     * @param variable $varValue
+     * @param mixed $varValue
+     * @return bool
      */
     public function inCollection($varValue)
     {
@@ -304,6 +348,7 @@ class Collection implements \Iterator, \JsonSerializable
      * Set the number of items per page.
      *
      * @param integer $intValue
+     * @return void
      */
     public function setPageItems($intValue)
     {
@@ -315,6 +360,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get the number of items per page.
+     *
+     * @return int
      */
     public function getPageItems()
     {
@@ -324,7 +371,8 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Set the current page.
      *
-     * @param integer $intValue
+     * @param integer|null $intValue
+     * @return void
      */
     public function setCurrentPage($intValue = null)
     {
@@ -352,6 +400,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get the current page number.
+     *
+     * @return int
      */
     public function getCurrentPage()
     {
@@ -360,6 +410,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get the number of pages for this collection.
+     *
+     * @return float|int
      */
     public function pageCount()
     {
@@ -374,6 +426,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get the number of the first item in the current page.
+     *
+     * @return int
      */
     public function pageStart()
     {
@@ -382,6 +436,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get the number of the last item in the current page.
+     *
+     * @return int
      */
     public function pageEnd()
     {
@@ -395,6 +451,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get the page number of the next page.
+     *
+     * @return float|int
      */
     public function nextPage()
     {
@@ -408,6 +466,8 @@ class Collection implements \Iterator, \JsonSerializable
 
     /**
      * Get the page number of the previous page.
+     *
+     * @return int
      */
     public function previousPage()
     {
@@ -419,7 +479,8 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Get the page number the child item is in.
      *
-     * @param object $objChild
+     * @param mixed $objChild
+     * @return float|int
      */
     public function getPageByChild($objChild)
     {
@@ -444,7 +505,8 @@ class Collection implements \Iterator, \JsonSerializable
     /**
      * Advance the internal pointer to a specific index indicated by a child item and return the index.
      *
-     * @param object $objChild
+     * @param mixed $objChild
+     * @return int
      */
     public function seekByChild($objChild)
     {

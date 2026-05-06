@@ -12,12 +12,25 @@ namespace Bili;
  */
 class FileIO
 {
+    /**
+     * Get the extension of a filename.
+     *
+     * @param string $filename
+     * @return string|null
+     */
     public static function extension($filename)
     {
         $path_info = pathinfo($filename);
         return $path_info['extension'] ?? null;
     }
 
+    /**
+     * Add a string to the base of a filename (before the extension).
+     *
+     * @param string $filename
+     * @param string $addition
+     * @return string
+     */
     public static function add2Base($filename, $addition)
     {
         $strBase = basename($filename, self::extension($filename));
@@ -35,6 +48,12 @@ class FileIO
         return $strReturn;
     }
 
+    /**
+     * Recursively remove a directory and its contents.
+     *
+     * @param string $dir
+     * @return bool
+     */
     public static function unlinkDir($dir)
     {
         if (is_dir($dir) === true) {
@@ -54,6 +73,12 @@ class FileIO
         return false;
     }
 
+    /**
+     * Create a temporary folder in the given base directory.
+     *
+     * @param string $strBaseFolder
+     * @return string
+     */
     public static function createTempFolder($strBaseFolder)
     {
         $strReturn = "";
@@ -75,8 +100,8 @@ class FileIO
      *
      * @param string $strHtml               The HTML input
      * @param string $strFilePrefix         Optional file prefix
-     * @param null|array $arrParameters     Optional wkhtmltopdf parameters
-     * @param array $arrSettings            Optional path settings
+     * @param array<int, string>|null $arrParameters Optional wkhtmltopdf parameters
+     * @param array<string, mixed> $arrSettings Optional path settings
      * @return string|null                  The binary PDF output or null if something went wrong.
      */
     public static function html2pdf($strHtml, $strFilePrefix = "document", $arrParameters = null, $arrSettings = [])
@@ -91,9 +116,9 @@ class FileIO
             $arrSettings["wkhtmltopdfPath"] = $GLOBALS["_CONF"]["app"]["wkhtmltopdf"];
         }
 
-        srand((double) microtime()*1000000);
+        srand((int)(microtime(true) * 1000000));
         $random_number = rand();
-        $sid = md5($random_number);
+        $sid = md5((string)$random_number);
 
         $strHash = $strFilePrefix . "-" . $sid;
         $strPdfFile = $arrSettings["tempPath"] . $strHash . ".pdf";
@@ -144,8 +169,8 @@ class FileIO
      *
      * @param string $strPathA          The path to save to. If it's an exisiting file it will be added to the merge
      *                                  and replaced after the successful merge.
-     * @param string|array $varPathB    The path(s) to the files that we want to merge.
-     * @param array $arrSettings        Optional path settings for ghostscript
+     * @param string|array<int, string> $varPathB The path(s) to the files that we want to merge.
+     * @param array<string, mixed> $arrSettings Optional path settings for ghostscript
      * @return boolean
      */
     public static function mergePdfFiles($strPathA, $varPathB, $arrSettings = [])
@@ -196,6 +221,15 @@ class FileIO
         return $blnReturn;
     }
 
+    /**
+     * Handle a file upload.
+     *
+     * @param string $targetDir
+     * @param int|null $intMaxSize
+     * @param bool $blnReturnInfo
+     * @param array<int, string>|null $arrAllowedExtensions
+     * @return array<string, string>|null
+     */
     public static function handleUpload(
         $targetDir,
         $intMaxSize = null,
@@ -222,7 +256,7 @@ class FileIO
 
         // Clean the fileName for security reasons
         $originalName = $fileName;
-        $fileName = Sanitize::filterStringPolyfill($fileName);
+        $fileName = Sanitize::filterFilename($fileName);
         $fileName = str_replace(" ", "-", $fileName);
         $fileName = str_replace("---", "-", $fileName);
         $fileName = str_replace("--", "-", $fileName);
@@ -374,8 +408,8 @@ class FileIO
      * or something similar instead of the possibly expected 'text/html'.
      *
      * @param string $strUrl The fully qualified path to the remote file
-     * @param array $arrValidations The array of validation rules
-     * @param array|null $arrHeaders The array of HTTP request headers
+     * @param array<int, mixed> $arrValidations The array of validation rules
+     * @param array<int, string>|null $arrHeaders The array of HTTP request headers
      * @return boolean True if the remote file exists and matches the validation rules, false if not
      */
     public static function webFileExists($strUrl, $arrValidations = [], $arrHeaders = null)
@@ -392,7 +426,7 @@ class FileIO
             curl_setopt($objCurl, CURLOPT_NOBODY, true);
             curl_setopt($objCurl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
             curl_setopt($objCurl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($objCurl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($objCurl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($objCurl, CURLOPT_MAXREDIRS, 10); //follow up to 10 redirections - avoids loops
@@ -434,8 +468,8 @@ class FileIO
      * Download a file from a webserver.
      *
      * @param string $strUrl The fully qualified path to the remote file
-     * @param null|array $arrHeaders The array of HTTP request headers
-     * @return mixed
+     * @param array<int, string>|null $arrHeaders The array of HTTP request headers
+     * @return string|bool|null
      */
     public static function getWebFile($strUrl, $arrHeaders = null)
     {
@@ -450,7 +484,7 @@ class FileIO
             curl_setopt($objCurl, CURLOPT_HEADER, false);
             curl_setopt($objCurl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
             curl_setopt($objCurl, CURLOPT_SSL_VERIFYPEER, false);
-            curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($objCurl, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($objCurl, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($objCurl, CURLOPT_FOLLOWLOCATION, true);
             curl_setopt($objCurl, CURLOPT_MAXREDIRS, 10); //follow up to 10 redirections - avoids loops
@@ -495,7 +529,7 @@ class FileIO
     /**
      * Get the file encoding from a file.
      *
-     * @param $strFilePath
+     * @param string $strFilePath
      * @return null|string
      */
     public static function detectFileEncoding($strFilePath) {

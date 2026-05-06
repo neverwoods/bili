@@ -9,6 +9,10 @@ namespace Bili;
  */
 class Sanitize
 {
+    /**
+     * @param string $strOutput
+     * @return string
+     */
     public static function toXhtml($strOutput)
     {
         $strReturn = $strOutput;
@@ -28,8 +32,8 @@ class Sanitize
     /**
      * Convert all special characters in a string or array to HTML Entities.
      *
-     * @param string|array $varValue
-     * @return string|array
+     * @param string|array<string, string> $varValue
+     * @return string|array<string, string>
      */
     public static function toEntities(mixed $varValue): string|array
     {
@@ -47,8 +51,8 @@ class Sanitize
     /**
      * Convert all HTML Entities in a string to special characters.
      *
-     * @param string|array $varValue
-     * @return string|array
+     * @param string|array<string, string> $varValue
+     * @return string|array<string, string>
      */
     public static function fromEntities(mixed $varValue): array|string
     {
@@ -63,6 +67,10 @@ class Sanitize
         return $varReturn;
     }
 
+    /**
+     * @param string $strOutput
+     * @return string
+     */
     public static function toXml($strOutput)
     {
         $strReturn = $strOutput;
@@ -76,6 +84,10 @@ class Sanitize
         return $strReturn;
     }
 
+    /**
+     * @param string $strOutput
+     * @return string|null
+     */
     public static function toFilename($strOutput)
     {
         $strOutput = preg_replace('/([^\w\d\-\.%_~,;: \(\)\[\]\|])/u', '', $strOutput);
@@ -177,6 +189,10 @@ class Sanitize
         return (float) $strValue;
     }
 
+    /**
+     * @param string $strInput
+     * @return string
+     */
     public static function br2nl($strInput)
     {
         $strReturn = str_replace("<br>", "\n", $strInput);
@@ -189,9 +205,9 @@ class Sanitize
     /**
      * Sanitize input to be an integer. Works on single values and arrays.
      *
-     * @param  string|float|array $varInput
+     * @param  string|float|array<int|string, mixed> $varInput
      * @param  boolean $blnDiscardInvalid Indicate if the input array should be compacted, leaving out invalid values.
-     * @return null|integer
+     * @return null|integer|array<int|string, int>
      */
     public static function toInteger($varInput, $blnDiscardInvalid = true)
     {
@@ -219,8 +235,8 @@ class Sanitize
      * Convert an input string to a save URL, which means no special characters, spaces or uppercase.
      * Spaces get converted to hyphens.
      *
-     * @param $strInput
-     * @return string
+     * @param string $strInput
+     * @return string|null
      */
     public static function toUrl($strInput)
     {
@@ -246,9 +262,9 @@ class Sanitize
      * Sanitize input to be a numeric value. Works on single values and arrays.
      * This will retain leading zeros.
      *
-     * @param  string|float|array $varInput
+     * @param  string|float|array<int|string, mixed> $varInput
      * @param  boolean $blnDiscardInvalid Indicate if the input array should be compacted, leaving out invalid values.
-     * @return null|float|integer
+     * @return null|float|integer|string|array<int|string, mixed>
      */
     public static function toNumeric($varInput, $blnDiscardInvalid = true)
     {
@@ -303,6 +319,10 @@ class Sanitize
         return $strReturn;
     }
 
+    /**
+     * @param string|null $text
+     * @return void
+     */
     private static function filterAmpersandEntity(&$text): void
     {
         if (is_null($text)) {
@@ -312,11 +332,19 @@ class Sanitize
         $text = preg_replace('/&(?!#?[xX]?(?:[0-9a-fA-F]+|\w{1,8});)/i', "&amp;", $text);
     }
 
+    /**
+     * @param string $text
+     * @return void
+     */
     private static function filterDollarEntity(&$text)
     {
         $text = str_replace("$", "&#36;", $text);
     }
 
+    /**
+     * @param string $text
+     * @return void
+     */
     private static function filterXhtmlLinkTarget(&$text)
     {
         $text = str_ireplace("target=\"_blank\"", "rel=\"external\"", $text);
@@ -339,5 +367,33 @@ class Sanitize
         $str = preg_replace('/\x00|<[^>]*>?/', '', $string);
 
         return str_replace(["'", '"'], ['&#39;', '&#34;'], $str);
+    }
+
+    /**
+     * Sanitize a string for safe use as a filename.
+     *
+     * Strips null bytes, HTML tags and shell metacharacters that allow command
+     * substitution or chaining when the filename is later interpolated into a
+     * shell command (e.g. for preview generation). Quote characters are stripped
+     * rather than HTML-encoded, because encoding would introduce `&` and `;`
+     * which are themselves shell metacharacters.
+     *
+     * Defense-in-depth — callers MUST still escape filename arguments with
+     * escapeshellarg() before passing them to exec()/shell_exec()/system().
+     *
+     * @param string|null $string
+     * @return string
+     */
+    public static function filterFilename(?string $string): string
+    {
+        if (is_null($string)) {
+            return "";
+        }
+
+        //*** Strip null bytes and HTML tags (parity with filterStringPolyfill).
+        $str = preg_replace('/\x00|<[^>]*>?/', '', $string);
+
+        //*** Strip shell metacharacters, quotes, backslash and newlines.
+        return preg_replace('/[$`|;&!(){}\[\]\'"\\\\\r\n]/', '', $str);
     }
 }

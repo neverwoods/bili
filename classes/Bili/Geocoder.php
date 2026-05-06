@@ -4,8 +4,14 @@ namespace Bili;
 
 class Geocoder
 {
+    /** @var string */
     protected static $googleMapsApi = "http://maps.googleapis.com/maps/api/geocode/json?address=%s&sensor=false";
 
+    /**
+     * @param string $strAddress
+     * @param array<string, mixed>|null $arrDefaultResponse
+     * @return array<string, mixed>
+     */
     public static function addressToLatLng(
         $strAddress,
         $arrDefaultResponse = null
@@ -19,7 +25,7 @@ class Geocoder
 
         $objCurlRequest = curl_init();
         curl_setopt($objCurlRequest, CURLOPT_URL, sprintf(self::$googleMapsApi, $strAddress));
-        curl_setopt($objCurlRequest, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($objCurlRequest, CURLOPT_RETURNTRANSFER, true);
 
         $arrResponse = json_decode(
             curl_exec($objCurlRequest),

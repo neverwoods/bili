@@ -99,18 +99,32 @@ namespace Bili;
 ########################################################
 
 class ImageEditor {
+  /** @var int */
   var $x;
+  /** @var int */
   var $y;
+  /** @var string */
   var $type;
+  /** @var \GdImage|false */
   var $img;
+  /** @var string|false */
   var $font;
+  /** @var bool */
   var $error;
+  /** @var int */
   var $size;
+  /** @var int */
   var $quality;
 
   ########################################################
   # CONSTRUCTOR
   ########################################################
+  /**
+   * @param string|int $filename Filename or width when creating a blank image
+   * @param string|int $path Directory path or height when creating a blank image
+   * @param array<int, int>|null $col RGB color array for blank image background
+   * @return void
+   */
   function ImageEditor($filename, $path, $col=NULL)
   {
     $this->font = false;
@@ -135,6 +149,7 @@ class ImageEditor {
     {
       ## FIRST SEE IF WE CAN FIND IMAGE
 
+      $file = null;
       if(is_file($path . $filename))
       {
         $file = $path . $filename;
@@ -148,7 +163,7 @@ class ImageEditor {
         $this->errorImage("File Could Not Be Loaded");
       }
 
-      if(!($this->error))
+      if($file !== null)
       {
         ## LOAD OUR IMAGE WITH CORRECT FUNCTION
         $arrFilename = explode('.', $filename);
@@ -175,6 +190,11 @@ class ImageEditor {
   ########################################################
   # RESIZE IMAGE GIVEN X AND Y
   ########################################################
+  /**
+   * @param int $width
+   * @param int $height
+   * @return void
+   */
   function resize($width, $height)
   {
     if(!$this->error && ($this->x != $width || $this->y != $height))
@@ -193,6 +213,13 @@ class ImageEditor {
   # CROPS THE IMAGE, GIVE A START CO-ORDINATE AND
   # LENGTH AND HEIGHT ATTRIBUTES
   ########################################################
+  /**
+   * @param int $x
+   * @param int $y
+   * @param int $width
+   * @param int $height
+   * @return void
+   */
   function crop($x, $y, $width, $height)
   {
     if(!$this->error && ($this->x != $width || $this->y != $height))
@@ -214,6 +241,9 @@ class ImageEditor {
   ########################################################
   # COVERT IMAGE TO GRAYSCALE
   ########################################################
+  /**
+   * @return void
+   */
   function grayscale()
   {
     if(!$this->error)
@@ -232,7 +262,7 @@ class ImageEditor {
           $r = ($rgb >> 16) & 0xFF;
           $g = ($rgb >> 8) & 0xFF;
           $b = $rgb & 0xFF;
-          $gs = $this->yiq($r, $g, $b);
+          $gs = (int) $this->yiq($r, $g, $b);
           imagesetpixel($tmpimage, $x, $y, $palette[$gs]);
         }
       }
@@ -242,6 +272,12 @@ class ImageEditor {
     }
   }
 
+  /**
+   * @param int $r
+   * @param int $g
+   * @param int $b
+   * @return float
+   */
   function yiq($r,$g,$b)
   {
     return (($r*0.299)+($g*0.587)+($b*0.114));
@@ -251,6 +287,13 @@ class ImageEditor {
   # ADDS TEXT TO AN IMAGE, TAKES THE STRING, A STARTING
   # POINT, PLUS A COLOR DEFINITION AS AN ARRAY IN RGB MODE
   ########################################################
+  /**
+   * @param string $str
+   * @param int $x
+   * @param int $y
+   * @param array<int, int> $col
+   * @return void
+   */
   function addText($str, $x, $y, $col)
   {
     if(!$this->error)
@@ -269,6 +312,15 @@ class ImageEditor {
     }
   }
 
+  /**
+   * @param string $str
+   * @param int $x
+   * @param int $y
+   * @param array<int, int> $col1
+   * @param array<int, int> $col2
+   * @param int $offset
+   * @return void
+   */
   function shadowText($str, $x, $y, $col1, $col2, $offset=2) {
    $this->addText($str, $x, $y, $col1);
    $this->addText($str, $x-$offset, $y-$offset, $col2);
@@ -279,6 +331,14 @@ class ImageEditor {
   # ADDS A LINE TO AN IMAGE, TAKES A STARTING AND AN END
   # POINT, PLUS A COLOR DEFINITION AS AN ARRAY IN RGB MODE
   ########################################################
+  /**
+   * @param int $x1
+   * @param int $y1
+   * @param int $x2
+   * @param int $y2
+   * @param array<int, int> $col
+   * @return void
+   */
   function addLine($x1, $y1, $x2, $y2, $col)
   {
     if(!$this->error)
@@ -291,6 +351,10 @@ class ImageEditor {
   ########################################################
   # RETURN OUR EDITED FILE AS AN IMAGE
   ########################################################
+  /**
+   * @param int $intQuality
+   * @return void
+   */
   function outputImage($intQuality)
   {
     if ($this->type == 'jpg' || $this->type == 'jpeg')
@@ -313,6 +377,12 @@ class ImageEditor {
   ########################################################
   # CREATE OUR EDITED FILE ON THE SERVER
   ########################################################
+  /**
+   * @param string $filename
+   * @param string $path
+   * @param int $intQuality
+   * @return void
+   */
   function outputFile($filename, $path, $intQuality)
   {
     if ($this->type == 'jpg' || $this->type == 'jpeg')
@@ -334,6 +404,10 @@ class ImageEditor {
   # SET OUTPUT TYPE IN ORDER TO SAVE IN DIFFERENT
   # TYPE THAN WE LOADED
   ########################################################
+  /**
+   * @param string $type
+   * @return void
+   */
   function setImageType($type)
   {
     $this->type = $type;
@@ -343,6 +417,10 @@ class ImageEditor {
   # ADDS TEXT TO AN IMAGE, TAKES THE STRING, A STARTING
   # POINT, PLUS A COLOR DEFINITION AS AN ARRAY IN RGB MODE
   ########################################################
+  /**
+   * @param string $font
+   * @return void
+   */
   function setFont($font) {
     $this->font = $font;
   }
@@ -350,6 +428,10 @@ class ImageEditor {
   ########################################################
   # SETS THE FONT SIZE
   ########################################################
+  /**
+   * @param int $size
+   * @return void
+   */
   function setSize($size) {
     $this->size = $size;
   }
@@ -357,13 +439,20 @@ class ImageEditor {
   ########################################################
   # GET VARIABLE FUNCTIONS
   ########################################################
+  /** @return int */
   function getWidth()                {return $this->x;}
+  /** @return int */
   function getHeight()               {return $this->y;}
+  /** @return string */
   function getImageType()            {return $this->type;}
 
   ########################################################
   # CREATES AN ERROR IMAGE SO A PROPER OBJECT IS RETURNED
   ########################################################
+  /**
+   * @param string $str
+   * @return void
+   */
   function errorImage($str)
   {
     $this->error = false;
