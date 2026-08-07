@@ -11,33 +11,41 @@ class CSSIncluder
 {
     /** @var array<string, array<int, string>> */
     private $arrFiles;
+    /** @var array<string, array<string, string|null>> */
+    protected $arrImports;
     /** @var string */
     private $sourcePath;
 
     /**
      * @param string $strSourcePath
-     * @param array<int, array<string, string>>|array<string, string>|null $varFiles
+     * @param array<int, array<string, string|bool|null>>|array<string, string|bool|null>|null $varFiles
      */
     public function __construct($strSourcePath, $varFiles = null)
     {
         $this->sourcePath = $strSourcePath;
         $this->arrFiles = array("all" => array(), "screen" => array(), "print" => array());
+        $this->arrImports = array("all" => array(), "screen" => array(), "print" => array());
 
         if (is_array($varFiles)) {
             if (isset($varFiles[0]) && is_array($varFiles[0])) {
-                /** @var array<int, array<string, string>> $varFiles */
+                /** @var array<int, array<string, string|bool|null>> $varFiles */
                 foreach ($varFiles as $value) {
                     $this->add($value);
                 }
             } else {
-                /** @var array<string, string> $varFiles */
+                /** @var array<string, string|bool|null> $varFiles */
                 $this->add($varFiles);
             }
         }
     }
 
     /**
-     * @param array<string, string> $arrFile
+     * Add a stylesheet. An entry with "import" set is emitted as an
+     * `@import url(...)` inside a style element — optionally assigned to the
+     * CSS cascade layer in its "layer" key — instead of a plain link, so the
+     * file itself stays layer-free on disk.
+     *
+     * @param array<string, string|bool|null> $arrFile Keys: "href", "media", optional "import" and "layer".
      * @return void
      */
     public function add($arrFile)
@@ -45,7 +53,11 @@ class CSSIncluder
         if (is_array($arrFile)) {
             if (is_file($this->sourcePath . $arrFile["href"] . ".css")) {
                 if (array_key_exists($arrFile["media"], $this->arrFiles)) {
-                    array_push($this->arrFiles[$arrFile["media"]], $arrFile["href"]);
+                    if (empty($arrFile["import"])) {
+                        array_push($this->arrFiles[$arrFile["media"]], $arrFile["href"]);
+                    } else {
+                        $this->arrImports[$arrFile["media"]][$arrFile["href"]] = $arrFile["layer"] ?? null;
+                    }
                 } else {
                     throw new \Exception("Stylesheet media type \"" . $arrFile["media"] . "\" not permitted.");
                 }
@@ -67,6 +79,10 @@ class CSSIncluder
 
         foreach ($this->arrFiles as $key => $value) {
             $strReturn .= $this->renderHtml($key, $strVersion);
+        }
+
+        foreach ($this->arrImports as $key => $value) {
+            $strReturn .= $this->renderImportHtml($key, $strVersion);
         }
 
         return $strReturn;
@@ -93,6 +109,46 @@ class CSSIncluder
         }
 
         return $strReturn;
+    }
+
+    /**
+     * Render the style element importing the import-registered files of a
+     * media type: one `@import url(...)` per layer, plus one for the files
+     * without a layer. Each import URL is preceded by a preload link so the
+     * browser fetches it in parallel instead of on @import discovery.
+     *
+     * @param string $strMedia
+     * @param string $strVersion
+     * @return string
+     */
+    protected function renderImportHtml($strMedia, $strVersion = "")
+    {
+        $strPreloads = "";
+        $strImports = "";
+        $arrGroups = [];
+
+        foreach ($this->arrImports[$strMedia] as $strHref => $strLayer) {
+            $arrGroups[(string)$strLayer][] = $strHref;
+        }
+
+        foreach ($arrGroups as $strLayer => $arrHrefs) {
+            $strFilter = implode(",", $arrHrefs);
+
+            if (!empty($strVersion)) {
+                $strFilter .= ",version-" . $strVersion;
+            }
+
+            $strPreloads .= '<link rel="preload" href="/css?' . $strFilter
+                . '" as="style" media="' . $strMedia . '" />';
+            $strImports .= '@import url("/css?' . $strFilter . '")'
+                . ($strLayer === "" ? "" : " layer(" . $strLayer . ")") . ';';
+        }
+
+        if (empty($strImports)) {
+            return "";
+        }
+
+        return $strPreloads . '<style media="' . $strMedia . '">' . $strImports . '</style>';
     }
 
     /**
@@ -126,7 +182,7 @@ class CSSIncluder
         \HTTP_ConditionalGet::check($dtLastModified, true, array("maxAge" => 1200000));
 
         //*** Modified. Get contents.
-        $strOutput = self::minify($arrFilter);
+        $strOutput = self::getOutput($arrFilter);
 
         //*** Gzip the CSS.
         $objEncoder = new \HTTP_Encoder(
@@ -138,6 +194,17 @@ class CSSIncluder
 
         $objEncoder->encode();
         $objEncoder->sendAll();
+    }
+
+    /**
+     * Get the combined CSS output for the given filter list.
+     *
+     * @param array<int, string> $arrFilter
+     * @return string
+     */
+    public static function getOutput($arrFilter)
+    {
+        return static::minify($arrFilter);
     }
 
     /**
@@ -178,7 +245,7 @@ class CSSIncluder
      * @param array<int, string> $arrFilter
      * @return string
      */
-    private static function minify($arrFilter)
+    protected static function minify($arrFilter)
     {
         $strOutput = "";
 
