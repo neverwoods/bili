@@ -290,6 +290,30 @@ class TemplateInterface
     }
 
     /**
+     * Add a CSS file to be included in the header as an @import, optionally
+     * assigned to a CSS cascade layer at include time. Parameter names are
+     * part of the API: call sites use named arguments, e.g.
+     * `addCssImport("bootstrap", strLayer: "legacy")`.
+     *
+     * @param string      $strInclude The name of the file without the extension
+     * @param string      $strMedia   Optional media argument. Default: "all"
+     * @param string|null $strLayer   Optional CSS cascade layer to assign the file to
+     */
+    protected static function addCssImport($strInclude, $strMedia = "all", $strLayer = null)
+    {
+        if (!empty($strInclude)) {
+            if (!array_key_exists($strInclude . "." . $strMedia . ".import", self::$cssIncludes)) {
+                self::$cssIncludes[$strInclude . "." . $strMedia . ".import"] = array(
+                    "href" => $strInclude,
+                    "media" => $strMedia,
+                    "layer" => $strLayer,
+                    "import" => true
+                );
+            }
+        }
+    }
+
+    /**
      * Test if a CSS file exists in the CSS path.
      *
      * @param  string  $strInclude The name of the CSS file
