@@ -14,9 +14,9 @@ use PHPUnit\Framework\TestCase;
  * error handling for invalid media types, missing files, and non-array input,
  * HTML output generation, and version string appending.
  *
- * Also covers @import registration (the "import"/"layer" keys on add(),
- * rendered as an `@import url(...) layer(<name>);` style element) and the
- * getOutput() concatenation seam using temporary CSS files and globals.
+ * Also covers cascade-layer registration (the "layer" key on add(), rendered as
+ * an `@import url(...) layer(<name>);` style element) and minify() concatenation
+ * using temporary CSS files and globals.
  *
  * Note: The static render() method is not tested as it requires
  * HTTP headers to be sent.
@@ -49,7 +49,7 @@ class CSSIncluderTest extends TestCase
     }
 
     /**
-     * Point the globals used by getOutput() at the temp directory,
+     * Point the globals used by minify() at the temp directory,
      * with result caching disabled.
      *
      * @return void
@@ -231,33 +231,37 @@ class CSSIncluderTest extends TestCase
     }
 
     /**
-     * Tests that getOutput() returns the concatenated CSS of the requested
+     * Tests that minify() returns the concatenated CSS of the requested
      * files, including the auto-appended "-custom" companion.
      *
      * @return void
+     * @throws \ReflectionException
      */
-    public function testGetOutputConcatenatesFilesWithCustomCompanion(): void
+    public function testMinifyConcatenatesFilesWithCustomCompanion(): void
     {
         $this->setUpOutputGlobals();
         file_put_contents($this->tempDir . 'style.css', '.base {}');
         file_put_contents($this->tempDir . 'style-custom.css', '.custom {}');
         file_put_contents($this->tempDir . 'other.css', '.other {}');
 
-        $output = CSSIncluder::getOutput(["style", "other"]);
+        $method = new \ReflectionMethod(CSSIncluder::class, 'minify');
+        $method->setAccessible(true);
+
+        $output = $method->invoke(null, ["style", "other"]);
         $this->assertStringContainsString('.base', $output);
         $this->assertStringContainsString('.custom', $output);
         $this->assertStringContainsString('.other', $output);
     }
 
     /**
-     * Tests that import entries with a layer are emitted as an @import with
-     * the layer() function inside a style element, while link entries keep
-     * the plain link — and that the link comes first.
+     * Tests that layered entries are emitted as an @import with the layer()
+     * function inside a style element, while unlayered entries keep the plain
+     * link — and that the link comes first.
      *
      * @return void
      * @throws Exception
      */
-    public function testToHtmlRendersImportEntriesAsImportStyle(): void
+    public function testToHtmlRendersLayeredEntriesAsImportStyle(): void
     {
         file_put_contents($this->tempDir . 'style.css', 'body{}');
         file_put_contents($this->tempDir . 'other.css', 'body{}');
@@ -265,8 +269,8 @@ class CSSIncluderTest extends TestCase
 
         $includer = new CSSIncluder($this->tempDir, [
             ["href" => "plain", "media" => "all"],
-            ["href" => "style", "media" => "all", "import" => true, "layer" => "legacy"],
-            ["href" => "other", "media" => "all", "import" => true, "layer" => "legacy"],
+            ["href" => "style", "media" => "all", "layer" => "legacy"],
+            ["href" => "other", "media" => "all", "layer" => "legacy"],
         ]);
 
         $html = $includer->toHtml();
@@ -289,12 +293,12 @@ class CSSIncluderTest extends TestCase
      * @return void
      * @throws Exception
      */
-    public function testToHtmlPreloadsImportUrls(): void
+    public function testToHtmlPreloadsLayeredUrls(): void
     {
         file_put_contents($this->tempDir . 'style.css', 'body{}');
 
         $includer = new CSSIncluder($this->tempDir, [
-            ["href" => "style", "media" => "all", "import" => true, "layer" => "legacy"],
+            ["href" => "style", "media" => "all", "layer" => "legacy"],
         ]);
 
         $html = $includer->toHtml("1.0.0");
@@ -308,28 +312,32 @@ class CSSIncluderTest extends TestCase
     }
 
     /**
-     * Tests that import entries in different layers get one @import per
-     * layer, and an import without a layer omits the layer() function.
+     * Tests that entries in different layers get one @import per layer, and
+     * that an entry without a layer stays a plain link instead.
      *
      * @return void
      * @throws Exception
      */
-    public function testToHtmlGroupsImportsPerLayer(): void
+    public function testToHtmlGroupsFilesPerLayer(): void
     {
         file_put_contents($this->tempDir . 'style.css', 'body{}');
         file_put_contents($this->tempDir . 'other.css', 'body{}');
         file_put_contents($this->tempDir . 'free.css', 'body{}');
 
         $includer = new CSSIncluder($this->tempDir, [
-            ["href" => "style", "media" => "all", "import" => true, "layer" => "legacy"],
-            ["href" => "other", "media" => "all", "import" => true, "layer" => "vendor"],
-            ["href" => "free", "media" => "all", "import" => true],
+            ["href" => "style", "media" => "all", "layer" => "legacy"],
+            ["href" => "other", "media" => "all", "layer" => "vendor"],
+            ["href" => "free", "media" => "all"],
         ]);
 
         $html = $includer->toHtml();
         $this->assertStringContainsString('@import url("/css?style") layer(legacy);', $html);
         $this->assertStringContainsString('@import url("/css?other") layer(vendor);', $html);
-        $this->assertStringContainsString('@import url("/css?free");', $html);
+        $this->assertStringContainsString(
+            '<link rel="stylesheet" type="text/css" href="/css?free" media="all" />',
+            $html
+        );
+        $this->assertStringNotContainsString('url("/css?free")', $html);
     }
 
     /**
@@ -344,7 +352,7 @@ class CSSIncluderTest extends TestCase
         file_put_contents($this->tempDir . 'style.css', 'body{}');
 
         $includer = new CSSIncluder($this->tempDir, [
-            ["href" => "style", "media" => "all", "import" => true, "layer" => "legacy"],
+            ["href" => "style", "media" => "all", "layer" => "legacy"],
         ]);
 
         $this->assertStringContainsString(
@@ -354,18 +362,18 @@ class CSSIncluderTest extends TestCase
     }
 
     /**
-     * Tests that import entries respect their media bucket via the style
+     * Tests that layered entries respect their media bucket via the style
      * element's media attribute.
      *
      * @return void
      * @throws Exception
      */
-    public function testToHtmlKeepsMediaBucketOnImport(): void
+    public function testToHtmlKeepsMediaBucketOnLayeredEntry(): void
     {
         file_put_contents($this->tempDir . 'print.css', 'body{}');
 
         $includer = new CSSIncluder($this->tempDir, [
-            ["href" => "print", "media" => "print", "import" => true, "layer" => "legacy"],
+            ["href" => "print", "media" => "print", "layer" => "legacy"],
         ]);
 
         $this->assertStringContainsString(
@@ -375,13 +383,13 @@ class CSSIncluderTest extends TestCase
     }
 
     /**
-     * Tests that a link without any import entry stays byte-identical to
+     * Tests that a link without any layered entry stays byte-identical to
      * the previous format (no style element emitted).
      *
      * @return void
      * @throws Exception
      */
-    public function testToHtmlWithoutImportsKeepsPlainLinkOnly(): void
+    public function testToHtmlWithoutLayersKeepsPlainLinkOnly(): void
     {
         file_put_contents($this->tempDir . 'style.css', 'body{}');
 
@@ -394,17 +402,17 @@ class CSSIncluderTest extends TestCase
     }
 
     /**
-     * Tests that an import entry referencing a missing file throws like a
-     * link entry does.
+     * Tests that a layered entry referencing a missing file throws like an
+     * unlayered entry does.
      *
      * @return void
      */
-    public function testAddImportMissingFileThrows(): void
+    public function testAddLayeredMissingFileThrows(): void
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('not found');
 
         $includer = new CSSIncluder($this->tempDir);
-        $includer->add(["href" => "nonexistent", "media" => "all", "import" => true]);
+        $includer->add(["href" => "nonexistent", "media" => "all", "layer" => "legacy"]);
     }
 }

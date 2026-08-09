@@ -275,40 +275,26 @@ class TemplateInterface
     }
 
     /**
-     * Add a CSS file to be included in the header.
-     *
-     * @param string $strInclude The name of the file without the extension
-     * @param string $strMedia   Optional media argument. Default: "screen"
-     */
-    protected static function addCss($strInclude, $strMedia = "all")
-    {
-        if (!empty($strInclude)) {
-            if (!array_key_exists($strInclude . "." . $strMedia, self::$cssIncludes)) {
-                self::$cssIncludes[$strInclude . "." . $strMedia] = array("href" => $strInclude, "media" => $strMedia);
-            }
-        }
-    }
-
-    /**
-     * Add a CSS file to be included in the header as an @import, optionally
-     * assigned to a CSS cascade layer at include time. Parameter names are
-     * part of the API: call sites use named arguments, e.g.
-     * `addCssImport("bootstrap", strLayer: "legacy")`.
+     * Add a CSS file to be included in the header. Passing a cascade layer assigns
+     * the file to that layer at include time, keeping the file itself layer-free on
+     * disk. Parameter names are part of the API: call sites use named arguments,
+     * e.g. `addCss("bootstrap", strLayer: "legacy")`.
      *
      * @param string      $strInclude The name of the file without the extension
      * @param string      $strMedia   Optional media argument. Default: "all"
      * @param string|null $strLayer   Optional CSS cascade layer to assign the file to
      */
-    protected static function addCssImport($strInclude, $strMedia = "all", $strLayer = null)
+    protected static function addCss($strInclude, $strMedia = "all", $strLayer = null)
     {
         if (!empty($strInclude)) {
-            if (!array_key_exists($strInclude . "." . $strMedia . ".import", self::$cssIncludes)) {
-                self::$cssIncludes[$strInclude . "." . $strMedia . ".import"] = array(
-                    "href" => $strInclude,
-                    "media" => $strMedia,
-                    "layer" => $strLayer,
-                    "import" => true
-                );
+            if (!array_key_exists($strInclude . "." . $strMedia, self::$cssIncludes)) {
+                $arrInclude = array("href" => $strInclude, "media" => $strMedia);
+
+                if (!empty($strLayer)) {
+                    $arrInclude["layer"] = $strLayer;
+                }
+
+                self::$cssIncludes[$strInclude . "." . $strMedia] = $arrInclude;
             }
         }
     }
