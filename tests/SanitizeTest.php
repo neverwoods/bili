@@ -21,6 +21,39 @@ class SanitizeTest extends TestCase
         $this->assertEquals("10$ bill", Sanitize::toEntities("10$ bill"));
     }
 
+    public function testToAttributeEncodesEveryHtmlSpecialCharacter(): void
+    {
+        $this->assertSame(
+            "&lt;p class=&quot;x&quot;&gt;Ben &amp; Jerry&#039;s&lt;/p&gt;",
+            Sanitize::toAttribute("<p class=\"x\">Ben & Jerry's</p>")
+        );
+    }
+
+    public function testToAttributeDoubleEncodesExistingEntities(): void
+    {
+        //*** An entity that was meant to be literal text must survive the browser's attribute decode.
+        $this->assertSame(
+            "&lt;p&gt;Desc &amp;lt;img src=x onerror=alert(1)&amp;gt;&lt;/p&gt;",
+            Sanitize::toAttribute("<p>Desc &lt;img src=x onerror=alert(1)&gt;</p>")
+        );
+    }
+
+    public function testToAttributeIsExactlyOneEscapeLayer(): void
+    {
+        $strFragment = "<p class='a'>Desc &lt;b&gt; &amp; \"q\" \xE2\x82\xAC</p>";
+
+        $this->assertSame(
+            $strFragment,
+            html_entity_decode(Sanitize::toAttribute($strFragment), ENT_QUOTES | ENT_HTML401, 'UTF-8')
+        );
+    }
+
+    public function testToAttributeSubstitutesInvalidUtf8(): void
+    {
+        //*** A broken byte becomes U+FFFD instead of silently disappearing.
+        $this->assertSame("Caf\u{FFFD} &lt;b&gt;", Sanitize::toAttribute("Caf\xE9 <b>"));
+    }
+
     public function testFromEntities(): void
     {
         $this->assertEquals("M&M's", Sanitize::fromEntities("M&amp;M&#039;s"));
