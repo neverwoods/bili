@@ -10,6 +10,17 @@ namespace Bili;
 class Sanitize
 {
     /**
+     * Post-process trusted, server-built markup for XHTML output.
+     *
+     * NOT an escaper. This method only encodes bare `&` as `&amp;`, `$` as `&#36;` and rewrites
+     * `target="_blank"` / `target="_top"` to `rel="external"`. It leaves `<`, `>`, `"` and `'`
+     * untouched and passes existing entities through, so it offers no protection for values that
+     * came from a user, a file or an external system.
+     *
+     * Never call this on user input. Use toEntities() to place a user value in HTML text or in a
+     * plain attribute, and toAttribute() to place a finished HTML fragment inside an attribute
+     * that the client re-parses as HTML.
+     *
      * @param string $strOutput
      * @return string
      */
@@ -46,6 +57,28 @@ class Sanitize
         }
 
         return $varReturn;
+    }
+
+    /**
+     * Escape a finished HTML fragment for placement inside an HTML attribute value.
+     *
+     * Use this when server-built markup travels through an attribute and is turned back into
+     * HTML on the client, e.g. Bootstrap popovers with `html: true` that read `data-content`.
+     * The browser decodes the attribute once, so the fragment needs its own full escape on top
+     * of the escaping its contents already received.
+     *
+     * Every `&`, `<`, `>`, `"` and `'` is encoded, including those in existing entities, so a
+     * `&lt;` that was meant to be a literal `<` survives the browser's attribute decode and still
+     * renders as text. Escape the user values inside the fragment first, with toEntities(), then
+     * pass the whole fragment through this method. Do not use it on plain text; toEntities() is
+     * the right call there.
+     *
+     * @param string $strHtml
+     * @return string
+     */
+    public static function toAttribute(string $strHtml): string
+    {
+        return htmlspecialchars($strHtml, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', true);
     }
 
     /**
